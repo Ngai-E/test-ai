@@ -1,0 +1,238 @@
+<!-- Loading indicator -->
+<div *ngIf="isLoading" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <p class="mt-2">Loading package details...</p>
+</div>
+
+<!-- Error message -->
+<div *ngIf="errorMessage && !isLoading" class="alert alert-danger" role="alert">
+  {{ errorMessage }}
+</div>
+
+<div class="package-details" *ngIf="package && !isLoading">
+  <!-- Hero Section -->
+  <section class="hero-section" [style.backgroundImage]="'url(' + package.image + ')'">
+    <div class="overlay">
+      <div class="container">
+        <h1 class="hero-title">{{ package.name }}</h1>
+        <p class="hero-subtitle">{{ package.description }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="container my-5">
+    <div class="row">
+      <!-- Left Column -->
+      <div class="col-lg-8">
+        <!-- Package Types -->
+        <section class="package-types card mb-4">
+          <div class="card-body">
+            <h2 class="card-title section-title mb-4">Available Packages</h2>
+            <div class="row">
+              <div class="col-md-6 mb-3" *ngFor="let type of package.packageTypes">
+                <div class="package-type-card">
+                  <h3 class="package-type-title">{{ type.name }}</h3>
+                  <p class="package-type-price">${{ type.price }}</p>
+                  <ul class="package-type-features">
+                    <li *ngFor="let feature of type.description.split(',')" class="mb-2">
+                      <i class="fas fa-check"></i> {{ feature.trim() }}
+                    </li>
+                  </ul>
+                  <button class="btn btn-primary w-100" (click)="openBookingModal(type)">Book Now</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Overview -->
+        <section class="overview card mb-4">
+          <div class="card-body">
+            <h2 class="card-title section-title mb-4">Overview</h2>
+            <p>{{ package.overview }}</p>
+            <div class="row mt-4">
+              <div class="col-md-6">
+                <div class="overview-item">
+                  <i class="fas fa-calendar-alt"></i>
+                  <div>
+                    <h5>Duration</h5>
+                    <p>{{ package.duration }} days</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="overview-item">
+                  <i class="fas fa-users"></i>
+                  <div>
+                    <h5>Group Size</h5>
+                    <p>{{ package.groupSize }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="overview-item">
+                  <i class="fas fa-bus"></i>
+                  <div>
+                    <h5>Transportation</h5>
+                    <p>{{ package.transportation }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="overview-item">
+                  <i class="fas fa-hotel"></i>
+                  <div>
+                    <h5>Accommodation</h5>
+                    <p>{{ package.accommodation }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="overview-item">
+                  <i class="fas fa-utensils"></i>
+                  <div>
+                    <h5>Meals</h5>
+                    <p>{{ package.meals }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="overview-item">
+                  <i class="fas fa-sun"></i>
+                  <div>
+                    <h5>Best Time to Visit</h5>
+                    <p>{{ package.bestTimeToVisit }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Highlights -->
+        <section class="highlights card mb-4">
+          <div class="card-body">
+            <h2 class="card-title section-title mb-4">Highlights</h2>
+            <ul class="highlights-list">
+              <li *ngFor="let highlight of package.highlights">
+                <i class="fas fa-star"></i> {{ highlight }}
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Itinerary -->
+        <section class="itinerary card mb-4">
+          <div class="card-body">
+            <h2 class="card-title section-title mb-4">Itinerary</h2>
+            <div class="accordion" id="itineraryAccordion">
+              <div class="accordion-item" *ngFor="let day of package.itinerary; let i = index">
+                <h2 class="accordion-header" [id]="'heading' + i">
+                  <button class="accordion-button" [class.collapsed]="i !== 0" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse' + i" [attr.aria-expanded]="i === 0 ? 'true' : 'false'" [attr.aria-controls]="'collapse' + i">
+                    <span class="day-number">Day {{ day.dayNumber }}</span> {{ day.title }}
+                  </button>
+                </h2>
+                <div [id]="'collapse' + i" class="accordion-collapse collapse" [class.show]="i === 0" [attr.aria-labelledby]="'heading' + i" data-bs-parent="#itineraryAccordion">
+                  <div class="accordion-body">
+                    <p>{{ day.description }}</p>
+                    <div class="itinerary-details">
+                      <div class="detail-item">
+                        <i class="fas fa-hotel"></i>
+                        <div>
+                          <h6>Accommodation</h6>
+                          <p>{{ day.accommodation }}</p>
+                        </div>
+                      </div>
+                      <div class="detail-item">
+                        <i class="fas fa-utensils"></i>
+                        <div>
+                          <h6>Meals</h6>
+                          <p>{{ day.meals }}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <h6 class="mt-3">Activities:</h6>
+                    <ul class="activities-list">
+                      <li *ngFor="let activity of day.activities">{{ activity }}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column -->
+      <div class="col-lg-4">
+        <div class="sidebar">
+          <!-- Included/Excluded -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h3 class="card-title">What's Included/Excluded</h3>
+              <div class="included-section">
+                <h5>Included</h5>
+                <ul class="included-list">
+                  <li *ngFor="let item of package.included">
+                    <i class="fas fa-check-circle text-success"></i> {{ item }}
+                  </li>
+                </ul>
+              </div>
+              <div class="excluded-section">
+                <h5>Excluded</h5>
+                <ul class="excluded-list">
+                  <li *ngFor="let item of package.excluded">
+                    <i class="fas fa-times-circle text-danger"></i> {{ item }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Booking Modal -->
+<ng-template #bookingModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Book {{ selectedPackageType?.name }} Package</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form #bookingForm="ngForm">
+      <div class="mb-3">
+        <label for="fullName" class="form-label">Full Name</label>
+        <input type="text" class="form-control" id="fullName" [(ngModel)]="bookingData.fullName" name="fullName" required>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" [(ngModel)]="bookingData.email" name="email" required>
+      </div>
+      <div class="mb-3">
+        <label for="phone" class="form-label">Phone</label>
+        <input type="tel" class="form-control" id="phone" [(ngModel)]="bookingData.phone" name="phone" required>
+      </div>
+      <div class="mb-3">
+        <label for="travelDate" class="form-label">Travel Date</label>
+        <input type="date" class="form-control" id="travelDate" [(ngModel)]="bookingData.travelDate" name="travelDate" required>
+      </div>
+      <div class="mb-3">
+        <label for="numberOfPeople" class="form-label">Number of People</label>
+        <input type="number" class="form-control" id="numberOfPeople" [(ngModel)]="bookingData.numberOfPeople" name="numberOfPeople" min="1" required>
+      </div>
+      <div class="mb-3">
+        <label for="specialRequirements" class="form-label">Special Requirements</label>
+        <textarea class="form-control" id="specialRequirements" [(ngModel)]="bookingData.specialRequirements" name="specialRequirements" rows="3"></textarea>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="submitBooking()" [disabled]="!bookingForm.form.valid">Book Now</button>
+  </div>
+</ng-template>

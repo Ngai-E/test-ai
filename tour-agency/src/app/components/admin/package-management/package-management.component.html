@@ -1,0 +1,288 @@
+<div class="container mt-4">
+  <h2>Package Management</h2>
+  
+  <form [formGroup]="packageForm" (ngSubmit)="onSubmit()" class="mb-4">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4>Basic Information</h4>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="name">Package Name</label>
+              <input type="text" class="form-control" id="name" formControlName="name">
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="country">Country</label>
+              <input type="text" class="form-control" id="country" formControlName="country">
+            </div>
+          </div>
+          
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea class="form-control" id="description" formControlName="description" rows="3"></textarea>
+            </div>
+          </div>
+          
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="overview">Overview</label>
+              <textarea class="form-control" id="overview" formControlName="overview" rows="3"></textarea>
+            </div>
+          </div>
+          
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="image">Image URL</label>
+              <input type="text" class="form-control" id="image" formControlName="image">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4>Tour Details</h4>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="duration">Duration (days)</label>
+              <input type="number" class="form-control" id="duration" formControlName="duration">
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="groupSize">Group Size</label>
+              <input type="text" class="form-control" id="groupSize" formControlName="groupSize">
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="transportation">Transportation</label>
+              <input type="text" class="form-control" id="transportation" formControlName="transportation">
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="accommodation">Accommodation</label>
+              <input type="text" class="form-control" id="accommodation" formControlName="accommodation">
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="meals">Meals</label>
+              <input type="text" class="form-control" id="meals" formControlName="meals">
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="bestTimeToVisit">Best Time to Visit</label>
+              <input type="text" class="form-control" id="bestTimeToVisit" formControlName="bestTimeToVisit">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4>Highlights</h4>
+      </div>
+      <div class="card-body">
+        <div formArrayName="highlights">
+          <div *ngFor="let highlight of highlights.controls; let i=index" class="mb-2">
+            <div class="input-group">
+              <input type="text" class="form-control" [formControlName]="i">
+              <button type="button" class="btn btn-danger" (click)="removeHighlight(i)">Remove</button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary mt-2" (click)="addHighlight()">Add Highlight</button>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4>Itinerary</h4>
+      </div>
+      <div class="card-body">
+        <div formArrayName="itinerary">
+          <div *ngFor="let day of itinerary.controls; let i=index" [formGroupName]="i" class="card mb-3">
+            <div class="card-header">
+              <h5>Day {{ i + 1 }}</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" class="form-control" formControlName="title">
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label>Description</label>
+                    <textarea class="form-control" formControlName="description" rows="2"></textarea>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Accommodation</label>
+                    <input type="text" class="form-control" formControlName="accommodation">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Meals</label>
+                    <input type="text" class="form-control" formControlName="meals">
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-3">
+                <label>Activities</label>
+                <div formArrayName="activities">
+                  <div *ngFor="let activity of getActivities(i).controls; let j=index" class="input-group mb-2">
+                    <input type="text" class="form-control" [formControlName]="j">
+                    <button type="button" class="btn btn-danger" (click)="removeActivity(i, j)">Remove</button>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" (click)="addActivity(i)">Add Activity</button>
+              </div>
+              
+              <button type="button" class="btn btn-danger mt-3" (click)="removeItineraryDay(i)">Remove Day</button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary" (click)="addItineraryDay()">Add Day</button>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4>Included & Excluded</h4>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h5>Included Items</h5>
+            <div formArrayName="included">
+              <div *ngFor="let item of included.controls; let i=index" class="mb-2">
+                <div class="input-group">
+                  <input type="text" class="form-control" [formControlName]="i">
+                  <button type="button" class="btn btn-danger" (click)="removeIncluded(i)">Remove</button>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary mt-2" (click)="addIncluded()">Add Included Item</button>
+          </div>
+          
+          <div class="col-md-6">
+            <h5>Excluded Items</h5>
+            <div formArrayName="excluded">
+              <div *ngFor="let item of excluded.controls; let i=index" class="mb-2">
+                <div class="input-group">
+                  <input type="text" class="form-control" [formControlName]="i">
+                  <button type="button" class="btn btn-danger" (click)="removeExcluded(i)">Remove</button>
+                </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-secondary mt-2" (click)="addExcluded()">Add Excluded Item</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header">
+        <h4>Package Types</h4>
+      </div>
+      <div class="card-body">
+        <div formArrayName="packageTypes">
+          <div *ngFor="let packageType of packageTypes.controls; let i=index" [formGroupName]="i" class="card mb-3">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Type Name</label>
+                    <input type="text" class="form-control" formControlName="name">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Price</label>
+                    <input type="number" class="form-control" formControlName="price">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" class="form-control" formControlName="description">
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn btn-danger mt-2" (click)="removePackageType(i)" *ngIf="packageTypes.length > 1">
+                Remove Type
+              </button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary" (click)="addPackageType()">Add Package Type</button>
+      </div>
+    </div>
+    
+    <div class="mt-3">
+      <button type="submit" class="btn btn-primary" [disabled]="!packageForm.valid">
+        {{ editMode ? 'Update' : 'Create' }} Package
+      </button>
+      <button type="button" class="btn btn-secondary ml-2" (click)="resetForm()" *ngIf="editMode">
+        Cancel
+      </button>
+    </div>
+  </form>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Country</th>
+          <th>Duration</th>
+          <th>Types</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let package of packages">
+          <td>{{ package.name }}</td>
+          <td>{{ package.country }}</td>
+          <td>{{ package.duration }} days</td>
+          <td>
+            <ul class="list-unstyled">
+              <li *ngFor="let type of package.packageTypes">
+                {{ type.name }} - {{ type.price | currency }}
+              </li>
+            </ul>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-info mr-2" (click)="editPackage(package)">Edit</button>
+            <button class="btn btn-sm btn-danger" (click)="deletePackage(package.id!)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

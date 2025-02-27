@@ -1,0 +1,27 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-4 mb-4" *ngFor="let package of packages">
+      <div class="card h-100">
+        <img [src]="package.image" class="card-img-top" [alt]="package.name">
+        <div class="card-body">
+          <h5 class="card-title">{{ package.name }}</h5>
+          <p class="card-text">{{ package.description }}</p>
+          <ul class="list-unstyled">
+            <li><strong>Country:</strong> {{ package.country }}</li>
+            <li><strong>Starting from:</strong> {{ package.packageTypes[0]?.price | currency }}</li>
+          </ul>
+          <div class="package-types mt-3">
+            <h6>Available Options:</h6>
+            <ul class="list-unstyled">
+              <li *ngFor="let type of package.packageTypes" class="mb-2">
+                <strong>{{ type.name }}</strong> - {{ type.price | currency }}
+                <small class="d-block text-muted">{{ type.description }}</small>
+              </li>
+            </ul>
+          </div>
+          <a [routerLink]="['/package', package.id]" class="btn btn-primary mt-2">View Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

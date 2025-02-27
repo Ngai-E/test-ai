@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="1" author="admin">
+        <!-- Create packages table -->
+        <createTable tableName="packages">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text"/>
+            <column name="country" type="varchar(255)"/>
+            <column name="image" type="varchar(1000)"/>
+            <column name="overview" type="text"/>
+            <column name="duration" type="int"/>
+            <column name="group_size" type="varchar(255)"/>
+            <column name="transportation" type="varchar(255)"/>
+            <column name="accommodation" type="varchar(255)"/>
+            <column name="meals" type="varchar(255)"/>
+            <column name="best_time_to_visit" type="varchar(255)"/>
+        </createTable>
+
+        <!-- Create package_types table -->
+        <createTable tableName="package_types">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="package_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_package_type_package" references="packages(id)"/>
+            </column>
+            <column name="name" type="varchar(255)"/>
+            <column name="price" type="decimal(10,2)"/>
+            <column name="description" type="varchar(500)"/>
+        </createTable>
+
+        <!-- Create itinerary_days table -->
+        <createTable tableName="itinerary_days">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="package_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_itinerary_package" references="packages(id)"/>
+            </column>
+            <column name="day_number" type="int"/>
+            <column name="title" type="varchar(255)"/>
+            <column name="description" type="text"/>
+            <column name="accommodation" type="varchar(255)"/>
+            <column name="meals" type="varchar(255)"/>
+        </createTable>
+
+        <!-- Create activities table -->
+        <createTable tableName="activities">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="itinerary_day_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_activity_itinerary" references="itinerary_days(id)"/>
+            </column>
+            <column name="description" type="varchar(500)"/>
+        </createTable>
+
+        <!-- Create package_highlights table -->
+        <createTable tableName="package_highlights">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="package_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_highlight_package" references="packages(id)"/>
+            </column>
+            <column name="highlight" type="varchar(500)"/>
+        </createTable>
+
+        <!-- Create included_items table -->
+        <createTable tableName="included_items">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="package_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_included_package" references="packages(id)"/>
+            </column>
+            <column name="item" type="varchar(500)"/>
+        </createTable>
+
+        <!-- Create excluded_items table -->
+        <createTable tableName="excluded_items">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="package_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_excluded_package" references="packages(id)"/>
+            </column>
+            <column name="item" type="varchar(500)"/>
+        </createTable>
+
+        <!-- Insert sample data -->
+        <!-- Swiss Alps Adventure Package -->
+        <insert tableName="packages">
+            <column name="id" value="1"/>
+            <column name="name" value="Swiss Alps Adventure"/>
+            <column name="description" value="Experience the majestic Swiss Alps with this comprehensive tour package that combines adventure, luxury, and natural beauty."/>
+            <column name="country" value="Switzerland"/>
+            <column name="image" value="https://images.unsplash.com/photo-1531210483974-4f8c1f33fd35"/>
+            <column name="overview" value="Embark on an unforgettable journey through the Swiss Alps, combining thrilling outdoor activities with luxurious accommodations and authentic Swiss experiences."/>
+            <column name="duration" value="7"/>
+            <column name="group_size" value="8-12 people"/>
+            <column name="transportation" value="Private minibus and mountain railways"/>
+            <column name="accommodation" value="4-star mountain hotels"/>
+            <column name="meals" value="Full board (Breakfast, Lunch, Dinner)"/>
+            <column name="best_time_to_visit" value="June to September"/>
+        </insert>
+
+        <insert tableName="package_types">
+            <column name="package_id" value="1"/>
+            <column name="name" value="Standard"/>
+            <column name="price" value="2499.00"/>
+            <column name="description" value="Standard package with shared accommodations"/>
+        </insert>
+
+        <insert tableName="package_types">
+            <column name="package_id" value="1"/>
+            <column name="name" value="Premium"/>
+            <column name="price" value="3499.00"/>
+            <column name="description" value="Premium package with private accommodations and additional activities"/>
+        </insert>
+
+        <insert tableName="package_highlights">
+            <column name="package_id" value="1"/>
+            <column name="highlight" value="Guided hiking through scenic Alpine trails"/>
+        </insert>
+
+        <insert tableName="package_highlights">
+            <column name="package_id" value="1"/>
+            <column name="highlight" value="Cable car ride to Jungfraujoch - Top of Europe"/>
+        </insert>
+
+        <insert tableName="package_highlights">
+            <column name="package_id" value="1"/>
+            <column name="highlight" value="Traditional Swiss cheese and chocolate tasting"/>
+        </insert>
+
+        <insert tableName="included_items">
+            <column name="package_id" value="1"/>
+            <column name="item" value="All accommodations in 4-star hotels"/>
+        </insert>
+
+        <insert tableName="included_items">
+            <column name="package_id" value="1"/>
+            <column name="item" value="Professional mountain guide"/>
+        </insert>
+
+        <insert tableName="included_items">
+            <column name="package_id" value="1"/>
+            <column name="item" value="All meals and snacks"/>
+        </insert>
+
+        <insert tableName="excluded_items">
+            <column name="package_id" value="1"/>
+            <column name="item" value="International flights"/>
+        </insert>
+
+        <insert tableName="excluded_items">
+            <column name="package_id" value="1"/>
+            <column name="item" value="Personal equipment and gear"/>
+        </insert>
+
+        <!-- Insert itinerary days -->
+        <insert tableName="itinerary_days">
+            <column name="id" value="1"/>
+            <column name="package_id" value="1"/>
+            <column name="day_number" value="1"/>
+            <column name="title" value="Arrival in Zurich"/>
+            <column name="description" value="Welcome to Switzerland! Arrive in Zurich and transfer to your hotel in the heart of the Swiss Alps. Evening welcome dinner and trip briefing."/>
+            <column name="accommodation" value="Mountain Lodge Zurich"/>
+            <column name="meals" value="Dinner"/>
+        </insert>
+
+        <insert tableName="activities">
+            <column name="itinerary_day_id" value="1"/>
+            <column name="description" value="Airport transfer to hotel"/>
+        </insert>
+
+        <insert tableName="activities">
+            <column name="itinerary_day_id" value="1"/>
+            <column name="description" value="Welcome dinner and orientation"/>
+        </insert>
+
+        <insert tableName="itinerary_days">
+            <column name="id" value="2"/>
+            <column name="package_id" value="1"/>
+            <column name="day_number" value="2"/>
+            <column name="title" value="Jungfraujoch Experience"/>
+            <column name="description" value="Take the scenic train journey to Jungfraujoch, the 'Top of Europe'. Visit the Ice Palace and enjoy panoramic views from the Sphinx Observatory."/>
+            <column name="accommodation" value="Mountain Lodge Grindelwald"/>
+            <column name="meals" value="Breakfast, Lunch, Dinner"/>
+        </insert>
+
+        <insert tableName="activities">
+            <column name="itinerary_day_id" value="2"/>
+            <column name="description" value="Scenic train ride to Jungfraujoch"/>
+        </insert>
+
+        <insert tableName="activities">
+            <column name="itinerary_day_id" value="2"/>
+            <column name="description" value="Visit to Ice Palace"/>
+        </insert>
+
+        <insert tableName="activities">
+            <column name="itinerary_day_id" value="2"/>
+            <column name="description" value="Lunch at the highest restaurant in Europe"/>
+        </insert>
+
+        <!-- Japanese Culture Tour Package -->
+        <insert tableName="packages">
+            <column name="id" value="2"/>
+            <column name="name" value="Japanese Culture Explorer"/>
+            <column name="description" value="Immerse yourself in Japanese culture with this comprehensive tour covering traditional and modern aspects of Japan."/>
+            <column name="country" value="Japan"/>
+            <column name="image" value="https://images.unsplash.com/photo-1545569341-9eb8b30979d9"/>
+            <column name="overview" value="Experience the perfect blend of ancient traditions and modern life in Japan. From historic temples to bustling city streets, discover the many faces of this fascinating country."/>
+            <column name="duration" value="10"/>
+            <column name="group_size" value="6-10 people"/>
+            <column name="transportation" value="Bullet train and private coach"/>
+            <column name="accommodation" value="Mix of traditional ryokans and modern hotels"/>
+            <column name="meals" value="Breakfast daily, selected lunches and dinners"/>
+            <column name="best_time_to_visit" value="March-May or October-November"/>
+        </insert>
+
+        <insert tableName="package_types">
+            <column name="package_id" value="2"/>
+            <column name="name" value="Classic"/>
+            <column name="price" value="3299.00"/>
+            <column name="description" value="Standard tour with shared accommodations"/>
+        </insert>
+
+        <insert tableName="package_types">
+            <column name="package_id" value="2"/>
+            <column name="name" value="Luxury"/>
+            <column name="price" value="4599.00"/>
+            <column name="description" value="Luxury tour with private accommodations and exclusive experiences"/>
+        </insert>
+
+        <insert tableName="package_highlights">
+            <column name="package_id" value="2"/>
+            <column name="highlight" value="Tea ceremony experience in Kyoto"/>
+        </insert>
+
+        <insert tableName="package_highlights">
+            <column name="package_id" value="2"/>
+            <column name="highlight" value="Sumo wrestling demonstration"/>
+        </insert>
+
+        <insert tableName="package_highlights">
+            <column name="package_id" value="2"/>
+            <column name="highlight" value="Mount Fuji visit and hot spring experience"/>
+        </insert>
+
+        <insert tableName="included_items">
+            <column name="package_id" value="2"/>
+            <column name="item" value="JR Rail Pass for bullet trains"/>
+        </insert>
+
+        <insert tableName="included_items">
+            <column name="package_id" value="2"/>
+            <column name="item" value="Traditional ryokan experience"/>
+        </insert>
+
+        <insert tableName="excluded_items">
+            <column name="package_id" value="2"/>
+            <column name="item" value="International flights"/>
+        </insert>
+
+        <insert tableName="excluded_items">
+            <column name="package_id" value="2"/>
+            <column name="item" value="Optional activities"/>
+        </insert>
+
+        <insert tableName="itinerary_days">
+            <column name="id" value="3"/>
+            <column name="package_id" value="2"/>
+            <column name="day_number" value="1"/>
+            <column name="title" value="Welcome to Tokyo"/>
+            <column name="description" value="Arrive in Tokyo and transfer to your hotel. Evening walking tour of Shinjuku district and welcome dinner."/>
+            <column name="accommodation" value="Tokyo Luxury Hotel"/>
+            <column name="meals" value="Dinner"/>
+        </insert>
+
+        <insert tableName="activities">
+            <column name="itinerary_day_id" value="3"/>
+            <column name="description" value="Airport transfer to hotel"/>
+        </insert>
+
+        <insert tableName="activities">
+            <column name="itinerary_day_id" value="3"/>
+            <column name="description" value="Shinjuku evening walking tour"/>
+        </insert>
+
+        <insert tableName="itinerary_days">
+            <column name="id" value="4"/>
+            <column name="package_id" value="2"/>
+            <column name="day_number" value="2"/>
+            <column name="title" value="Tokyo Exploration"/>
+            <column name="description" value="Full day exploring Tokyo's highlights including Senso-ji Temple, Meiji Shrine, and the famous Shibuya crossing."/>
+            <column name="accommodation" value="Tokyo Luxury Hotel"/>
+            <column name="meals" value="Breakfast, Lunch"/>
+        </insert>
+
+        <insert tableName="activities">
+            <column name="itinerary_day_id" value="4"/>
+            <column name="description" value="Visit to Senso-ji Temple"/>
+        </insert>
+
+        <insert tableName="activities">
+            <column name="itinerary_day_id" value="4"/>
+            <column name="description" value="Meiji Shrine guided tour"/>
+        </insert>
+
+        <insert tableName="activities">
+            <column name="itinerary_day_id" value="4"/>
+            <column name="description" value="Photo stop at Shibuya crossing"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

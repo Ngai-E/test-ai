@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="2" author="admin">
+        <!-- Create itinerary_day_activities table -->
+        <createTable tableName="itinerary_day_activities">
+            <column name="day_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_activity_day" references="itinerary_days(id)"/>
+            </column>
+            <column name="activity" type="varchar(500)"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
