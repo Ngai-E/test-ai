@@ -8,20 +8,6 @@ interface LoginData {
   rememberMe: boolean;
 }
 
-interface Testimonial {
-  name: string;
-  location: string;
-  quote: string;
-  rating: number;
-  image: string;
-}
-
-interface SpecialOffer {
-  title: string;
-  discount: number;
-  description: string;
-}
-
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -37,48 +23,6 @@ export class HomeComponent implements OnInit {
     password: '',
     rememberMe: false
   };
-
-  testimonials: Testimonial[] = [
-    {
-      name: 'Sarah Johnson',
-      location: 'New York, USA',
-      quote: 'The beach resort was absolutely stunning! The staff went above and beyond to make our stay memorable.',
-      rating: 5,
-      image: 'https://randomuser.me/api/portraits/women/1.jpg'
-    },
-    {
-      name: 'Michael Chen',
-      location: 'Vancouver, Canada',
-      quote: 'Amazing mountain trek experience. Our guide was knowledgeable and professional. Highly recommended!',
-      rating: 5,
-      image: 'https://randomuser.me/api/portraits/men/2.jpg'
-    },
-    {
-      name: 'Emma Wilson',
-      location: 'London, UK',
-      quote: 'The cultural tour exceeded our expectations. We learned so much about local traditions and history.',
-      rating: 5,
-      image: 'https://randomuser.me/api/portraits/women/3.jpg'
-    }
-  ];
-
-  specialOffers: SpecialOffer[] = [
-    {
-      title: 'Early Bird Special',
-      discount: 20,
-      description: 'Book 3 months in advance and save up to 20% on selected packages'
-    },
-    {
-      title: 'Group Discount',
-      discount: 15,
-      description: 'Get 15% off when booking for groups of 5 or more'
-    },
-    {
-      title: 'Last Minute Deals',
-      discount: 30,
-      description: 'Up to 30% off on last-minute bookings for selected destinations'
-    }
-  ];
 
   constructor(
     private packageService: PackageService,

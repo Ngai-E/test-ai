@@ -102,36 +102,6 @@ export class PackageDetailsComponent implements OnInit {
         console.error('Itinerary is not an array:', this.package.itinerary);
         this.itineraryDays = [];
       }
-      
-      // If no itinerary data is available, create some mock data
-      if (this.itineraryDays.length === 0) {
-        this.itineraryDays = [
-          {
-            dayNumber: 1,
-            title: 'Arrival and Welcome',
-            description: 'Arrive at your destination and check into your hotel. Welcome dinner in the evening.',
-            accommodation: 'Hotel',
-            meals: 'Dinner',
-            activities: ['Airport transfer', 'Hotel check-in', 'Welcome dinner']
-          },
-          {
-            dayNumber: 2,
-            title: 'City Exploration',
-            description: 'Full day exploring the main attractions of the city.',
-            accommodation: 'Hotel',
-            meals: 'Breakfast, Lunch',
-            activities: ['Guided city tour', 'Museum visit', 'Local market exploration']
-          },
-          {
-            dayNumber: 3,
-            title: 'Nature Adventure',
-            description: 'Day trip to nearby natural attractions.',
-            accommodation: 'Hotel',
-            meals: 'Breakfast, Packed lunch',
-            activities: ['Hiking', 'Picnic lunch', 'Scenic viewpoints']
-          }
-        ];
-      }
     }
   }
 
