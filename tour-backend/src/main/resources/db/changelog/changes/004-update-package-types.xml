@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="4" author="admin">
+        <!-- Add new columns to package_types table -->
+        <addColumn tableName="package_types">
+            <column name="detailed_description" type="VARCHAR(1000)"/>
+            <column name="accommodation_type" type="VARCHAR(255)"/>
+            <column name="transfer_type" type="VARCHAR(255)"/>
+        </addColumn>
+        
+        <!-- Create new tables for package type features and activities -->
+        <createTable tableName="package_type_features">
+            <column name="package_type_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_package_type_feature" references="package_types(id)" deleteCascade="true"/>
+            </column>
+            <column name="feature" type="VARCHAR(255)"/>
+        </createTable>
+        
+        <createTable tableName="package_type_activities">
+            <column name="package_type_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_package_type_activity" references="package_types(id)" deleteCascade="true"/>
+            </column>
+            <column name="activity" type="VARCHAR(255)"/>
+        </createTable>
+        
+        <!-- Update Dubai Package Types with more detailed information -->
+        <!-- Standard Package -->
+        <update tableName="package_types">
+            <column name="detailed_description" value="Our Standard package offers comfortable 3-star accommodation with all the essential experiences to enjoy Dubai. Perfect for budget-conscious travelers who want to experience the highlights of Dubai without breaking the bank."/>
+            <column name="accommodation_type" value="3-star hotel"/>
+            <column name="transfer_type" value="Shared airport transfers"/>
+            <where>package_id = 3 AND name = 'Standard'</where>
+        </update>
+        
+        <!-- Insert features for Standard Package -->
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Standard')"/>
+            <column name="feature" value="3-star hotel accommodation"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Standard')"/>
+            <column name="feature" value="Shared airport transfers"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Standard')"/>
+            <column name="feature" value="Half-day city tour"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Standard')"/>
+            <column name="feature" value="Standard desert safari"/>
+        </insert>
+        
+        <!-- Insert activities for Standard Package -->
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Standard')"/>
+            <column name="activity" value="Group desert safari with dune bashing"/>
+        </insert>
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Standard')"/>
+            <column name="activity" value="Half-day city tour"/>
+        </insert>
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Standard')"/>
+            <column name="activity" value="Dubai Mall visit"/>
+        </insert>
+        
+        <!-- Premium Package -->
+        <update tableName="package_types">
+            <column name="detailed_description" value="Our Premium package offers luxurious 5-star accommodation with an extended range of experiences. Enjoy private transfers, VIP desert safari, and tickets to the iconic Burj Khalifa. Perfect for travelers seeking comfort and exclusive experiences."/>
+            <column name="accommodation_type" value="5-star hotel"/>
+            <column name="transfer_type" value="Private airport transfers"/>
+            <where>package_id = 3 AND name = 'Premium'</where>
+        </update>
+        
+        <!-- Insert features for Premium Package -->
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Premium')"/>
+            <column name="feature" value="5-star hotel accommodation"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Premium')"/>
+            <column name="feature" value="Private airport transfers"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Premium')"/>
+            <column name="feature" value="Full-day city tour"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Premium')"/>
+            <column name="feature" value="VIP desert safari"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Premium')"/>
+            <column name="feature" value="Burj Khalifa tickets (124th floor)"/>
+        </insert>
+        
+        <!-- Insert activities for Premium Package -->
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Premium')"/>
+            <column name="activity" value="Private desert safari with dune bashing"/>
+        </insert>
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Premium')"/>
+            <column name="activity" value="Full-day city tour with professional guide"/>
+        </insert>
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Premium')"/>
+            <column name="activity" value="Burj Khalifa visit (124th floor)"/>
+        </insert>
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Premium')"/>
+            <column name="activity" value="Dubai Marina dinner cruise"/>
+        </insert>
+        
+        <!-- Luxury Package -->
+        <update tableName="package_types">
+            <column name="detailed_description" value="Our Luxury package offers the ultimate Dubai experience with top-tier accommodation, private luxury transfers, and exclusive activities including a helicopter tour of Dubai and a private desert safari. Perfect for travelers seeking the most luxurious and exclusive Dubai experience."/>
+            <column name="accommodation_type" value="5-star luxury hotel"/>
+            <column name="transfer_type" value="Private luxury transfers"/>
+            <where>package_id = 3 AND name = 'Luxury'</where>
+        </update>
+        
+        <!-- Insert features for Luxury Package -->
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="feature" value="5-star luxury hotel accommodation"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="feature" value="Private luxury transfers"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="feature" value="Helicopter tour of Dubai"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="feature" value="Private desert safari"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="feature" value="Fine dining experiences"/>
+        </insert>
+        <insert tableName="package_type_features">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="feature" value="Burj Khalifa tickets (148th floor - At The Top SKY)"/>
+        </insert>
+        
+        <!-- Insert activities for Luxury Package -->
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="activity" value="Helicopter tour of Dubai"/>
+        </insert>
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="activity" value="Private desert safari with luxury camp experience"/>
+        </insert>
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="activity" value="Burj Khalifa visit (148th floor - At The Top SKY)"/>
+        </insert>
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="activity" value="Fine dining at top Dubai restaurants"/>
+        </insert>
+        <insert tableName="package_type_activities">
+            <column name="package_type_id" valueComputed="(SELECT id FROM package_types WHERE package_id = 3 AND name = 'Luxury')"/>
+            <column name="activity" value="Private yacht cruise at Dubai Marina"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

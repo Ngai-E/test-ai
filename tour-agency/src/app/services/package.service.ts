@@ -1,11 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface PackageType {
+  id?: number;
   name: string;
   price: number;
   description: string;
+  detailedDescription?: string;
+  accommodationType?: string;
+  transferType?: string;
+  features?: string[];
+  specialActivities?: string[];
 }
 
 export interface ItineraryDay {
@@ -19,11 +26,11 @@ export interface ItineraryDay {
 }
 
 export interface Package {
-  id?: number;
+  id: number;
   name: string;
   description: string;
   country: string;
-  image: string;
+  image: string;  
   overview: string;
   duration: number;
   groupSize: string;
@@ -32,10 +39,16 @@ export interface Package {
   meals: string;
   bestTimeToVisit: string;
   highlights: string[];
-  itinerary: ItineraryDay[];
+  itinerary: ItineraryDay[];  
   included: string[];
   excluded: string[];
-  packageTypes: PackageType[];
+  basePrice: number;
+  bookingCount: number;
+  averageRating: number;
+  packageTypes?: PackageType[];
+  addons?: any[];
+  reviews?: any[];
+  wishlistedBy?: any[];
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -44,7 +57,7 @@ export interface Package {
   providedIn: 'root'
 })
 export class PackageService {
-  private apiUrl = 'http://localhost:8081/api/packages';
+  private apiUrl = `${environment.apiUrl}/packages`;
 
   constructor(private http: HttpClient) { }
 

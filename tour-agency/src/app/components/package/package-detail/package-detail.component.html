@@ -1,0 +1,354 @@
+<div class="package-detail-container" *ngIf="!loading && package">
+  <!-- Hero Section -->
+  <div class="hero-container">
+    <img [src]="package.image" [alt]="package.name" class="hero-image">
+    <div class="hero-overlay">
+      <div class="container">
+        <div class="hero-content">
+          <h1 class="title">{{package.name}}</h1>
+          <div class="location">
+            <i class="fas fa-map-marker-alt"></i> {{package.country}}
+          </div>
+          <div class="rating">
+            <div class="stars">
+              <i class="fas fa-star" *ngFor="let star of getStarArray(package.averageRating)" [ngClass]="{'filled': true}"></i>
+              <i class="far fa-star" *ngFor="let star of getStarArray(5 - package.averageRating)" [ngClass]="{'filled': false}"></i>
+            </div>
+            <span class="rating-text">{{package.averageRating}} ({{package.bookingCount}} bookings)</span>
+          </div>
+          <div class="price-badge">
+            <span class="currency">$</span>
+            <span class="amount">{{package.basePrice}}</span>
+            <span class="period">/ per person</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Info Section -->
+  <div class="quick-info">
+    <div class="container">
+      <div class="info-grid">
+        <div class="info-item">
+          <i class="far fa-clock"></i>
+          <h4>Duration</h4>
+          <p>{{package.duration}} days</p>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-users"></i>
+          <h4>Group Size</h4>
+          <p>{{package.groupSize}}</p>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-bus"></i>
+          <h4>Transportation</h4>
+          <p>{{package.transportation}}</p>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-bed"></i>
+          <h4>Accommodation</h4>
+          <p>{{package.accommodation}}</p>
+        </div>
+        <div class="info-item">
+          <i class="fas fa-utensils"></i>
+          <h4>Meals</h4>
+          <p>{{package.meals}}</p>
+        </div>
+        <div class="info-item">
+          <i class="far fa-calendar-alt"></i>
+          <h4>Best Time</h4>
+          <p>{{package.bestTimeToVisit}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="package-details">
+    <div class="container">
+      <div class="row">
+        <!-- Left Column: Package Information -->
+        <div class="col-lg-8">
+          <!-- Overview -->
+          <div class="content-section">
+            <h2 class="section-title">Overview</h2>
+            <p class="description">{{package.overview}}</p>
+          </div>
+
+          <!-- Highlights -->
+          <div class="content-section">
+            <h2 class="section-title">Highlights</h2>
+            <ul class="highlights-list">
+              <li *ngFor="let highlight of package.highlights">
+                <i class="fas fa-check-circle"></i> {{highlight}}
+              </li>
+            </ul>
+          </div>
+
+          <!-- Itinerary -->
+          <div class="content-section">
+            <h2 class="section-title">Itinerary</h2>
+            <div class="timeline">
+              <div class="timeline-item" *ngFor="let day of package.itinerary">
+                <div class="timeline-marker">
+                  <span class="day-number">Day {{day.dayNumber}}</span>
+                </div>
+                <div class="timeline-content">
+                  <h3 class="day-title">{{day.title}}</h3>
+                  <p class="day-description">{{day.description}}</p>
+                  <div class="day-details">
+                    <div class="detail-item" *ngIf="day.accommodation">
+                      <i class="fas fa-bed"></i> 
+                      <span>{{day.accommodation}}</span>
+                    </div>
+                    <div class="detail-item" *ngIf="day.meals">
+                      <i class="fas fa-utensils"></i> 
+                      <span>{{day.meals}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- What's Included/Excluded -->
+          <div class="content-section">
+            <h2 class="section-title">What's Included & Excluded</h2>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="included-box">
+                  <h4><i class="fas fa-check"></i> Included</h4>
+                  <ul>
+                    <li *ngFor="let item of package.included">{{item}}</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="excluded-box">
+                  <h4><i class="fas fa-times"></i> Excluded</h4>
+                  <ul>
+                    <li *ngFor="let item of package.excluded">{{item}}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reviews -->
+          <div class="content-section">
+            <h2 class="section-title">Traveler Reviews</h2>
+            <div class="review-container">
+              <div class="review-item" *ngFor="let review of package.reviews">
+                <div class="review-header">
+                  <div class="review-rating">
+                    <i class="fas fa-star filled" *ngFor="let star of getStarArray(review.rating)"></i>
+                    <i class="far fa-star" *ngFor="let star of getStarArray(5 - review.rating)"></i>
+                  </div>
+                  <div class="review-date">
+                    {{formatDate(review.createdAt)}}
+                  </div>
+                </div>
+                <div class="review-body">
+                  <p>{{review.comment}}</p>
+                </div>
+              </div>
+              
+              <div class="no-reviews" *ngIf="package.reviews?.length === 0">
+                <p>No reviews yet. Be the first to review this package!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Booking & Info -->
+        <div class="col-lg-4">
+          <!-- Booking Card -->
+          <div class="booking-card">
+            <div class="card-header">
+              <h3>Book Your Adventure</h3>
+            </div>
+            <div class="card-body">
+              <div class="price-info">
+                <span class="price-label">From</span>
+                <span class="price-value">${{package.basePrice}}</span>
+                <span class="price-person">per person</span>
+              </div>
+              
+              <form [formGroup]="bookingForm" (ngSubmit)="bookNow()">
+                <div class="form-group mb-3">
+                  <label for="startDate">Start Date</label>
+                  <input type="date" id="startDate" formControlName="startDate" class="form-control">
+                  <div *ngIf="bookingForm.get('startDate')?.invalid && bookingForm.get('startDate')?.touched" class="text-danger">
+                    Start date is required
+                  </div>
+                </div>
+                
+                <div class="form-group mb-3">
+                  <label for="travelers">Number of Travelers</label>
+                  <input type="number" id="travelers" formControlName="travelers" class="form-control" min="1">
+                  <div *ngIf="bookingForm.get('travelers')?.invalid && bookingForm.get('travelers')?.touched" class="text-danger">
+                    Number of travelers is required
+                  </div>
+                </div>
+                
+                <div class="total-price-section">
+                  <div class="d-flex justify-content-between">
+                    <span>Total Price:</span>
+                    <span class="total-price">${{totalPrice}}</span>
+                  </div>
+                </div>
+                
+                <button type="submit" class="btn-book-now" [disabled]="bookingForm.invalid">Book Now</button>
+              </form>
+              
+              <button class="btn-wishlist" [ngClass]="{'active': isInWishlist}" (click)="toggleWishlist()">
+                <i class="fas" [ngClass]="isInWishlist ? 'fa-heart' : 'fa-heart'"></i>
+                <span>{{isInWishlist ? 'Added to Wishlist' : 'Add to Wishlist'}}</span>
+              </button>
+              
+              <div class="share-tour mt-4">
+                <h4>Share This Tour</h4>
+                <div class="social-icons">
+                  <a href="javascript:void(0)" class="social-icon" (click)="shareOnSocial('facebook')"><i class="fab fa-facebook-f"></i></a>
+                  <a href="javascript:void(0)" class="social-icon" (click)="shareOnSocial('twitter')"><i class="fab fa-twitter"></i></a>
+                  <a href="javascript:void(0)" class="social-icon" (click)="shareOnSocial('pinterest')"><i class="fab fa-pinterest-p"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Need Help Box -->
+          <div class="help-box mt-4">
+            <h4>Need Help?</h4>
+            <p>Our travel experts are here to assist you</p>
+            <div class="contact-info">
+              <div class="contact-item">
+                <i class="fas fa-phone-alt"></i>
+                <span>+1 800 123 4567</span>
+              </div>
+              <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>info@adventuretours.com</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Add-ons Section -->
+  <section class="addons-section">
+    <div class="container">
+      <h2 class="section-title text-center">Enhance Your Experience</h2>
+      <p class="section-description text-center">Customize your adventure with these premium add-ons</p>
+      
+      <div class="row">
+        <div class="col-md-6 col-lg-3 mb-4" *ngFor="let addon of package.addons">
+          <div class="addon-card">
+            <div class="addon-image">
+              <img [src]="addon.imageUrl" [alt]="addon.name">
+              <div class="addon-category">{{addon.category}}</div>
+            </div>
+            <div class="addon-content">
+              <h3 class="addon-title">{{addon.name}}</h3>
+              <p class="addon-description">{{addon.description}}</p>
+              <div class="addon-price">${{addon.price}}</div>
+              <div class="d-flex justify-content-between mt-3">
+                <button class="btn btn-sm btn-primary" (click)="toggleAddon(addon.id)" [class.active]="selectedAddons[addon.id]">
+                  {{selectedAddons[addon.id] ? 'Remove' : 'Add'}}
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" [attr.data-bs-target]="'#addon-modal-' + addon.id">
+                  Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Add-on Modals -->
+  <div *ngFor="let addon of package.addons" class="modal fade" [id]="'addon-modal-' + addon.id" tabindex="-1" aria-labelledby="addonModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addonModalLabel">{{addon.name}}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <img [src]="addon.imageUrl" [alt]="addon.name" class="img-fluid rounded">
+              <div class="video-preview mt-3" *ngIf="addon.videoUrl">
+                <a [href]="addon.videoUrl" class="video-link" target="_blank">
+                  <i class="fas fa-play-circle"></i>
+                  <span>Watch Video Preview</span>
+                </a>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="addon-details">
+                <h3>{{addon.name}}</h3>
+                <div class="addon-price">${{addon.price}}</div>
+                <div class="addon-category-badge">{{addon.category}}</div>
+                <p class="addon-detailed-description">{{addon.detailedDescription}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" (click)="toggleAddon(addon.id)" data-bs-dismiss="modal">
+            {{selectedAddons[addon.id] ? 'Remove from Booking' : 'Add to Booking'}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Related Packages -->
+  <section class="related-packages py-5 bg-light">
+    <div class="container">
+      <h2 class="section-title text-center mb-4">You May Also Like</h2>
+      <div class="row">
+        <!-- This would be populated from a related packages service -->
+        <div class="col-md-4 mb-4">
+          <div class="card h-100">
+            <img src="https://images.unsplash.com/photo-1565609697399-a81680c249ec" class="card-img-top" alt="Alpine Skiing Adventure">
+            <div class="card-body">
+              <h5 class="card-title">Alpine Skiing Adventure</h5>
+              <div class="d-flex justify-content-between mb-2">
+                <span><i class="far fa-clock"></i> 5 days</span>
+                <span><i class="fas fa-map-marker-alt"></i> Switzerland</span>
+              </div>
+              <p class="card-text">Experience the thrill of skiing in the majestic Swiss Alps with professional instructors.</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="price">From $1,200</span>
+                <a href="#" class="btn btn-outline-primary btn-sm">View Details</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Loading Spinner -->
+<div class="loading-container" *ngIf="loading">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <p>Loading package details...</p>
+</div>
+
+<!-- Error Message -->
+<div class="error-container" *ngIf="error">
+  <div class="alert alert-danger" role="alert">
+    {{error}}
+  </div>
+  <button class="btn btn-primary" (click)="retryLoading()">Try Again</button>
+</div>

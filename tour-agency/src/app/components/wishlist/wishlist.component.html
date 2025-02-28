@@ -1,0 +1,57 @@
+<div class="wishlist-container">
+  <div class="wishlist-header">
+    <h1>My Wishlist</h1>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="!loading && wishlistItems.length === 0" class="empty-wishlist">
+    <div class="empty-message">
+      <i class="fa fa-heart-o fa-4x"></i>
+      <h3>Your wishlist is empty</h3>
+      <p>Browse our packages and add your favorites to your wishlist</p>
+      <button class="btn btn-primary" routerLink="/packages">Browse Packages</button>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && wishlistItems.length > 0" class="wishlist-content">
+    <div class="row">
+      <div *ngFor="let item of wishlistItems" class="col-md-6 col-lg-4 mb-4">
+        <div class="card package-card">
+          <div class="package-image">
+            <img [src]="item.image" [alt]="item.name" class="card-img-top">
+            <button class="remove-btn" (click)="removeFromWishlist(item.id)">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{ item.name }}</h5>
+            <div class="package-meta">
+              <div class="rating">
+                <span class="stars">
+                  <i *ngFor="let star of [1,2,3,4,5]" 
+                     class="fa" 
+                     [ngClass]="star <= item.averageRating ? 'fa-star' : 'fa-star-o'"></i>
+                </span>
+                <span class="rating-value">{{ item.averageRating | number:'1.1-1' }}</span>
+              </div>
+              <div class="price">
+                <span>${{ item.basePrice | number:'1.2-2' }}</span>
+              </div>
+            </div>
+            <p class="card-text">{{ item.description | slice:0:100 }}...</p>
+            <button class="btn btn-outline-primary btn-block" (click)="viewPackageDetails(item.id)">
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

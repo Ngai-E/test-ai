@@ -1,6 +1,7 @@
 package com.touragency.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,10 +30,13 @@ public class Package {
     private String accommodation;
     private String meals;
     private String bestTimeToVisit;
+    private BigDecimal basePrice;
+    private Integer bookingCount = 0;
+    private Double averageRating = 0.0;
     
-    @JsonManagedReference
     @OneToMany(mappedBy = "tourPackage", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PackageType> packageTypes = new ArrayList<>();
+    @JsonIgnoreProperties("tourPackage")
+    private List<Addon> addons = new ArrayList<>();
     
     @JsonManagedReference
     @OneToMany(mappedBy = "tourPackage", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -53,6 +57,14 @@ public class Package {
     @Column(name = "item")
     private List<String> excluded = new ArrayList<>();
     
+    @OneToMany(mappedBy = "tourPackage")
+    @JsonIgnoreProperties("tourPackage")
+    private List<Review> reviews = new ArrayList<>();
+    
+    @ManyToMany(mappedBy = "wishlist")
+    @JsonIgnoreProperties("wishlist")
+    private List<User> wishlistedBy = new ArrayList<>();
+    
     @PrePersist
     protected void onCreate() {
         // createdAt = LocalDateTime.now();
@@ -62,5 +74,18 @@ public class Package {
     @PreUpdate
     protected void onUpdate() {
         // updatedAt = LocalDateTime.now();
+    }
+    
+    public void updateAverageRating() {
+        if (reviews.isEmpty()) {
+            this.averageRating = 0.0;
+            return;
+        }
+        
+        double sum = reviews.stream()
+            .mapToInt(Review::getRating)
+            .sum();
+        
+        this.averageRating = sum / reviews.size();
     }
 }

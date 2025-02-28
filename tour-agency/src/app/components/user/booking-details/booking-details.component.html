@@ -1,0 +1,174 @@
+<div class="container mt-5 mb-5">
+  <!-- Back Button -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <button class="btn btn-outline-secondary" (click)="goBack()">
+        <i class="fa fa-arrow-left mr-2"></i> Back to Bookings
+      </button>
+    </div>
+  </div>
+  
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+  
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="close" (click)="errorMessage = ''">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ successMessage }}
+    <button type="button" class="close" (click)="successMessage = ''">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  
+  <!-- Booking Details -->
+  <div *ngIf="!loading && booking" class="booking-details">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="booking-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2>Booking #{{ booking.id }}</h2>
+            <span class="badge" [ngClass]="getStatusClass(booking.status)">{{ booking.status }}</span>
+          </div>
+          <p class="text-muted">Booked on {{ formatDate(booking.bookingDate) }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <!-- Tour Package Details -->
+      <div class="col-md-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Tour Package</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <img [src]="booking.package.image" [alt]="booking.package.name" class="img-fluid rounded">
+              </div>
+              <div class="col-md-8">
+                <h4>{{ booking.package.name }}</h4>
+                <p class="text-muted">
+                  <i class="fa fa-map-marker mr-1"></i> {{ booking.package.destination }}
+                </p>
+                <p [innerHTML]="booking.package.description"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Addons -->
+        <div *ngIf="booking.addons && booking.addons.length > 0" class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Add-ons</h5>
+          </div>
+          <div class="card-body p-0">
+            <table class="table mb-0">
+              <thead>
+                <tr>
+                  <th>Add-on</th>
+                  <th>Quantity</th>
+                  <th class="text-right">Price</th>
+                  <th class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let addon of booking.addons">
+                  <td>
+                    <div>
+                      <strong>{{ addon.name }}</strong>
+                      <p class="mb-0 text-muted small">{{ addon.description }}</p>
+                    </div>
+                  </td>
+                  <td>{{ addon.quantity }}</td>
+                  <td class="text-right">${{ addon.price | number:'1.2-2' }}</td>
+                  <td class="text-right">${{ addon.price * addon.quantity | number:'1.2-2' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Booking Summary -->
+      <div class="col-md-4">
+        <!-- Customer Information -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Customer Information</h5>
+          </div>
+          <div class="card-body">
+            <p class="mb-1"><strong>Name:</strong> {{ booking.firstName }} {{ booking.lastName }}</p>
+            <p class="mb-1"><strong>Email:</strong> {{ booking.email }}</p>
+            <p class="mb-1"><strong>Phone:</strong> {{ booking.phone }}</p>
+            <div *ngIf="booking.specialRequests">
+              <p class="mb-0"><strong>Special Requests:</strong></p>
+              <p class="mb-0 text-muted">{{ booking.specialRequests }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Payment Summary -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="mb-0">Payment Summary</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <span>Package Price:</span>
+              <span>${{ booking.totalAmount - getTotalAddonsPrice() | number:'1.2-2' }}</span>
+            </div>
+            <div *ngIf="booking.addons && booking.addons.length > 0" class="d-flex justify-content-between mb-2">
+              <span>Add-ons:</span>
+              <span>${{ getTotalAddonsPrice() | number:'1.2-2' }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Subtotal:</span>
+              <span>${{ booking.totalAmount | number:'1.2-2' }}</span>
+            </div>
+            <div *ngIf="booking.discountAmount > 0" class="d-flex justify-content-between mb-2 text-success">
+              <span>Discount:</span>
+              <span>-${{ booking.discountAmount | number:'1.2-2' }}</span>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between mb-2">
+              <strong>Total:</strong>
+              <strong>${{ booking.finalAmount | number:'1.2-2' }}</strong>
+            </div>
+            
+            <!-- Coupon Information -->
+            <div *ngIf="booking.coupon" class="coupon-info mt-3">
+              <div class="applied-coupon">
+                <span class="badge badge-success">{{ booking.coupon.code }}</span>
+                <span class="ml-2">{{ booking.coupon.description }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Actions -->
+        <div *ngIf="booking.status.toUpperCase() !== 'CANCELLED' && booking.status.toUpperCase() !== 'COMPLETED'" class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Actions</h5>
+          </div>
+          <div class="card-body">
+            <button class="btn btn-danger btn-block" (click)="cancelBooking()">
+              <i class="fa fa-times mr-2"></i> Cancel Booking
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

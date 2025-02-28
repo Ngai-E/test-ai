@@ -8,18 +8,20 @@
           <p class="card-text">{{ package.description }}</p>
           <ul class="list-unstyled">
             <li><strong>Country:</strong> {{ package.country }}</li>
-            <li><strong>Starting from:</strong> {{ package.packageTypes[0]?.price | currency }}</li>
+            <li><strong>Starting from:</strong> {{ package.basePrice | currency }}</li>
           </ul>
-          <div class="package-types mt-3">
-            <h6>Available Options:</h6>
+          <div class="package-info mt-3">
+            <h6>Package Details:</h6>
             <ul class="list-unstyled">
-              <li *ngFor="let type of package.packageTypes" class="mb-2">
-                <strong>{{ type.name }}</strong> - {{ type.price | currency }}
-                <small class="d-block text-muted">{{ type.description }}</small>
+              <li class="mb-2">
+                <strong>Duration:</strong> {{ package.duration }} days
+              </li>
+              <li class="mb-2">
+                <strong>Transportation:</strong> {{ package.transportation }}
               </li>
             </ul>
           </div>
-          <a [routerLink]="['/package', package.id]" class="btn btn-primary mt-2">View Details</a>
+          <a [routerLink]="['/packages', package.id]" class="btn btn-primary mt-2">View Details</a>
         </div>
       </div>
     </div>

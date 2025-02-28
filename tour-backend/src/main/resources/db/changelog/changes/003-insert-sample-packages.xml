@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="3" author="admin">
+        <!-- Insert Dubai Package -->
+        <insert tableName="packages">
+            <column name="id" value="3"/>
+            <column name="name" value="Dubai Desert &amp; City Explorer"/>
+            <column name="description" value="Experience the perfect blend of modern luxury and traditional Arabian culture in Dubai."/>
+            <column name="country" value="Dubai"/>
+            <column name="image" value="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&amp;fit=crop&amp;w=600&amp;h=400"/>
+            <column name="overview" value="Experience the perfect blend of modern luxury and traditional Arabian culture in Dubai. This 7-day tour combines the best of Dubai's modern attractions with traditional Arabian experiences."/>
+            <column name="duration" value="7"/>
+            <column name="group_size" value="2-15 people"/>
+            <column name="transportation" value="Private and shared transfers"/>
+            <column name="accommodation" value="3-5 star hotels based on package type"/>
+            <column name="meals" value="Daily breakfast and select meals"/>
+            <column name="best_time_to_visit" value="October to April"/>
+        </insert>
+
+        <!-- Insert Dubai Package Types -->
+        <insert tableName="package_types">
+            <column name="package_id" value="3"/>
+            <column name="name" value="Standard"/>
+            <column name="price" value="1500"/>
+            <column name="description" value="3-star hotel accommodation, Airport transfers, Basic city tour, Desert safari"/>
+        </insert>
+        <insert tableName="package_types">
+            <column name="package_id" value="3"/>
+            <column name="name" value="Premium"/>
+            <column name="price" value="2500"/>
+            <column name="description" value="5-star hotel accommodation, Private transfers, Extended city tour, VIP desert safari, Burj Khalifa tickets"/>
+        </insert>
+        <insert tableName="package_types">
+            <column name="package_id" value="3"/>
+            <column name="name" value="Luxury"/>
+            <column name="price" value="3500"/>
+            <column name="description" value="Luxury hotel accommodation, Private luxury transfers, Helicopter tour, Private desert safari, Fine dining experiences"/>
+        </insert>
+
+        <!-- Insert Dubai Package Highlights -->
+        <insert tableName="package_highlights">
+            <column name="package_id" value="3"/>
+            <column name="highlight" value="Visit Burj Khalifa - World's tallest building"/>
+        </insert>
+        <insert tableName="package_highlights">
+            <column name="package_id" value="3"/>
+            <column name="highlight" value="Desert Safari with BBQ dinner"/>
+        </insert>
+        <insert tableName="package_highlights">
+            <column name="package_id" value="3"/>
+            <column name="highlight" value="Dubai Mall and Dubai Fountain show"/>
+        </insert>
+        <insert tableName="package_highlights">
+            <column name="package_id" value="3"/>
+            <column name="highlight" value="Gold Souk and traditional markets"/>
+        </insert>
+        <insert tableName="package_highlights">
+            <column name="package_id" value="3"/>
+            <column name="highlight" value="Dubai Marina cruise"/>
+        </insert>
+
+        <!-- Insert Dubai Package Inclusions -->
+        <insert tableName="included_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="Hotel accommodation"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="Daily breakfast"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="Airport transfers"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="Sightseeing as per itinerary"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="English speaking guide"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="All entrance fees"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="Desert safari with BBQ dinner"/>
+        </insert>
+
+        <!-- Insert Dubai Package Exclusions -->
+        <insert tableName="excluded_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="International flights"/>
+        </insert>
+        <insert tableName="excluded_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="Travel insurance"/>
+        </insert>
+        <insert tableName="excluded_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="Personal expenses"/>
+        </insert>
+        <insert tableName="excluded_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="Optional tours"/>
+        </insert>
+        <insert tableName="excluded_items">
+            <column name="package_id" value="3"/>
+            <column name="item" value="Visa fees"/>
+        </insert>
+
+        <!-- Insert Dubai Itinerary Days -->
+        <insert tableName="itinerary_days">
+            <column name="package_id" value="3"/>
+            <column name="day_number" value="1"/>
+            <column name="title" value="Arrival &amp; Welcome"/>
+            <column name="description" value="Arrive in Dubai and transfer to your hotel. Enjoy a welcome dinner at a traditional Arabic restaurant followed by the spectacular Dubai Fountain show."/>
+            <column name="accommodation" value="Hotel in Downtown Dubai"/>
+            <column name="meals" value="Dinner"/>
+        </insert>
+        <insert tableName="itinerary_days">
+            <column name="package_id" value="3"/>
+            <column name="day_number" value="2"/>
+            <column name="title" value="Modern Dubai Tour"/>
+            <column name="description" value="Explore the modern marvels of Dubai including the Burj Khalifa, Dubai Mall, and Dubai Marina. End the day with a dinner cruise at Dubai Marina."/>
+            <column name="accommodation" value="Hotel in Downtown Dubai"/>
+            <column name="meals" value="Breakfast, Dinner"/>
+        </insert>
+        <insert tableName="itinerary_days">
+            <column name="package_id" value="3"/>
+            <column name="day_number" value="3"/>
+            <column name="title" value="Desert Adventure"/>
+            <column name="description" value="Morning at leisure. In the afternoon, embark on an exciting desert safari with dune bashing, camel riding, and a BBQ dinner with entertainment."/>
+            <column name="accommodation" value="Hotel in Downtown Dubai"/>
+            <column name="meals" value="Breakfast, BBQ Dinner"/>
+        </insert>
+
+        <!-- Insert Dubai Itinerary Day Activities -->
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 1)"/>
+            <column name="activity" value="Airport pickup and transfer to hotel"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 1)"/>
+            <column name="activity" value="Welcome dinner at traditional Arabic restaurant"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 1)"/>
+            <column name="activity" value="Dubai Fountain show viewing"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 2)"/>
+            <column name="activity" value="Visit Burj Khalifa observation deck"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 2)"/>
+            <column name="activity" value="Dubai Mall shopping"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 2)"/>
+            <column name="activity" value="Dubai Marina walk"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 2)"/>
+            <column name="activity" value="Dinner cruise at Dubai Marina"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 3)"/>
+            <column name="activity" value="Morning at leisure"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 3)"/>
+            <column name="activity" value="Afternoon desert safari"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 3)"/>
+            <column name="activity" value="Dune bashing"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 3)"/>
+            <column name="activity" value="Camel riding"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 3 AND day_number = 3)"/>
+            <column name="activity" value="BBQ dinner with entertainment"/>
+        </insert>
+
+        <!-- Insert Singapore Package -->
+        <insert tableName="packages">
+            <column name="id" value="4"/>
+            <column name="name" value="Singapore Modern City Experience"/>
+            <column name="description" value="Discover the perfect blend of nature, culture, and modernity in Singapore."/>
+            <column name="country" value="Singapore"/>
+            <column name="image" value="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&amp;fit=crop&amp;w=600&amp;h=400"/>
+            <column name="overview" value="Discover the perfect blend of nature, culture, and modernity in Singapore. This 5-day tour showcases the best of Singapore's attractions, from futuristic gardens to wildlife experiences."/>
+            <column name="duration" value="5"/>
+            <column name="group_size" value="2-20 people"/>
+            <column name="transportation" value="Private and public transportation"/>
+            <column name="accommodation" value="3-5 star hotels based on package type"/>
+            <column name="meals" value="Daily breakfast and select meals"/>
+            <column name="best_time_to_visit" value="Year-round destination"/>
+        </insert>
+
+        <!-- Insert Singapore Package Types -->
+        <insert tableName="package_types">
+            <column name="package_id" value="4"/>
+            <column name="name" value="Standard"/>
+            <column name="price" value="1200"/>
+            <column name="description" value="3-star hotel accommodation, Public transport pass, Basic city tour, Gardens by the Bay visit"/>
+        </insert>
+        <insert tableName="package_types">
+            <column name="package_id" value="4"/>
+            <column name="name" value="Premium"/>
+            <column name="price" value="2000"/>
+            <column name="description" value="4-star hotel accommodation, Private transfers, Universal Studios, Night Safari, Marina Bay Sands observation deck"/>
+        </insert>
+        <insert tableName="package_types">
+            <column name="package_id" value="4"/>
+            <column name="name" value="Luxury"/>
+            <column name="price" value="3000"/>
+            <column name="description" value="5-star luxury hotel, Private luxury transfers, Private tours, Fine dining experiences, Exclusive experiences"/>
+        </insert>
+
+        <!-- Insert Singapore Package Highlights -->
+        <insert tableName="package_highlights">
+            <column name="package_id" value="4"/>
+            <column name="highlight" value="Gardens by the Bay with Cloud Forest"/>
+        </insert>
+        <insert tableName="package_highlights">
+            <column name="package_id" value="4"/>
+            <column name="highlight" value="Universal Studios Singapore"/>
+        </insert>
+        <insert tableName="package_highlights">
+            <column name="package_id" value="4"/>
+            <column name="highlight" value="Singapore Night Safari"/>
+        </insert>
+        <insert tableName="package_highlights">
+            <column name="package_id" value="4"/>
+            <column name="highlight" value="Marina Bay Sands"/>
+        </insert>
+        <insert tableName="package_highlights">
+            <column name="package_id" value="4"/>
+            <column name="highlight" value="Sentosa Island attractions"/>
+        </insert>
+
+        <!-- Insert Singapore Package Inclusions -->
+        <insert tableName="included_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="Hotel accommodation"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="Daily breakfast"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="Airport transfers"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="Public transport pass"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="Entrance fees to attractions"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="English speaking guide"/>
+        </insert>
+        <insert tableName="included_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="Welcome dinner"/>
+        </insert>
+
+        <!-- Insert Singapore Package Exclusions -->
+        <insert tableName="excluded_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="International flights"/>
+        </insert>
+        <insert tableName="excluded_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="Travel insurance"/>
+        </insert>
+        <insert tableName="excluded_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="Personal expenses"/>
+        </insert>
+        <insert tableName="excluded_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="Optional tours"/>
+        </insert>
+        <insert tableName="excluded_items">
+            <column name="package_id" value="4"/>
+            <column name="item" value="Additional meals"/>
+        </insert>
+
+        <!-- Insert Singapore Itinerary Days -->
+        <insert tableName="itinerary_days">
+            <column name="package_id" value="4"/>
+            <column name="day_number" value="1"/>
+            <column name="title" value="Welcome to Singapore"/>
+            <column name="description" value="Arrive in Singapore and transfer to your hotel. In the evening, enjoy the Marina Bay Sands light show and a welcome dinner at Clarke Quay."/>
+            <column name="accommodation" value="Hotel in Marina Bay"/>
+            <column name="meals" value="Dinner"/>
+        </insert>
+        <insert tableName="itinerary_days">
+            <column name="package_id" value="4"/>
+            <column name="day_number" value="2"/>
+            <column name="title" value="City Highlights"/>
+            <column name="description" value="Explore Singapore's iconic attractions including Gardens by the Bay, Marina Bay Sands observation deck, and Singapore Flyer. Spend the evening at Clarke Quay."/>
+            <column name="accommodation" value="Hotel in Marina Bay"/>
+            <column name="meals" value="Breakfast, Lunch"/>
+        </insert>
+        <insert tableName="itinerary_days">
+            <column name="package_id" value="4"/>
+            <column name="day_number" value="3"/>
+            <column name="title" value="Nature &amp; Wildlife"/>
+            <column name="description" value="Spend the day exploring Singapore's wildlife attractions including Singapore Zoo, River Safari, and Night Safari. Enjoy local food tasting in the evening."/>
+            <column name="accommodation" value="Hotel in Marina Bay"/>
+            <column name="meals" value="Breakfast, Dinner"/>
+        </insert>
+
+        <!-- Insert Singapore Itinerary Day Activities -->
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 1)"/>
+            <column name="activity" value="Airport pickup and transfer to hotel"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 1)"/>
+            <column name="activity" value="Marina Bay Sands light show"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 1)"/>
+            <column name="activity" value="Welcome dinner at Clarke Quay"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 2)"/>
+            <column name="activity" value="Gardens by the Bay tour"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 2)"/>
+            <column name="activity" value="Marina Bay Sands observation deck"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 2)"/>
+            <column name="activity" value="Singapore Flyer experience"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 2)"/>
+            <column name="activity" value="Evening at Clarke Quay"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 3)"/>
+            <column name="activity" value="Morning at Singapore Zoo"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 3)"/>
+            <column name="activity" value="River Safari experience"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 3)"/>
+            <column name="activity" value="Night Safari adventure"/>
+        </insert>
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="(SELECT id FROM itinerary_days WHERE package_id = 4 AND day_number = 3)"/>
+            <column name="activity" value="Local food tasting"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

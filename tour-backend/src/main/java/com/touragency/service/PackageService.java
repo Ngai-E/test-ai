@@ -20,23 +20,23 @@ public class PackageService {
         this.packageRepository = packageRepository;
     }
     
-    public List<Package> getAllPackages() {
+    public List<com.touragency.model.Package> getAllPackages() {
         return packageRepository.findAll();
     }
     
-    public Optional<Package> getPackageById(Long id) {
+    public Optional<com.touragency.model.Package> getPackageById(Long id) {
         return packageRepository.findById(id);
     }
     
     @Transactional
-    public Package createPackage(Package tourPackage) {
+    public com.touragency.model.Package createPackage(com.touragency.model.Package tourPackage) {
         // Set bidirectional relationships
         setRelationships(tourPackage);
         return packageRepository.save(tourPackage);
     }
     
     @Transactional
-    public Optional<Package> updatePackage(Long id, Package tourPackage) {
+    public Optional<com.touragency.model.Package> updatePackage(Long id, com.touragency.model.Package tourPackage) {
         return packageRepository.findById(id)
             .map(existingPackage -> {
                 tourPackage.setId(id);
@@ -46,10 +46,10 @@ public class PackageService {
             });
     }
     
-    private void setRelationships(Package tourPackage) {
+    private void setRelationships(com.touragency.model.Package tourPackage) {
         // Set package types relationship
-        if (tourPackage.getPackageTypes() != null) {
-            tourPackage.getPackageTypes().forEach(packageType -> packageType.setTourPackage(tourPackage));
+        if (tourPackage.getAddons() != null) {
+            tourPackage.getAddons().forEach(addon -> addon.setTourPackage(tourPackage));
         }
         
         // Set itinerary days relationship

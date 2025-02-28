@@ -169,24 +169,38 @@ export class PackageManagementComponent implements OnInit {
     });
     
     // Add itinerary days
-    pkg.itinerary.forEach(day => {
+    if (typeof pkg.itinerary === 'string') {
+      // Handle string itinerary (convert to a single day)
       const dayForm = this.fb.group({
-        dayNumber: [day.dayNumber, Validators.required],
-        title: [day.title, Validators.required],
-        description: [day.description, Validators.required],
-        accommodation: [day.accommodation, Validators.required],
-        meals: [day.meals, Validators.required],
-        activities: this.fb.array([])
+        dayNumber: [1, Validators.required],
+        title: ['Itinerary', Validators.required],
+        description: [pkg.itinerary, Validators.required],
+        accommodation: ['Not specified', Validators.required],
+        meals: ['Not specified', Validators.required],
+        activities: this.fb.array([this.fb.control('Explore')])
       });
-      
-      // Add activities
-      const activities = dayForm.get('activities') as FormArray;
-      day.activities.forEach(activity => {
-        activities.push(this.fb.control(activity));
-      });
-      
       this.itinerary.push(dayForm);
-    });
+    } else {
+      // Handle array of itinerary days
+      (pkg.itinerary as ItineraryDay[]).forEach((day: ItineraryDay) => {
+        const dayForm = this.fb.group({
+          dayNumber: [day.dayNumber, Validators.required],
+          title: [day.title, Validators.required],
+          description: [day.description, Validators.required],
+          accommodation: [day.accommodation, Validators.required],
+          meals: [day.meals, Validators.required],
+          activities: this.fb.array([])
+        });
+        
+        // Add activities
+        const activities = dayForm.get('activities') as FormArray;
+        day.activities.forEach((activity: string) => {
+          activities.push(this.fb.control(activity));
+        });
+        
+        this.itinerary.push(dayForm);
+      });
+    }
     
     // Add included items
     pkg.included.forEach(item => {
@@ -199,13 +213,15 @@ export class PackageManagementComponent implements OnInit {
     });
     
     // Add package types
-    pkg.packageTypes.forEach(type => {
-      this.packageTypes.push(this.fb.group({
-        name: [type.name, Validators.required],
-        price: [type.price, [Validators.required, Validators.min(0)]],
-        description: [type.description]
-      }));
-    });
+    if (pkg.packageTypes) {
+      pkg.packageTypes.forEach(type => {
+        this.packageTypes.push(this.fb.group({
+          name: [type.name, Validators.required],
+          price: [type.price, [Validators.required, Validators.min(0)]],
+          description: [type.description]
+        }));
+      });
+    }
     
     // Set main form values
     this.packageForm.patchValue({

@@ -1,0 +1,53 @@
+<div class="login-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Login</h2>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+        
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number</label>
+          <input 
+            type="text" 
+            formControlName="phoneNumber" 
+            class="form-control" 
+            [ngClass]="{ 'is-invalid': f['phoneNumber'].touched && f['phoneNumber'].errors }"
+            placeholder="Enter your 10-digit phone number"
+          />
+          <div *ngIf="f['phoneNumber'].touched && f['phoneNumber'].errors" class="invalid-feedback">
+            <div *ngIf="f['phoneNumber'].errors['required']">Phone number is required</div>
+            <div *ngIf="f['phoneNumber'].errors['pattern']">Phone number must be 10 digits</div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            formControlName="password" 
+            class="form-control" 
+            [ngClass]="{ 'is-invalid': f['password'].touched && f['password'].errors }"
+            placeholder="Enter your password"
+          />
+          <div *ngIf="f['password'].touched && f['password'].errors" class="invalid-feedback">
+            <div *ngIf="f['password'].errors['required']">Password is required</div>
+            <div *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters</div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <button [disabled]="loginForm.invalid || loading" class="btn btn-primary btn-block">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+            Login
+          </button>
+        </div>
+        
+        <div class="text-center mt-3">
+          <p>Don't have an account? <a routerLink="/register">Register now</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

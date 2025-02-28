@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+
+    <changeSet id="005-add-user-features" author="touragency">
+        <!-- Add base_price, booking_count, and average_rating to packages table -->
+        <addColumn tableName="packages">
+            <column name="base_price" type="decimal(10,2)" defaultValue="0.00">
+                <constraints nullable="false"/>
+            </column>
+            <column name="booking_count" type="int" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="average_rating" type="double" defaultValue="0.0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Create users table -->
+        <createTable tableName="users">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="phone_number" type="varchar(20)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="full_name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(100)"/>
+            <column name="coin_balance" type="int" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="referral_code" type="varchar(20)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Create addons table -->
+        <createTable tableName="addons">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="detailed_description" type="varchar(1000)"/>
+            <column name="price" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_url" type="varchar(255)"/>
+            <column name="video_url" type="varchar(255)"/>
+            <column name="category" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="package_id" type="bigint">
+                <constraints foreignKeyName="fk_addon_package" references="packages(id)"/>
+            </column>
+        </createTable>
+
+        <!-- Create reviews table -->
+        <createTable tableName="reviews">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="fk_review_user" references="users(id)" nullable="false"/>
+            </column>
+            <column name="package_id" type="bigint">
+                <constraints foreignKeyName="fk_review_package" references="packages(id)" nullable="false"/>
+            </column>
+            <column name="rating" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="comment" type="varchar(1000)"/>
+            <column name="created_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Create bookings table -->
+        <createTable tableName="bookings">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="fk_booking_user" references="users(id)" nullable="false"/>
+            </column>
+            <column name="package_id" type="bigint">
+                <constraints foreignKeyName="fk_booking_package" references="packages(id)" nullable="false"/>
+            </column>
+            <column name="start_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number_of_adults" type="int" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number_of_children" type="int" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_price" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="booking_status" type="varchar(20)" defaultValue="BOOKED">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_status" type="varchar(20)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="booking_reference" type="varchar(50)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="coupon_code" type="varchar(20)"/>
+            <column name="discount_amount" type="decimal(10,2)" defaultValue="0.00"/>
+        </createTable>
+
+        <!-- Create booking_addons table -->
+        <createTable tableName="booking_addons">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="booking_id" type="bigint">
+                <constraints foreignKeyName="fk_booking_addon_booking" references="bookings(id)" nullable="false"/>
+            </column>
+            <column name="addon_id" type="bigint">
+                <constraints foreignKeyName="fk_booking_addon_addon" references="addons(id)" nullable="false"/>
+            </column>
+            <column name="quantity" type="int" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price_at_booking" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Create user_wishlist table -->
+        <createTable tableName="user_wishlist">
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_wishlist_user" references="users(id)"/>
+            </column>
+            <column name="package_id" type="bigint">
+                <constraints nullable="false" foreignKeyName="fk_wishlist_package" references="packages(id)"/>
+            </column>
+        </createTable>
+        <addPrimaryKey tableName="user_wishlist" columnNames="user_id, package_id"/>
+
+        <!-- Create cart_items table -->
+        <createTable tableName="cart_items">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="fk_cart_user" references="users(id)" nullable="false"/>
+            </column>
+            <column name="package_id" type="bigint">
+                <constraints foreignKeyName="fk_cart_package" references="packages(id)" nullable="false"/>
+            </column>
+            <column name="start_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number_of_adults" type="int" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="number_of_children" type="int" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="base_price" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="added_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Create cart_item_addons table -->
+        <createTable tableName="cart_item_addons">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="cart_item_id" type="bigint">
+                <constraints foreignKeyName="fk_cart_addon_cart" references="cart_items(id)" nullable="false"/>
+            </column>
+            <column name="addon_id" type="bigint">
+                <constraints foreignKeyName="fk_cart_addon_addon" references="addons(id)" nullable="false"/>
+            </column>
+            <column name="quantity" type="int" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Create coupons table -->
+        <createTable tableName="coupons">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="varchar(20)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="value" type="decimal(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valid_from" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="valid_to" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_used" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="fk_coupon_user" references="users(id)" nullable="false"/>
+            </column>
+            <column name="created_at" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Insert sample data -->
+        <!-- Sample user -->
+        <insert tableName="users">
+            <column name="phone_number">+1234567890</column>
+            <column name="password">$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG</column> <!-- password: password123 -->
+            <column name="full_name">John Doe</column>
+            <column name="email">john.doe@example.com</column>
+            <column name="coin_balance">100</column>
+            <column name="referral_code">REF12345</column>
+            <column name="created_at">2025-01-01 00:00:00</column>
+            <column name="updated_at">2025-01-01 00:00:00</column>
+        </insert>
+
+        <!-- Update packages with base price -->
+        <update tableName="packages">
+            <column name="base_price" valueNumeric="1500.00"/>
+            <where>id = 1</where>
+        </update>
+
+        <!-- Sample addons for Dubai package -->
+        <insert tableName="addons">
+            <column name="name">5-Star Hotel Upgrade</column>
+            <column name="description">Upgrade to a luxurious 5-star hotel experience</column>
+            <column name="detailed_description">Enjoy the ultimate luxury with our 5-star hotel upgrade. Experience world-class amenities, stunning views, and impeccable service. This upgrade includes access to exclusive hotel facilities such as spa, infinity pool, and premium dining options.</column>
+            <column name="price" valueNumeric="500.00"/>
+            <column name="image_url">https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&amp;fit=crop&amp;w=800&amp;h=500</column>
+            <column name="video_url">https://example.com/videos/5star-hotel-tour.mp4</column>
+            <column name="category">ACCOMMODATION</column>
+            <column name="package_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="addons">
+            <column name="name">Helicopter City Tour</column>
+            <column name="description">See Dubai from above with a thrilling helicopter tour</column>
+            <column name="detailed_description">Experience the breathtaking skyline of Dubai from a bird's eye view. This 30-minute helicopter tour takes you over iconic landmarks including the Burj Khalifa, Palm Jumeirah, and The World Islands. Professional pilots provide informative commentary throughout the journey.</column>
+            <column name="price" valueNumeric="350.00"/>
+            <column name="image_url">https://images.unsplash.com/photo-1473862170180-84427c485aca?auto=format&amp;fit=crop&amp;w=800&amp;h=500</column>
+            <column name="video_url">https://example.com/videos/dubai-helicopter-tour.mp4</column>
+            <column name="category">ACTIVITY</column>
+            <column name="package_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="addons">
+            <column name="name">Desert Safari with BBQ Dinner</column>
+            <column name="description">Thrilling desert adventure with traditional dinner</column>
+            <column name="detailed_description">Experience the magic of the Arabian desert with our premium safari package. Enjoy dune bashing in luxury 4x4 vehicles, sandboarding, camel rides, and a traditional BBQ dinner under the stars. Includes henna painting, shisha, and live entertainment with belly dancing and tanoura shows.</column>
+            <column name="price" valueNumeric="120.00"/>
+            <column name="image_url">https://images.unsplash.com/photo-1547823065-4cbbb3d9d463?auto=format&amp;fit=crop&amp;w=800&amp;h=500</column>
+            <column name="video_url">https://example.com/videos/desert-safari.mp4</column>
+            <column name="category">ACTIVITY</column>
+            <column name="package_id" valueNumeric="1"/>
+        </insert>
+        <insert tableName="addons">
+            <column name="name">Private Luxury Transportation</column>
+            <column name="description">Dedicated luxury vehicle with personal chauffeur</column>
+            <column name="detailed_description">Travel in style with our private luxury transportation service. A dedicated professional chauffeur will be at your service throughout your stay, driving you in a premium vehicle (Mercedes S-Class or similar). Includes airport transfers, daily excursions, and 24/7 availability.</column>
+            <column name="price" valueNumeric="800.00"/>
+            <column name="image_url">https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&amp;fit=crop&amp;w=800&amp;h=500</column>
+            <column name="video_url">https://example.com/videos/luxury-transport.mp4</column>
+            <column name="category">TRANSPORTATION</column>
+            <column name="package_id" valueNumeric="1"/>
+        </insert>
+
+        <!-- Sample reviews -->
+        <insert tableName="reviews">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="1"/>
+            <column name="rating" valueNumeric="5"/>
+            <column name="comment">Amazing experience! The Dubai tour exceeded all my expectations. The hotel was luxurious, and the activities were well-organized. Highly recommend the desert safari!</column>
+            <column name="created_at">2025-01-15 14:30:00</column>
+            <column name="updated_at">2025-01-15 14:30:00</column>
+        </insert>
+
+        <!-- Update package with booking count and rating -->
+        <update tableName="packages">
+            <column name="booking_count" valueNumeric="12"/>
+            <column name="average_rating" valueNumeric="4.7"/>
+            <where>id = 1</where>
+        </update>
+
+        <!-- Add user to wishlist -->
+        <insert tableName="user_wishlist">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

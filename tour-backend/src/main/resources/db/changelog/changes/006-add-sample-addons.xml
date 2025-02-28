@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+
+    <changeSet id="006-add-sample-addons" author="touragency">
+        <!-- Add sample packages -->
+        <insert tableName="packages">
+            <column name="name">Test Tour Package</column>
+            <column name="description">This is a test tour package for API testing</column>
+            <column name="country">Test Country</column>
+            <column name="image">https://example.com/test-image.jpg</column>
+            <column name="overview">Test overview of the tour package</column>
+            <column name="duration" valueNumeric="5"/>
+            <column name="group_size">2-8 people</column>
+            <column name="transportation">Private transportation</column>
+            <column name="accommodation">4-star hotels</column>
+            <column name="meals">Breakfast included</column>
+            <column name="best_time_to_visit">All year round</column>
+            <column name="base_price" valueNumeric="799.99"/>
+            <column name="booking_count" valueNumeric="0"/>
+            <column name="average_rating" valueNumeric="0.0"/>
+        </insert>
+        
+        <!-- Get the ID of the inserted package -->
+        <sql>SET @test_package_id = LAST_INSERT_ID();</sql>
+        
+        <!-- Add sample addons for the test package -->
+        <insert tableName="addons">
+            <column name="name">Premium Hotel Upgrade</column>
+            <column name="description">Upgrade to a premium 5-star hotel</column>
+            <column name="detailed_description">Enjoy your stay in a luxurious 5-star hotel with premium amenities and services.</column>
+            <column name="price" valueNumeric="299.99"/>
+            <column name="image_url">https://example.com/premium-hotel.jpg</column>
+            <column name="video_url">https://example.com/premium-hotel-video.mp4</column>
+            <column name="category">ACCOMMODATION</column>
+            <column name="package_id" valueComputed="@test_package_id"/>
+        </insert>
+        
+        <insert tableName="addons">
+            <column name="name">Private Tour Guide</column>
+            <column name="description">Personal tour guide for your entire trip</column>
+            <column name="detailed_description">Get a knowledgeable local guide who will accompany you throughout your journey, providing insights and personalized recommendations.</column>
+            <column name="price" valueNumeric="199.99"/>
+            <column name="image_url">https://example.com/tour-guide.jpg</column>
+            <column name="video_url">https://example.com/tour-guide-video.mp4</column>
+            <column name="category">SERVICE</column>
+            <column name="package_id" valueComputed="@test_package_id"/>
+        </insert>
+        
+        <insert tableName="addons">
+            <column name="name">Adventure Activities Package</column>
+            <column name="description">Bundle of exciting adventure activities</column>
+            <column name="detailed_description">Experience thrilling activities including zip-lining, rock climbing, and white-water rafting during your tour.</column>
+            <column name="price" valueNumeric="249.99"/>
+            <column name="image_url">https://example.com/adventure.jpg</column>
+            <column name="video_url">https://example.com/adventure-video.mp4</column>
+            <column name="category">ACTIVITY</column>
+            <column name="package_id" valueComputed="@test_package_id"/>
+        </insert>
+        
+        <!-- Add package highlights -->
+        <insert tableName="package_highlights">
+            <column name="package_id" valueComputed="@test_package_id"/>
+            <column name="highlight">Scenic mountain views</column>
+        </insert>
+        
+        <insert tableName="package_highlights">
+            <column name="package_id" valueComputed="@test_package_id"/>
+            <column name="highlight">Cultural experiences</column>
+        </insert>
+        
+        <insert tableName="package_highlights">
+            <column name="package_id" valueComputed="@test_package_id"/>
+            <column name="highlight">Gourmet local cuisine</column>
+        </insert>
+        
+        <!-- Add included items -->
+        <insert tableName="included_items">
+            <column name="package_id" valueComputed="@test_package_id"/>
+            <column name="item">Accommodation</column>
+        </insert>
+        
+        <insert tableName="included_items">
+            <column name="package_id" valueComputed="@test_package_id"/>
+            <column name="item">Daily breakfast</column>
+        </insert>
+        
+        <insert tableName="included_items">
+            <column name="package_id" valueComputed="@test_package_id"/>
+            <column name="item">Airport transfers</column>
+        </insert>
+        
+        <!-- Add excluded items -->
+        <insert tableName="excluded_items">
+            <column name="package_id" valueComputed="@test_package_id"/>
+            <column name="item">Travel insurance</column>
+        </insert>
+        
+        <insert tableName="excluded_items">
+            <column name="package_id" valueComputed="@test_package_id"/>
+            <column name="item">Personal expenses</column>
+        </insert>
+        
+        <!-- Add itinerary days -->
+        <insert tableName="itinerary_days">
+            <column name="package_id" valueComputed="@test_package_id"/>
+            <column name="day_number" valueNumeric="1"/>
+            <column name="title">Arrival Day</column>
+            <column name="description">Welcome to your destination! Check into your hotel and enjoy a welcome dinner.</column>
+        </insert>
+        
+        <sql>SET @day1_id = LAST_INSERT_ID();</sql>
+        
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="@day1_id"/>
+            <column name="activity">Airport pickup</column>
+        </insert>
+        
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="@day1_id"/>
+            <column name="activity">Hotel check-in</column>
+        </insert>
+        
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="@day1_id"/>
+            <column name="activity">Welcome dinner</column>
+        </insert>
+        
+        <insert tableName="itinerary_days">
+            <column name="package_id" valueComputed="@test_package_id"/>
+            <column name="day_number" valueNumeric="2"/>
+            <column name="title">City Exploration</column>
+            <column name="description">Explore the city with a guided tour of major attractions and landmarks.</column>
+        </insert>
+        
+        <sql>SET @day2_id = LAST_INSERT_ID();</sql>
+        
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="@day2_id"/>
+            <column name="activity">Guided city tour</column>
+        </insert>
+        
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="@day2_id"/>
+            <column name="activity">Museum visit</column>
+        </insert>
+        
+        <insert tableName="itinerary_day_activities">
+            <column name="day_id" valueComputed="@day2_id"/>
+            <column name="activity">Local cuisine dinner</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

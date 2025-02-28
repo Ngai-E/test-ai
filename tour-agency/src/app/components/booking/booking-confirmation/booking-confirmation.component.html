@@ -1,0 +1,118 @@
+<div class="confirmation-container">
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="!loading && booking" class="confirmation-content">
+    <div class="confirmation-header">
+      <div class="success-icon">
+        <i class="fa fa-check-circle"></i>
+      </div>
+      <h1>Booking Confirmed!</h1>
+      <p class="lead">Thank you for booking with Dream Vacations</p>
+    </div>
+
+    <div class="booking-details">
+      <div class="booking-reference">
+        <h3>Booking Reference</h3>
+        <div class="reference-code">{{ booking?.bookingReference }}</div>
+        <p class="reference-note">Please save this reference number for future inquiries</p>
+      </div>
+
+      <div class="booking-status">
+        <div class="status-label">Status:</div>
+        <div class="status-value" [ngClass]="'status-' + (booking?.bookingStatus ? booking?.bookingStatus?.toLowerCase() : 'unknown')">
+          {{ booking?.bookingStatus || 'Unknown' }}
+        </div>
+      </div>
+
+      <div class="package-details">
+        <div class="package-image">
+          <img [src]="booking?.tourPackage?.image || 'assets/images/placeholder.jpg'" [alt]="booking?.tourPackage?.name || 'Package'">
+        </div>
+        <div class="package-info">
+          <h2 class="package-name">{{ booking?.tourPackage?.name || 'Unknown Package' }}</h2>
+          <div class="package-destination">
+            <i class="fa fa-map-marker"></i> {{ booking?.tourPackage?.destination || 'Unknown Destination' }}
+          </div>
+          <div class="booking-dates">
+            <i class="fa fa-calendar"></i> {{ booking?.startDate | date }} - {{ booking?.endDate | date }}
+          </div>
+          <div class="booking-travelers">
+            <i class="fa fa-users"></i> {{ booking?.numberOfAdults }} Adults, {{ booking?.numberOfChildren }} Children
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="booking?.addons && (booking?.addons?.length ?? 0) > 0" class="booking-addons">
+        <h3>Selected Add-ons</h3>
+        <div class="addon-list">
+          <div *ngFor="let addon of booking?.addons" class="addon-item">
+            <div class="addon-name">{{ addon?.addon?.name }}</div>
+            <div class="addon-details">
+              <div class="addon-quantity">x{{ addon?.quantity }}</div>
+              <div class="addon-price">${{ (addon?.priceAtBooking || 0) * (addon?.quantity || 1) | number:'1.2-2' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="payment-details">
+        <h3>Payment Details</h3>
+        <div class="payment-info">
+          <div class="payment-row">
+            <div class="payment-label">Package Price:</div>
+            <div class="payment-value">${{ booking?.packagePrice | number:'1.2-2' }}</div>
+          </div>
+          <div class="payment-row">
+            <div class="payment-label">Add-ons:</div>
+            <div class="payment-value">${{ booking?.addonsTotalPrice | number:'1.2-2' }}</div>
+          </div>
+          <div *ngIf="booking?.discountAmount && (booking?.discountAmount ?? 0) > 0" class="payment-row discount">
+            <div class="payment-label">Discount:</div>
+            <div class="payment-value">-${{ booking?.discountAmount | number:'1.2-2' }}</div>
+          </div>
+          <div class="payment-row total">
+            <div class="payment-label">Total:</div>
+            <div class="payment-value">${{ booking?.totalPrice | number:'1.2-2' }}</div>
+          </div>
+        </div>
+        <div class="payment-status">
+          <div class="status-label">Payment Status:</div>
+          <div class="status-value" [ngClass]="'payment-' + (booking?.paymentStatus ? booking?.paymentStatus?.toLowerCase() : 'unknown')">
+            {{ booking?.paymentStatus || 'Unknown' }}
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-actions">
+        <button class="btn btn-primary" (click)="viewAllBookings()">View All Bookings</button>
+        <button 
+          *ngIf="booking?.bookingStatus === 'CONFIRMED' || booking?.bookingStatus === 'PENDING'" 
+          class="btn btn-danger" 
+          (click)="cancelBooking()">
+          Cancel Booking
+        </button>
+      </div>
+    </div>
+
+    <div class="confirmation-footer">
+      <div class="contact-info">
+        <h3>Need Help?</h3>
+        <p>If you have any questions about your booking, please contact our customer service:</p>
+        <div class="contact-methods">
+          <div class="contact-method">
+            <i class="fa fa-phone"></i> +1 (555) 123-4567
+          </div>
+          <div class="contact-method">
+            <i class="fa fa-envelope"></i> support@dreamvacations.com
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
