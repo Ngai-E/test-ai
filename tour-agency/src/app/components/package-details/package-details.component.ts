@@ -1,118 +1,142 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { PackageService, Package, ItineraryDay as ServiceItineraryDay } from '../../services/package.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ItineraryDay } from '../../models/itinerary.model';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '../../services/auth.service';
+import { PackageService } from '../../services/package.service';
+import { BookingService } from '../../services/booking.service';
+import { ToastService } from '../../services/toast.service';
+
+interface BookingData {
+  guests: number;
+  date: string;
+  specialRequirements?: string;
+}
 
 @Component({
   selector: 'app-package-details',
   templateUrl: './package-details.component.html',
-  styleUrls: ['./package-details.component.scss']
+  styles: [`
+    .package-details {
+      padding: 2rem 0;
+    }
+    .package-image {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      border-radius: 0.5rem;
+    }
+    .package-info {
+      margin-top: 2rem;
+    }
+    .price {
+      font-size: 2rem;
+      color: #28a745;
+      font-weight: bold;
+    }
+    .rating {
+      color: #ffc107;
+      margin-right: 0.5rem;
+    }
+    .booking-form {
+      margin-top: 2rem;
+      padding: 2rem;
+      border: 1px solid #dee2e6;
+      border-radius: 0.5rem;
+    }
+  `]
 })
 export class PackageDetailsComponent implements OnInit {
-  @ViewChild('bookingModal') bookingModal: any;
-  
-  package: Package | null = null;
+  package: any;
   isLoading = true;
-  errorMessage = '';
-  selectedPackageType: any;
-  itineraryDays: ItineraryDay[] = [];
-  bookingData = {
-    fullName: '',
-    email: '',
-    phone: '',
-    travelDate: '',
-    numberOfPeople: 1,
-    specialRequirements: ''
-  };
+  errorMessage: string | null = null;
+  bookingForm: FormGroup;
+  isLoggedIn = false;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
+    private fb: FormBuilder,
+    private authService: AuthService,
     private packageService: PackageService,
-    private modalService: NgbModal
-  ) { }
-
-  ngOnInit(): void {
-    const packageId = this.route.snapshot.paramMap.get('id');
-    if (packageId) {
-      this.loadPackageDetails(Number(packageId));
-    }
+    private bookingService: BookingService,
+    private toastService: ToastService
+  ) {
+    this.bookingForm = this.fb.group({
+      guests: ['', [Validators.required, Validators.min(1)]],
+      date: ['', Validators.required],
+      specialRequirements: ['']
+    });
   }
 
-  loadPackageDetails(id: number): void {
-    this.isLoading = true;
-    this.packageService.getPackageById(id).subscribe({
-      next: (data) => {
-        this.package = data;
-        
-        // Map addons to packageTypes for compatibility with existing HTML
-        if (this.package && this.package.addons) {
-          this.package.packageTypes = this.package.addons.map(addon => {
-            return {
-              id: addon.id,
-              name: addon.name,
-              price: addon.price,
-              description: addon.description,
-              detailedDescription: addon.detailedDescription,
-              accommodationType: addon.category === 'ACCOMMODATION' ? addon.description : undefined,
-              transferType: addon.category === 'TRANSPORTATION' ? addon.description : undefined,
-              features: [addon.description],
-              specialActivities: addon.category === 'ACTIVITY' ? [addon.description] : []
-            };
-          });
-        }
-        
-        this.parseItinerary();
-        console.log('Loaded package details:', this.package);
+  ngOnInit(): void {
+    this.authService.currentUser$.subscribe(user => {
+      this.isLoggedIn = !!user;
+    });
+
+    const packageId = this.route.snapshot.paramMap.get('id');
+    if (!packageId) {
+      this.router.navigate(['/packages']);
+      return;
+    }
+
+    this.loadPackageDetails(parseInt(packageId, 10));
+  }
+
+  private loadPackageDetails(packageId: number): void {
+    this.packageService.getPackageById(packageId).subscribe({
+      next: (packageData) => {
+        this.package = packageData;
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading package details:', error);
-        this.errorMessage = 'Failed to load package details. Please try again later.';
+        this.errorMessage = 'Failed to load package details';
         this.isLoading = false;
+        this.toastService.showError('Failed to load package details');
       }
     });
   }
 
-  parseItinerary(): void {
-    if (this.package && this.package.itinerary) {
-      // Use the actual itinerary data from the backend
-      console.log('Itinerary data (raw):', this.package.itinerary);
-      console.log('Itinerary data (JSON):', JSON.stringify(this.package.itinerary, null, 2));
-      
-      // Make sure we have an array of itinerary days
-      if (Array.isArray(this.package.itinerary)) {
-        this.itineraryDays = this.package.itinerary.map((day: any) => {
-          // Ensure activities is an array
-          let activities: string[] = day.activities ? (Array.isArray(day.activities) ? day.activities : (typeof day.activities === 'string' ? (day.activities as string).split(',').map((activity: string) => activity.trim()) : [])) : [];
-          
-          return {
-            dayNumber: day.dayNumber || 0,
-            title: day.title || `Day ${day.dayNumber}`,
-            description: day.description || '',
-            accommodation: day.accommodation || 'Not specified',
-            meals: day.meals || 'Not specified',
-            activities: activities
-          } as ItineraryDay;
-        });
-        
-        // Sort by day number
-        this.itineraryDays.sort((a, b) => a.dayNumber - b.dayNumber);
+  submitBooking(): void {
+    if (!this.isLoggedIn) {
+      this.router.navigate(['/login'], { 
+        queryParams: { returnUrl: `/packages/${this.package.id}` }
+      });
+      return;
+    }
+
+    if (this.bookingForm.invalid) {
+      this.toastService.showError('Please fill in all required fields');
+      return;
+    }
+
+    const bookingData: BookingData = {
+      guests: this.bookingForm.get('guests')?.value,
+      date: this.bookingForm.get('date')?.value,
+      specialRequirements: this.bookingForm.get('specialRequirements')?.value
+    };
+
+    this.bookingService.createBooking(this.package.id, bookingData).subscribe({
+      next: (response) => {
+        this.toastService.showSuccess('Booking created successfully');
+        this.router.navigate(['/booking-confirmation', response.id]);
+      },
+      error: (error) => {
+        this.toastService.showError('Failed to create booking');
+      }
+    });
+  }
+
+  getStars(rating: number): string[] {
+    const stars: string[] = [];
+    for (let i = 1; i <= 5; i++) {
+      if (i <= rating) {
+        stars.push('fas fa-star');
+      } else if (i - 0.5 <= rating) {
+        stars.push('fas fa-star-half-alt');
       } else {
-        console.error('Itinerary is not an array:', this.package.itinerary);
-        this.itineraryDays = [];
+        stars.push('far fa-star');
       }
     }
-  }
-
-  openBookingModal(packageType: any): void {
-    this.selectedPackageType = packageType;
-    this.modalService.open(this.bookingModal, { centered: true, size: 'lg' });
-  }
-
-  submitBooking(): void {
-    console.log('Booking submitted:', this.bookingData);
-    this.modalService.dismissAll();
-    // Here you would typically call a service to submit the booking
+    return stars;
   }
 }

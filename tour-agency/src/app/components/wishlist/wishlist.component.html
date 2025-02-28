@@ -36,16 +36,17 @@
               <div class="rating">
                 <span class="stars">
                   <i *ngFor="let star of [1,2,3,4,5]" 
-                     class="fa" 
-                     [ngClass]="star <= item.averageRating ? 'fa-star' : 'fa-star-o'"></i>
+                     class="fa"
+                     [class.fa-star]="star <= item.averageRating"
+                     [class.fa-star-o]="star > item.averageRating"></i>
                 </span>
-                <span class="rating-value">{{ item.averageRating | number:'1.1-1' }}</span>
+                <span class="rating-value">{{ item.averageRating.toFixed(1) }}</span>
               </div>
               <div class="price">
-                <span>${{ item.basePrice | number:'1.2-2' }}</span>
+                <span>${{ item.basePrice.toFixed(2) }}</span>
               </div>
             </div>
-            <p class="card-text">{{ item.description | slice:0:100 }}...</p>
+            <p class="card-text">{{ item.description.substring(0, 100) }}...</p>
             <button class="btn btn-outline-primary btn-block" (click)="viewPackageDetails(item.id)">
               View Details
             </button>

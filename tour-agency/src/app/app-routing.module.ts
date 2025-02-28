@@ -9,8 +9,6 @@ import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
 import { WishlistComponent } from './components/wishlist/wishlist.component';
 import { CartComponent } from './components/cart/cart.component';
-import { PackageDetailComponent } from './components/package/package-detail/package-detail.component';
-import { BookingListComponent } from './components/booking/booking-list/booking-list.component';
 import { BookingConfirmationComponent } from './components/booking/booking-confirmation/booking-confirmation.component';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { BookingsComponent } from './components/user/bookings/bookings.component';
@@ -21,7 +19,7 @@ const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'packages', component: PackagesComponent },
   { path: 'contact', component: ContactComponent },
-  { path: 'packages/:id', component: PackageDetailComponent },
+  { path: 'packages/:id', component: PackageDetailsComponent },
   { path: 'admin/packages', component: PackageManagementComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
@@ -29,6 +27,7 @@ const routes: Routes = [
   { path: 'cart', component: CartComponent, canActivate: [AuthGuard] },
   { path: 'bookings', component: BookingsComponent, canActivate: [AuthGuard] },
   { path: 'bookings/:id', component: BookingDetailsComponent, canActivate: [AuthGuard] },
+  { path: 'booking-confirmation/:id', component: BookingConfirmationComponent, canActivate: [AuthGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' }
 ];

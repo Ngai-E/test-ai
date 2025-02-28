@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { User, PasswordChange } from '../models/user.model';
@@ -18,13 +18,13 @@ export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
   private userUrl = `${environment.apiUrl}/users`;
   private currentUserSubject: BehaviorSubject<User | null>;
-  public currentUser: Observable<User | null>;
+  public currentUser$: Observable<User | null>;
   private tokenExpirationTimer: any;
 
   constructor(private http: HttpClient, private router: Router) {
     const storedUser = localStorage.getItem('currentUser');
     this.currentUserSubject = new BehaviorSubject<User | null>(storedUser ? JSON.parse(storedUser) : null);
-    this.currentUser = this.currentUserSubject.asObservable();
+    this.currentUser$ = this.currentUserSubject.asObservable();
     
     // Check token expiration on service initialization
     if (storedUser) {

@@ -1,62 +1,120 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { WishlistService } from '../../services/wishlist.service';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { Package } from '../../services/package.service';
+import { WishlistService } from '../../services/wishlist.service';
+import { ToastService } from '../../services/toast.service';
+import { User } from '../../models/user.model';
 
 @Component({
   selector: 'app-wishlist',
   templateUrl: './wishlist.component.html',
-  styleUrls: ['./wishlist.component.css']
+  styles: [`
+    .wishlist-container {
+      padding: 2rem;
+    }
+    .wishlist-item {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      border: 1px solid #dee2e6;
+      border-radius: 0.5rem;
+    }
+    .star-rating {
+      color: #ffc107;
+      margin-right: 0.5rem;
+    }
+    .price {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #28a745;
+    }
+    .btn-remove {
+      color: #dc3545;
+      border-color: #dc3545;
+    }
+    .btn-remove:hover {
+      background-color: #dc3545;
+      color: white;
+    }
+  `]
 })
-export class WishlistComponent implements OnInit {
-  wishlistItems: Package[] = [];
-  loading = true;
-  error = '';
+export class WishlistComponent implements OnInit, OnDestroy {
+  wishlistItems: any[] = [];
+  loading = false;
+  error: string | null = null;
+  private subscriptions: Subscription[] = [];
 
   constructor(
-    private wishlistService: WishlistService,
     private authService: AuthService,
+    private wishlistService: WishlistService,
+    private toastService: ToastService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.authService.currentUser.subscribe(currentUser => {
-      if (currentUser && currentUser.id) {
-        this.loadWishlist(currentUser.id);
-      }
-    });
-  }
-
-  loadWishlist(userId: number): void {
     this.loading = true;
-    this.wishlistService.getWishlist(userId).subscribe({
-      next: (packages) => {
-        this.wishlistItems = packages;
-        this.loading = false;
-      },
-      error: (error) => {
-        this.error = 'Failed to load wishlist. Please try again.';
-        this.loading = false;
+    const authSub = this.authService.currentUser$.subscribe((currentUser: User | null) => {
+      if (!currentUser || !currentUser.id) {
+        this.router.navigate(['/login'], { queryParams: { returnUrl: '/wishlist' } });
+        return;
       }
+      this.loadWishlistItems(currentUser.id);
     });
+    this.subscriptions.push(authSub);
   }
 
-  removeFromWishlist(packageId: number): void {
-    const currentUser = this.authService.currentUserValue;
-    if (!currentUser || !currentUser.id) return;
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 
-    this.wishlistService.removeFromWishlist(currentUser.id, packageId).subscribe({
-      next: () => {
-        this.wishlistItems = this.wishlistItems.filter(item => item.id !== packageId);
+  private loadWishlistItems(userId: number): void {
+    const wishlistSub = this.wishlistService.getWishlist(userId).subscribe({
+      next: (items) => {
+        this.wishlistItems = items;
+        this.loading = false;
       },
       error: (error) => {
-        this.error = 'Failed to remove item from wishlist. Please try again.';
+        this.error = 'Failed to load wishlist items';
+        this.loading = false;
+        this.toastService.showError('Failed to load wishlist items');
+      }
+    });
+    this.subscriptions.push(wishlistSub);
+  }
+
+  removeFromWishlist(itemId: number): void {
+    const currentUser = this.authService.currentUserValue;
+    if (!currentUser || !currentUser.id) {
+      this.toastService.showError('You must be logged in to remove items from your wishlist');
+      return;
+    }
+
+    this.wishlistService.removeFromWishlist(currentUser.id, itemId).subscribe({
+      next: () => {
+        this.wishlistItems = this.wishlistItems.filter(item => item.id !== itemId);
+        this.toastService.showSuccess('Item removed from wishlist');
+      },
+      error: (error) => {
+        this.toastService.showError('Failed to remove item from wishlist');
       }
     });
   }
 
   viewPackageDetails(packageId: number): void {
     this.router.navigate(['/packages', packageId]);
+  }
+
+  getStars(rating: number): string[] {
+    const stars: string[] = [];
+    for (let i = 1; i <= 5; i++) {
+      if (i <= rating) {
+        stars.push('fas fa-star');
+      } else if (i - 0.5 <= rating) {
+        stars.push('fas fa-star-half-alt');
+      } else {
+        stars.push('far fa-star');
+      }
+    }
+    return stars;
   }
 }
