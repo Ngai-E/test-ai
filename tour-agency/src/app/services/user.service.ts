@@ -3,16 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-
-export interface User {
-  id: number;
-  phoneNumber: string;
-  fullName: string;
-  email: string;
-  coinBalance: number;
-  referralCode: string;
-  token?: string;
-}
+import { map } from 'rxjs/operators';
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -26,11 +18,13 @@ export class UserService {
   ) { }
 
   getUserProfile(): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/profile`);
+    const userId = this.authService.getCurrentUserId();
+    return this.http.get<User>(`${this.apiUrl}/${userId}`);
   }
 
   updateUserProfile(userData: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/profile`, userData);
+    const userId = this.authService.getCurrentUserId();
+    return this.http.put<User>(`${this.apiUrl}/${userId}`, userData);
   }
 
   getUserCoins(): Observable<number> {
@@ -38,9 +32,12 @@ export class UserService {
     return this.http.get<number>(`${this.apiUrl}/${userId}/coins`);
   }
 
+  // According to the API spec, there is no specific endpoint for getting just the referral code
+  // We'll need to get the user profile and extract the referral code
   getReferralCode(): Observable<string> {
-    const userId = this.authService.getCurrentUserId();
-    return this.http.get<string>(`${this.apiUrl}/${userId}/referral-code`);
+    return this.getUserProfile().pipe(
+      map((user: User) => user.referralCode || '')
+    );
   }
 
   generateCoupon(value: number): Observable<{ code: string, value: number, expiryDate: string }> {

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 export interface Addon {
   id: number;
@@ -69,11 +70,15 @@ export interface Booking {
 export class BookingService {
   private apiUrl = `${environment.apiUrl}/bookings`;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   // Get all bookings for the current user
   getUserBookings(): Observable<Booking[]> {
-    return this.http.get<Booking[]>(`${this.apiUrl}/user`);
+    const userId = this.authService.getCurrentUserId();
+    return this.http.get<Booking[]>(`${this.apiUrl}/user/${userId}`);
   }
 
   // Get a specific booking by ID

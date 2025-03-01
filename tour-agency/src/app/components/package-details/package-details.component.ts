@@ -693,14 +693,12 @@ export class PackageDetailsComponent implements OnInit, OnDestroy {
   }
 
   private loadUserData(): void {
-    if (!this.currentUser) return;
-
     // Load user coins
     const coinsSub = this.userService.getUserCoins().subscribe({
       next: (data: any) => {
-        this.userCoins = data?.coinBalance || 0;
+        this.userCoins = data || 0;
       },
-      error: (error: any) => {
+      error: (error) => {
         console.error('Error loading user coins:', error);
       }
     });
@@ -708,10 +706,10 @@ export class PackageDetailsComponent implements OnInit, OnDestroy {
 
     // Load referral code
     const referralSub = this.userService.getReferralCode().subscribe({
-      next: (data: any) => {
-        this.referralCode = data?.referralCode || '';
+      next: (referralCode: string) => {
+        this.referralCode = referralCode || '';
       },
-      error: (error: any) => {
+      error: (error) => {
         console.error('Error loading referral code:', error);
       }
     });
@@ -770,8 +768,8 @@ export class PackageDetailsComponent implements OnInit, OnDestroy {
     if (!this.isLoggedIn || !this.package) return;
 
     const reviewSub = this.reviewService.hasUserReviewed(this.package.id).subscribe({
-      next: (status: any) => {
-        this.hasUserReviewed = status?.hasReviewed || false;
+      next: (hasReviewed: boolean) => {
+        this.hasUserReviewed = hasReviewed;
       },
       error: (error) => {
         console.error('Error checking review status:', error);

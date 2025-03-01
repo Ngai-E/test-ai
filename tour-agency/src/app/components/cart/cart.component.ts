@@ -162,11 +162,16 @@ export class CartComponent implements OnInit, OnDestroy {
   prefillUserInfo(): void {
     const currentUser = this.authService.currentUserValue;
     if (currentUser) {
+      // Extract first and last name from fullName
+      const nameParts = currentUser.fullName ? currentUser.fullName.split(' ') : ['', ''];
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+      
       this.bookingForm.patchValue({
-        firstName: currentUser.firstName || '',
-        lastName: currentUser.lastName || '',
+        firstName: firstName,
+        lastName: lastName,
         email: currentUser.email || '',
-        phone: currentUser.phone || ''
+        phone: currentUser.phoneNumber || ''
       });
     }
   }

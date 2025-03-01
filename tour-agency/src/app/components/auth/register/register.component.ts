@@ -73,12 +73,9 @@ export class RegisterComponent {
     const fullPhoneNumber = this.f['countryCode'].value + this.f['phoneNumber'].value;
 
     const user: User = {
-      id: 0, // Will be assigned by the server
-      username: fullPhoneNumber, // Use phoneNumber as username
+      phoneNumber: fullPhoneNumber,
+      fullName: this.f['fullName'].value,
       email: this.f['email'].value,
-      firstName: this.f['fullName'].value.split(' ')[0],
-      lastName: this.f['fullName'].value.split(' ').slice(1).join(' '),
-      phone: fullPhoneNumber,
       referralCode: this.f['referralCode'].value || undefined
     };
 

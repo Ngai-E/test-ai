@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { User, PasswordChange } from '../models/user.model';
 import { Router } from '@angular/router';
+import { User, PasswordChange } from '../models/user.model';
 
 interface AuthResponse {
   id: number;
@@ -60,21 +60,17 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { phoneNumber, password })
       .pipe(
         tap(response => {
-          // Convert the response to match our User model
+          // Store user details and jwt token in local storage to keep user logged in between page refreshes
           const user: User = {
             id: response.id,
-            username: response.phoneNumber,
+            phoneNumber: response.phoneNumber,
+            fullName: response.fullName,
             email: response.email,
-            firstName: response.fullName.split(' ')[0],
-            lastName: response.fullName.split(' ').slice(1).join(' '),
-            phone: response.phoneNumber,
-            coins: response.coinBalance,
-            referralCode: response.referralCode
+            coinBalance: response.coinBalance,
+            referralCode: response.referralCode,
+            token: response.token
           };
-          
-          // Store user details and token in local storage
           localStorage.setItem('currentUser', JSON.stringify(user));
-          localStorage.setItem('token', response.token);
           this.currentUserSubject.next(user);
           this.autoLogout();
         }),
@@ -89,22 +85,18 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { ...user, password })
       .pipe(
         tap(response => {
-          // Convert the response to match our User model
-          const savedUser: User = {
+          // Store user details and jwt token in local storage
+          const newUser: User = {
             id: response.id,
-            username: response.phoneNumber,
+            phoneNumber: response.phoneNumber,
+            fullName: response.fullName,
             email: response.email,
-            firstName: response.fullName.split(' ')[0],
-            lastName: response.fullName.split(' ').slice(1).join(' '),
-            phone: response.phoneNumber,
-            coins: response.coinBalance,
-            referralCode: response.referralCode
+            coinBalance: response.coinBalance,
+            referralCode: response.referralCode,
+            token: response.token
           };
-          
-          // Store user details and token in local storage
-          localStorage.setItem('currentUser', JSON.stringify(savedUser));
-          localStorage.setItem('token', response.token);
-          this.currentUserSubject.next(savedUser);
+          localStorage.setItem('currentUser', JSON.stringify(newUser));
+          this.currentUserSubject.next(newUser);
           this.autoLogout();
         }),
         catchError(error => {
@@ -147,7 +139,8 @@ export class AuthService {
    * Get the current user's profile
    */
   getUserProfile(): Observable<User> {
-    return this.http.get<User>(`${this.userUrl}/profile`);
+    const userId = this.getCurrentUserId();
+    return this.http.get<User>(`${this.userUrl}/${userId}`);
   }
 
   /**
@@ -155,7 +148,8 @@ export class AuthService {
    * @param userData Updated user data
    */
   updateProfile(userData: Partial<User>): Observable<User> {
-    return this.http.put<User>(`${this.userUrl}/profile`, userData)
+    const userId = this.getCurrentUserId();
+    return this.http.put<User>(`${this.userUrl}/${userId}`, userData)
       .pipe(
         tap(updatedUser => {
           // Update stored user data
@@ -174,14 +168,24 @@ export class AuthService {
    * @param passwordData Password change data
    */
   changePassword(passwordData: PasswordChange): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.userUrl}/change-password`, passwordData);
+    const userId = this.getCurrentUserId();
+    return this.http.post<{ message: string }>(`${this.userUrl}/${userId}/change-password`, passwordData);
   }
 
   /**
    * Get user's referral information
    */
   getReferralInfo(): Observable<{ referralCode: string, referralCount: number, coinsEarned: number }> {
-    return this.http.get<{ referralCode: string, referralCount: number, coinsEarned: number }>(`${this.userUrl}/referrals`);
+    const userId = this.getCurrentUserId();
+    // Based on the API spec, we don't have a specific endpoint for referrals
+    // We'll use the user profile endpoint and extract the relevant information
+    return this.getUserProfile().pipe(
+      map(user => ({
+        referralCode: user.referralCode || '',
+        referralCount: 0, // This information is not available in the user profile
+        coinsEarned: user.coinBalance || 0
+      }))
+    );
   }
 
   /**

@@ -23,21 +23,17 @@ export class ProfileComponent implements OnInit {
     referralCount: 0,
     coinsEarned: 0
   };
+  coinBalance = 0;
+  referralCode = '';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService
   ) {
     this.profileForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      fullName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
-      address: [''],
-      city: [''],
-      state: [''],
-      country: [''],
-      zipCode: ['']
+      phoneNumber: ['', Validators.required]
     });
 
     this.passwordForm = this.fb.group({
@@ -49,7 +45,6 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUserProfile();
-    this.loadReferralInfo();
   }
 
   loadUserProfile(): void {
@@ -57,43 +52,48 @@ export class ProfileComponent implements OnInit {
     this.authService.getUserProfile()
       .pipe(
         catchError(error => {
+          this.loading = false;
           this.errorMessage = 'Failed to load profile. Please try again.';
+          console.error('Error loading profile:', error);
           return of(null);
-        }),
-        finalize(() => this.loading = false)
+        })
       )
       .subscribe(user => {
-        if (user) {
-          this.currentUser = user;
-          this.profileForm.patchValue({
-            firstName: user.firstName || '',
-            lastName: user.lastName || '',
-            email: user.email || '',
-            phone: user.phone || '',
-            address: user.address || '',
-            city: user.city || '',
-            state: user.state || '',
-            country: user.country || '',
-            zipCode: user.zipCode || ''
-          });
-        }
+        this.loading = false;
+        
+        if (!user) return;
+        
+        // Update form with user data
+        this.profileForm.patchValue({
+          fullName: user.fullName || '',
+          email: user.email || '',
+          phoneNumber: user.phoneNumber || ''
+        });
+        
+        // Store user data
+        this.currentUser = user;
+        this.coinBalance = user.coinBalance || 0;
+        this.referralCode = user.referralCode || '';
+        
+        // Load referral stats
+        this.loadReferralStats();
       });
   }
 
-  loadReferralInfo(): void {
+  loadReferralStats(): void {
     this.authService.getReferralInfo()
       .pipe(
         catchError(error => {
-          console.error('Failed to load referral info', error);
+          console.error('Error loading referral stats:', error);
           return of({
-            referralCode: 'N/A',
+            referralCode: this.referralCode || '',
             referralCount: 0,
             coinsEarned: 0
           });
         })
       )
-      .subscribe(info => {
-        this.referralInfo = info;
+      .subscribe(stats => {
+        this.referralInfo = stats;
       });
   }
 

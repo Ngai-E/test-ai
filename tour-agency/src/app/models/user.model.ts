@@ -1,19 +1,11 @@
 export interface User {
   id?: number;
-  username: string;
+  phoneNumber: string;
+  fullName: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  zipCode?: string;
-  coins?: number;
+  coinBalance?: number;
   referralCode?: string;
-  referredBy?: string;
-  role?: string;
+  token?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
