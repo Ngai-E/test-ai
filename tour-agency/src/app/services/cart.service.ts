@@ -7,16 +7,21 @@ import { AuthService } from './auth.service';
 
 export interface CartItemAddon {
   id: number;
-  cartItem: any;
-  addon: any;
+  addonId: number;
+  addonName: string;
+  addonDescription: string;
   quantity: number;
   price: number;
 }
 
 export interface CartItem {
   id: number;
-  user: any;
-  tourPackage: any;
+  userId: number;
+  packageId: number;
+  packageName: string;
+  packageImage: string;
+  packageCountry: string;
+  packageDuration: number;
   startDate: string;
   endDate: string;
   numberOfAdults: number;

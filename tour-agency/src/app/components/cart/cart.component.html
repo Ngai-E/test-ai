@@ -46,21 +46,21 @@
             <div *ngFor="let item of cartItems" class="cart-item">
               <div class="row align-items-center">
                 <div class="col-md-3">
-                  <img [src]="item.package.image" alt="{{ item.package.name }}" class="img-fluid rounded">
+                  <img [src]="item.packageImage" alt="{{ item.packageName }}" class="img-fluid rounded">
                 </div>
                 <div class="col-md-9">
                   <div class="d-flex justify-content-between align-items-start">
                     <div>
-                      <h5>{{ item.package.name }}</h5>
-                      <p class="text-muted">{{ item.package.destination }}</p>
+                      <h5>{{ item.packageName }}</h5>
+                      <p class="text-muted">{{ item.packageCountry }}</p>
                       <div class="d-flex align-items-center mt-2">
                         <div class="quantity-control">
                           <button class="btn btn-sm btn-outline-secondary" (click)="updateQuantity(item, -1)">-</button>
-                          <span class="mx-2">{{ item.quantity }}</span>
+                          <span class="mx-2">{{ item.numberOfAdults }}</span>
                           <button class="btn btn-sm btn-outline-secondary" (click)="updateQuantity(item, 1)">+</button>
                         </div>
                         <div class="price ml-3">
-                          <span class="text-primary">${{ item.package.price | number:'1.2-2' }}</span>
+                          <span class="text-primary">${{ item.basePrice | number:'1.2-2' }}</span>
                         </div>
                       </div>
                     </div>
@@ -74,7 +74,7 @@
                     <h6>Add-ons:</h6>
                     <div *ngFor="let addon of item.addons" class="addon-item d-flex justify-content-between align-items-center">
                       <div>
-                        <span>{{ addon.name }}</span>
+                        <span>{{ addon.addonName }}</span>
                         <small class="text-muted ml-2">${{ addon.price | number:'1.2-2' }} each</small>
                       </div>
                       <div class="d-flex align-items-center">
@@ -211,13 +211,13 @@
             </div>
             
             <div class="form-group">
-              <label for="specialRequests">Special Requests</label>
+              <label for="specialRequests">Special Requests (Optional)</label>
               <textarea id="specialRequests" class="form-control" rows="3" formControlName="specialRequests"></textarea>
             </div>
             
-            <button type="submit" class="btn btn-primary btn-block" [disabled]="bookingForm.invalid || bookingLoading || total <= 0">
+            <button type="submit" class="btn btn-primary btn-block" [disabled]="bookingForm.invalid || bookingLoading">
               <i *ngIf="bookingLoading" class="fa fa-spinner fa-spin mr-2"></i>
-              Complete Booking
+              Proceed to Payment
             </button>
           </form>
         </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CartService } from '../../services/cart.service';
+import { CartService, CartItem, CartItemAddon } from '../../services/cart.service';
 import { CouponService, Coupon } from '../../services/coupon.service';
 import { BookingService } from '../../services/booking.service';
 import { AuthService } from '../../services/auth.service';
@@ -15,7 +15,7 @@ import { of } from 'rxjs';
   styleUrls: ['./cart.component.css']
 })
 export class CartComponent implements OnInit {
-  cartItems: any[] = [];
+  cartItems: CartItem[] = [];
   couponForm: FormGroup;
   bookingForm: FormGroup;
   loading = false;
@@ -57,6 +57,10 @@ export class CartComponent implements OnInit {
     this.prefillUserInfo();
   }
 
+  get hasItems(): boolean {
+    return this.cartItems.length > 0;
+  }
+
   loadCartItems(): void {
     this.loading = true;
     this.cartService.getCartItems()
@@ -87,8 +91,8 @@ export class CartComponent implements OnInit {
     }
   }
 
-  updateQuantity(item: any, change: number): void {
-    const newQuantity = item.quantity + change;
+  updateQuantity(item: CartItem, change: number): void {
+    const newQuantity = item.numberOfAdults + change;
     if (newQuantity < 1) return;
     
     this.loading = true;
@@ -105,17 +109,17 @@ export class CartComponent implements OnInit {
       )
       .subscribe(response => {
         if (response) {
-          item.quantity = newQuantity;
+          item.numberOfAdults = newQuantity;
         }
       });
   }
 
-  updateAddonQuantity(item: any, addon: any, change: number): void {
+  updateAddonQuantity(item: CartItem, addon: CartItemAddon, change: number): void {
     const newQuantity = addon.quantity + change;
     if (newQuantity < 0) return;
     
     this.loading = true;
-    this.cartService.updateAddonQuantity(item.id, addon.id, newQuantity)
+    this.cartService.updateAddonQuantity(item.id, addon.addonId, newQuantity)
       .pipe(
         catchError(error => {
           this.errorMessage = 'Failed to update addon quantity. Please try again.';
@@ -144,7 +148,7 @@ export class CartComponent implements OnInit {
         finalize(() => this.loading = false)
       )
       .subscribe(response => {
-        if (response) {
+        if (response !== null) {
           this.cartItems = this.cartItems.filter(item => item.id !== itemId);
           this.calculateTotals();
         }
@@ -190,7 +194,7 @@ export class CartComponent implements OnInit {
   calculateTotals(): void {
     // Calculate subtotal
     this.subtotal = this.cartItems.reduce((total, item) => {
-      const itemTotal = item.package.price * item.quantity;
+      const itemTotal = item.basePrice * item.numberOfAdults;
       const addonTotal = this.addonTotalPipe.transform(item.addons || []);
       return total + itemTotal + addonTotal;
     }, 0);
@@ -212,7 +216,11 @@ export class CartComponent implements OnInit {
     
     const bookingData = {
       ...this.bookingForm.value,
-      couponId: this.appliedCoupon?.id
+      cartItems: this.cartItems.map(item => item.id),
+      couponCode: this.appliedCoupon?.code || null,
+      subtotal: this.subtotal,
+      discount: this.discount,
+      total: this.total
     };
     
     this.bookingService.createBooking(bookingData)
@@ -221,20 +229,16 @@ export class CartComponent implements OnInit {
           this.errorMessage = error.error?.message || 'Failed to create booking. Please try again.';
           return of(null);
         }),
-        finalize(() => this.bookingLoading = false)
+        finalize(() => {
+          this.bookingLoading = false;
+        })
       )
-      .subscribe(booking => {
-        if (booking) {
+      .subscribe(response => {
+        if (response) {
           this.successMessage = 'Booking created successfully!';
           this.cartService.clearCart().subscribe();
-          setTimeout(() => {
-            this.router.navigate(['/bookings', booking.id]);
-          }, 1500);
+          this.router.navigate(['/bookings', response.id]);
         }
       });
-  }
-
-  get hasItems(): boolean {
-    return this.cartItems.length > 0;
   }
 }
