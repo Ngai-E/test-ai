@@ -6,6 +6,60 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom Styles -->
+  <style>
+    :root {
+      --primary-color: #3f51b5;
+      --secondary-color: #4caf50;
+      --accent-color: #ffc107;
+      --light-bg: #f9fafb;
+      --dark-text: #2c3e50;
+      --light-text: #6c757d;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--light-bg);
+      color: var(--dark-text);
+    }
+    
+    .btn {
+      font-weight: 500;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+      background-color: #303f9f;
+      border-color: #303f9f;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(63, 81, 181, 0.3);
+    }
+    
+    .card {
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+  </style>
 </head>
 <body>
   <app-root></app-root>

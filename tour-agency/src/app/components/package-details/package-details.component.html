@@ -12,93 +12,207 @@
 </div>
 
 <div class="package-details" *ngIf="package && !isLoading">
-  <div class="container">
+  <!-- Hero Section with Full-width Image -->
+  <div class="hero-banner" [style.background-image]="'url(' + package.image + ')'">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="hero-content">
+        <div class="badge-container mb-2">
+          <span class="badge bg-primary me-2">{{ package.duration }} days</span>
+          <span class="badge bg-success">{{ package.country }}</span>
+        </div>
+        <h1 class="display-4 fw-bold text-white mb-3">{{ package.name }}</h1>
+        <div class="d-flex align-items-center mb-4">
+          <div class="rating me-3">
+            <i *ngFor="let star of getStars(package.averageRating)" [class]="star"></i>
+          </div>
+          <span class="text-white">({{ package.reviews?.length || 0 }} reviews)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container py-5">
     <div class="row">
-      <!-- Package Details -->
+      <!-- Left Column - Package Details -->
       <div class="col-md-8">
-        <img [src]="package.image" [alt]="package.name" class="package-image mb-4">
-        <h1 class="mb-4">{{ package.name }}</h1>
-        
-        <div class="package-info">
-          <div class="d-flex align-items-center mb-3">
-            <div class="rating me-3">
-              <i *ngFor="let star of getStars(package.averageRating)" [class]="star"></i>
-            </div>
-            <span class="text-muted">({{ package.reviews?.length || 0 }} reviews)</span>
-          </div>
-
-          <p class="lead">{{ package.description }}</p>
-
-          <div class="row mb-4">
+        <!-- Quick Info Cards -->
+        <div class="info-cards-container mb-5">
+          <div class="row g-3">
             <div class="col-6 col-md-3">
-              <div class="info-item">
+              <div class="info-card">
                 <i class="fas fa-clock"></i>
-                <span>{{ package.duration }} days</span>
+                <h5>Duration</h5>
+                <p>{{ package.duration }} days</p>
               </div>
             </div>
             <div class="col-6 col-md-3">
-              <div class="info-item">
+              <div class="info-card">
                 <i class="fas fa-users"></i>
-                <span>{{ package.groupSize }}</span>
+                <h5>Group Size</h5>
+                <p>{{ package.groupSize }}</p>
               </div>
             </div>
             <div class="col-6 col-md-3">
-              <div class="info-item">
+              <div class="info-card">
                 <i class="fas fa-map-marker-alt"></i>
-                <span>{{ package.country }}</span>
+                <h5>Location</h5>
+                <p>{{ package.country }}</p>
               </div>
             </div>
             <div class="col-6 col-md-3">
-              <div class="info-item">
+              <div class="info-card">
                 <i class="fas fa-tag"></i>
-                <span>${{ package.basePrice }}</span>
+                <h5>Price</h5>
+                <p>${{ package.basePrice }}</p>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="highlights mb-4">
-            <h3>Highlights</h3>
-            <ul class="list-unstyled">
-              <li *ngFor="let highlight of package.highlights">
-                <i class="fas fa-check-circle text-success me-2"></i>
-                {{ highlight }}
-              </li>
-            </ul>
+        <!-- Overview Section -->
+        <div class="content-section mb-5">
+          <h2 class="section-title">Overview</h2>
+          <p class="lead">{{ package.description }}</p>
+        </div>
+
+        <!-- Highlights Section -->
+        <div class="content-section mb-5">
+          <h2 class="section-title">Highlights</h2>
+          <div class="highlights-container">
+            <div class="highlight-item" *ngFor="let highlight of package.highlights || ['Scenic mountain views', 'Local cuisine experience', 'Cultural immersion', 'Adventure activities']">
+              <div class="highlight-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div>
+                <p class="mb-0">{{ highlight }}</p>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div class="itinerary">
-            <h3>Itinerary</h3>
-            <div *ngFor="let day of package.itinerary" class="mb-3">
-              <h4>Day {{ day.dayNumber }}: {{ day.title }}</h4>
-              <p>{{ day.description }}</p>
-              <div class="itinerary-details">
-                <p><strong>Accommodation:</strong> {{ day.accommodation }}</p>
-                <p><strong>Meals:</strong> {{ day.meals }}</p>
-                <div *ngIf="day.activities && day.activities.length > 0">
-                  <p><strong>Activities:</strong></p>
-                  <ul>
-                    <li *ngFor="let activity of day.activities">{{ activity }}</li>
-                  </ul>
+        <!-- Itinerary Section -->
+        <div class="content-section mb-5">
+          <h2 class="section-title">Itinerary</h2>
+          <div class="accordion" id="itineraryAccordion">
+            <div class="accordion-item" *ngFor="let day of [1, 2, 3, 4, 5]; let i = index">
+              <h2 class="accordion-header" [id]="'heading' + i">
+                <button class="accordion-button" [class.collapsed]="i !== 0" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse' + i" [attr.aria-expanded]="i === 0 ? 'true' : 'false'" [attr.aria-controls]="'collapse' + i">
+                  <span class="day-number">Day {{ day }}</span> {{ package['day' + day + 'Title'] || 'Explore & Adventure' }}
+                </button>
+              </h2>
+              <div [id]="'collapse' + i" class="accordion-collapse collapse" [class.show]="i === 0" [attr.aria-labelledby]="'heading' + i" data-bs-parent="#itineraryAccordion">
+                <div class="accordion-body">
+                  <p>{{ package['day' + day + 'Description'] || 'Experience the beauty and culture of this amazing destination with guided tours, delicious local cuisine, and unforgettable adventures.' }}</p>
+                  <div class="itinerary-details">
+                    <div class="detail-item">
+                      <i class="fas fa-utensils"></i>
+                      <div>
+                        <h6>Meals</h6>
+                        <p>Breakfast, Lunch, Dinner</p>
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <i class="fas fa-bed"></i>
+                      <div>
+                        <h6>Accommodation</h6>
+                        <p>{{ package.accommodation || 'Luxury Hotel' }}</p>
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <i class="fas fa-route"></i>
+                      <div>
+                        <h6>Activities</h6>
+                        <p>Guided tour, Local experiences, Free time for exploration</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Booking Form -->
-      <div class="col-md-4">
-        <div class="booking-form">
-          <h3>Book This Package</h3>
-          <div class="price mb-4">
-            <span class="amount">${{ package.basePrice }}</span>
-            <span class="text-muted">/person</span>
+        <!-- Addons Section -->
+        <div class="content-section mb-5" *ngIf="package.addons && package.addons.length > 0">
+          <h2 class="section-title">Enhance Your Experience</h2>
+          <p class="mb-4">Customize your trip with these exclusive add-ons</p>
+          
+          <div class="row g-4">
+            <div class="col-md-6" *ngFor="let addon of package.addons">
+              <div class="addon-card" [class.selected]="addon.selected">
+                <div class="addon-header">
+                  <h5>{{ addon.name }}</h5>
+                  <span class="addon-price">${{ addon.price }}</span>
+                </div>
+                <p>{{ addon.description }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <button class="btn btn-sm" [class.btn-outline-primary]="!addon.selected" [class.btn-primary]="addon.selected" (click)="selectAddon(addon)">
+                    <i class="fas" [class.fa-plus-circle]="!addon.selected" [class.fa-check-circle]="addon.selected"></i>
+                    {{ addon.selected ? 'Selected' : 'Add' }}
+                  </button>
+                  <button *ngIf="addon.videoUrl" class="btn btn-sm btn-outline-secondary" (click)="openVideoModal(addon)">
+                    <i class="fas fa-play-circle"></i> Watch Video
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <form [formGroup]="bookingForm" (ngSubmit)="submitBooking()">
+        <!-- Reviews Section -->
+        <div class="content-section mb-5">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title mb-0">Reviews</h2>
+            <button *ngIf="isLoggedIn && !hasUserReviewed" class="btn btn-primary" (click)="openReviewModal()">
+              <i class="fas fa-star me-2"></i>Write a Review
+            </button>
+          </div>
+          
+          <div *ngIf="!package.reviews || package.reviews.length === 0" class="text-center py-4 bg-light rounded">
+            <i class="fas fa-comment-alt fa-3x text-muted mb-3"></i>
+            <p class="lead mb-0">No reviews yet. Be the first to share your experience!</p>
+          </div>
+          
+          <div class="reviews-container">
+            <div class="review-card" *ngFor="let review of package.reviews">
+              <div class="review-header">
+                <div class="reviewer-info">
+                  <div class="reviewer-avatar">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0">{{ review.user?.name || 'Anonymous' }}</h6>
+                    <div class="rating">
+                      <i *ngFor="let star of getStars(review.rating)" [class]="star"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="review-date">
+                  {{ review.createdAt | date: 'mediumDate' }}
+                </div>
+              </div>
+              <p class="mt-3">{{ review.comment }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column - Booking Card -->
+      <div class="col-md-4">
+        <div class="booking-card">
+          <h3 class="mb-3">Book This Tour</h3>
+          <div class="price-container mb-4">
+            <span class="price-label">From</span>
+            <span class="price">${{ totalPrice }}</span>
+            <span class="price-per">per person</span>
+          </div>
+          
+          <form [formGroup]="bookingForm" (ngSubmit)="addToCart()">
             <div class="mb-3">
               <label for="guests" class="form-label">Number of Guests</label>
-              <input type="number" class="form-control" id="guests" formControlName="guests" min="1">
+              <input type="number" class="form-control" id="guests" formControlName="guests" min="1" (change)="updateTotalPrice()">
               <div *ngIf="bookingForm.get('guests')?.invalid && bookingForm.get('guests')?.touched" class="text-danger">
                 Please enter a valid number of guests
               </div>
@@ -114,12 +228,44 @@
 
             <div class="mb-3">
               <label for="specialRequirements" class="form-label">Special Requirements</label>
-              <textarea class="form-control" id="specialRequirements" formControlName="specialRequirements" rows="3"></textarea>
+              <textarea class="form-control" id="specialRequirements" formControlName="specialRequirements" rows="3" placeholder="Any dietary restrictions, accessibility needs, or special requests?"></textarea>
+            </div>
+            
+            <!-- Coin Balance Section -->
+            <div class="coin-balance mb-3" *ngIf="isLoggedIn && userCoins > 0">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="useCoin" formControlName="useCoin" (change)="updateTotalPrice()">
+                <label class="form-check-label" for="useCoin">
+                  <i class="fas fa-coins text-warning me-2"></i>
+                  Use {{ userCoins }} coins (Save up to ${{ userCoins }})
+                </label>
+              </div>
+            </div>
+            
+            <!-- Referral Section -->
+            <div class="referral-info mb-4" *ngIf="isLoggedIn && referralCode">
+              <div>
+                <i class="fas fa-gift text-info me-2"></i>
+                <span>Share your referral code and earn coins!</span>
+                <div class="input-group mt-2">
+                  <input type="text" class="form-control" [value]="referralCode" readonly>
+                  <button class="btn btn-outline-primary" type="button" (click)="copyReferralCode()">
+                    <i class="fas fa-copy"></i>
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <button type="submit" class="btn btn-primary w-100" [disabled]="!isLoggedIn">
-              {{ isLoggedIn ? 'Book Now' : 'Login to Book' }}
-            </button>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg" [disabled]="!isLoggedIn || !bookingForm.valid">
+                {{ isLoggedIn ? 'Add to Cart' : 'Login to Book' }}
+              </button>
+              
+              <button type="button" class="btn btn-outline-primary mt-2" (click)="toggleWishlist()">
+                <i class="fas" [class.fa-heart]="isInWishlist" [class.fa-heart-o]="!isInWishlist"></i>
+                {{ isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist' }}
+              </button>
+            </div>
           </form>
         </div>
       </div>
@@ -127,42 +273,59 @@
   </div>
 </div>
 
-<!-- Booking Modal -->
-<ng-template #bookingModal let-modal>
+<!-- Review Modal -->
+<ng-template #reviewModal let-modal>
   <div class="modal-header">
-    <h5 class="modal-title">Book {{ selectedPackageType?.name }} Package</h5>
+    <h5 class="modal-title">Write a Review</h5>
     <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body">
-    <form #bookingForm="ngForm">
-      <div class="mb-3">
-        <label for="fullName" class="form-label">Full Name</label>
-        <input type="text" class="form-control" id="fullName" [(ngModel)]="bookingData.fullName" name="fullName" required>
+    <form [formGroup]="reviewForm">
+      <div class="mb-4 text-center">
+        <label class="form-label d-block">Your Rating</label>
+        <div class="rating-input">
+          <i class="far" 
+             *ngFor="let i of [1, 2, 3, 4, 5]"
+             [class.fa-star]="i <= selectedRating || i <= hoverRating"
+             [class.fa-star-o]="i > selectedRating && i > hoverRating"
+             (click)="setRating(i)"
+             (mouseenter)="hoverRating = i"
+             (mouseleave)="hoverRating = 0"></i>
+        </div>
+        <div *ngIf="reviewForm.get('rating')?.invalid && reviewForm.get('rating')?.touched" class="text-danger mt-2">
+          Please select a rating
+        </div>
       </div>
       <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" class="form-control" id="email" [(ngModel)]="bookingData.email" name="email" required>
-      </div>
-      <div class="mb-3">
-        <label for="phone" class="form-label">Phone</label>
-        <input type="tel" class="form-control" id="phone" [(ngModel)]="bookingData.phone" name="phone" required>
-      </div>
-      <div class="mb-3">
-        <label for="travelDate" class="form-label">Travel Date</label>
-        <input type="date" class="form-control" id="travelDate" [(ngModel)]="bookingData.travelDate" name="travelDate" required>
-      </div>
-      <div class="mb-3">
-        <label for="numberOfPeople" class="form-label">Number of People</label>
-        <input type="number" class="form-control" id="numberOfPeople" [(ngModel)]="bookingData.numberOfPeople" name="numberOfPeople" min="1" required>
-      </div>
-      <div class="mb-3">
-        <label for="specialRequirements" class="form-label">Special Requirements</label>
-        <textarea class="form-control" id="specialRequirements" [(ngModel)]="bookingData.specialRequirements" name="specialRequirements" rows="3"></textarea>
+        <label for="comment" class="form-label">Your Review</label>
+        <textarea class="form-control" id="comment" formControlName="comment" rows="4" placeholder="Share your experience with this tour package..."></textarea>
+        <div *ngIf="reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched" class="text-danger">
+          Please write your review
+        </div>
       </div>
     </form>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
-    <button type="button" class="btn btn-primary" (click)="submitBooking()" [disabled]="!bookingForm.form.valid">Book Now</button>
+    <button type="button" class="btn btn-primary" (click)="submitReview()" [disabled]="!reviewForm.valid">Submit Review</button>
+  </div>
+</ng-template>
+
+<!-- Video Modal -->
+<ng-template #videoModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ selectedAddon?.name }}</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body p-0">
+    <div class="video-container">
+      <iframe *ngIf="sanitizedVideoUrl" [src]="sanitizedVideoUrl" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+    <button type="button" class="btn btn-primary" (click)="selectAddon(selectedAddon); modal.dismiss()">
+      {{ selectedAddon?.selected ? 'Remove' : 'Add to Package' }}
+    </button>
   </div>
 </ng-template>
