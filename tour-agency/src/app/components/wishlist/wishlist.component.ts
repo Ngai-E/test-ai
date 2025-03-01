@@ -58,7 +58,7 @@ export class WishlistComponent implements OnInit, OnDestroy {
         this.router.navigate(['/login'], { queryParams: { returnUrl: '/wishlist' } });
         return;
       }
-      this.loadWishlistItems(currentUser.id);
+      this.loadWishlistItems();
     });
     this.subscriptions.push(authSub);
   }
@@ -67,8 +67,8 @@ export class WishlistComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
-  private loadWishlistItems(userId: number): void {
-    const wishlistSub = this.wishlistService.getWishlist(userId).subscribe({
+  private loadWishlistItems(): void {
+    const wishlistSub = this.wishlistService.getWishlist().subscribe({
       next: (items) => {
         this.wishlistItems = items;
         this.loading = false;
@@ -89,7 +89,7 @@ export class WishlistComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.wishlistService.removeFromWishlist(currentUser.id, itemId).subscribe({
+    this.wishlistService.removeFromWishlist(itemId).subscribe({
       next: () => {
         this.wishlistItems = this.wishlistItems.filter(item => item.id !== itemId);
         this.toastService.showSuccess('Item removed from wishlist');

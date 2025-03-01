@@ -36,6 +36,21 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  /**
+   * Get the current user's ID
+   * @returns The user ID
+   */
+  getCurrentUserId(): number {
+    const currentUser = this.currentUserValue;
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+    if (currentUser.id === undefined) {
+      throw new Error('User ID is undefined');
+    }
+    return currentUser.id;
+  }
+
   login(phoneNumber: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { phoneNumber, password })
       .pipe(

@@ -3,15 +3,30 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
+
+export interface CartItemAddon {
+  id: number;
+  cartItem: any;
+  addon: any;
+  quantity: number;
+  price: number;
+}
 
 export interface CartItem {
   id: number;
-  package: any;
-  quantity: number;
-  addons: any[];
+  user: any;
+  tourPackage: any;
+  startDate: string;
+  endDate: string;
+  numberOfAdults: number;
+  numberOfChildren: number;
+  basePrice: number;
+  addedAt: string;
+  addons: CartItemAddon[];
 }
 
-export interface AddonSelection {
+export interface AddonSelectionDto {
   addonId: number;
   quantity: number;
 }
@@ -24,15 +39,15 @@ export class CartService {
   private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
   public cartItems$ = this.cartItemsSubject.asObservable();
   
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {
     this.loadCart();
   }
   
   private loadCart(): void {
-    // Check if user is logged in by looking for token
-    const token = localStorage.getItem('token');
-    if (!token) {
-      // If not logged in, use empty cart
+    if (!this.authService.isAuthenticated()) {
       this.cartItemsSubject.next([]);
       return;
     }
@@ -41,7 +56,6 @@ export class CartService {
       items => this.cartItemsSubject.next(items),
       error => {
         console.error('Error loading cart:', error);
-        // If unauthorized, use empty cart
         if (error.status === 403 || error.status === 401) {
           this.cartItemsSubject.next([]);
         }
@@ -50,14 +64,12 @@ export class CartService {
   }
   
   getCartItems(): Observable<CartItem[]> {
-    // Check if user is logged in by looking for token
-    const token = localStorage.getItem('token');
-    if (!token) {
-      // If not logged in, return empty array
+    if (!this.authService.isAuthenticated()) {
       return of([]);
     }
     
-    return this.http.get<CartItem[]>(`${this.apiUrl}`).pipe(
+    const userId = this.authService.getCurrentUserId();
+    return this.http.get<CartItem[]>(`${this.apiUrl}/user/${userId}`).pipe(
       catchError(error => {
         console.error('Error fetching cart items:', error);
         return of([]);
@@ -65,60 +77,66 @@ export class CartService {
     );
   }
   
-  // Get cart item count
+  getCartTotal(): Observable<number> {
+    const userId = this.authService.getCurrentUserId();
+    return this.http.get<number>(`${this.apiUrl}/user/${userId}/total`);
+  }
+  
   getCartItemCount(): Observable<number> {
-    return this.getCartItems().pipe(
-      map(items => {
-        return items.length;
-      })
+    return this.cartItems$.pipe(
+      map(items => items.length)
     );
   }
   
   addToCart(
-    userId: number,
     packageId: number,
     startDate: string,
     endDate: string,
     numberOfAdults: number,
     numberOfChildren: number,
-    addons: any[] = []
-  ): Observable<any> {
-    const payload = {
-      userId,
-      packageId,
-      startDate,
-      endDate,
-      numberOfAdults,
-      numberOfChildren,
-      addons
-    };
+    addons: AddonSelectionDto[] = []
+  ): Observable<CartItem> {
+    const userId = this.authService.getCurrentUserId();
     
-    return this.http.post<any>(`${this.apiUrl}`, payload).pipe(
+    return this.http.post<CartItem>(
+      `${this.apiUrl}/user/${userId}/add?packageId=${packageId}&startDate=${startDate}&endDate=${endDate}&numberOfAdults=${numberOfAdults}&numberOfChildren=${numberOfChildren}`,
+      addons
+    ).pipe(
       tap(() => this.loadCart())
     );
   }
   
-  updateCartItem(itemId: number, quantity: number): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${itemId}`, { quantity }).pipe(
+  removeCartItem(cartItemId: number): Observable<void> {
+    const userId = this.authService.getCurrentUserId();
+    return this.http.delete<void>(`${this.apiUrl}/user/${userId}/remove/${cartItemId}`).pipe(
       tap(() => this.loadCart())
     );
   }
   
-  updateAddonQuantity(itemId: number, addonId: number, quantity: number): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${itemId}/addons/${addonId}`, { quantity }).pipe(
-      tap(() => this.loadCart())
-    );
-  }
-  
-  removeCartItem(itemId: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${itemId}`).pipe(
-      tap(() => this.loadCart())
-    );
-  }
-  
-  clearCart(): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}`).pipe(
+  clearCart(): Observable<void> {
+    const userId = this.authService.getCurrentUserId();
+    return this.http.delete<void>(`${this.apiUrl}/user/${userId}/clear`).pipe(
       tap(() => this.cartItemsSubject.next([]))
+    );
+  }
+  
+  updateCartItem(cartItemId: number, quantity: number): Observable<CartItem> {
+    const userId = this.authService.getCurrentUserId();
+    return this.http.put<CartItem>(
+      `${this.apiUrl}/user/${userId}/item/${cartItemId}?quantity=${quantity}`,
+      {}
+    ).pipe(
+      tap(() => this.loadCart())
+    );
+  }
+  
+  updateAddonQuantity(cartItemId: number, addonId: number, quantity: number): Observable<CartItem> {
+    const userId = this.authService.getCurrentUserId();
+    return this.http.put<CartItem>(
+      `${this.apiUrl}/user/${userId}/item/${cartItemId}/addon/${addonId}?quantity=${quantity}`,
+      {}
+    ).pipe(
+      tap(() => this.loadCart())
     );
   }
 }
