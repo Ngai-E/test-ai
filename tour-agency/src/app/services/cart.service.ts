@@ -113,8 +113,34 @@ export class CartService {
   
   removeCartItem(cartItemId: number): Observable<void> {
     const userId = this.authService.getCurrentUserId();
+    console.log(`CartService: Removing cart item ${cartItemId} for user ${userId}`);
+    
     return this.http.delete<void>(`${this.apiUrl}/user/${userId}/remove/${cartItemId}`).pipe(
-      tap(() => this.loadCart())
+      tap(() => {
+        console.log('CartService: Successfully removed cart item');
+        // Update the cart items in the BehaviorSubject immediately
+        const currentItems = this.cartItemsSubject.getValue();
+        const updatedItems = currentItems.filter(item => item.id !== cartItemId);
+        this.cartItemsSubject.next(updatedItems);
+      }),
+      catchError(error => {
+        console.error('CartService: Error removing cart item:', error);
+        
+        // Handle specific error cases
+        if (error.status === 404) {
+          console.log('CartService: Item not found, removing from local state');
+          // If the item doesn't exist on the server, we should still remove it from the local state
+          const currentItems = this.cartItemsSubject.getValue();
+          const updatedItems = currentItems.filter(item => item.id !== cartItemId);
+          this.cartItemsSubject.next(updatedItems);
+          
+          // Return an empty observable to indicate "success" since the item is gone
+          return of(undefined);
+        }
+        
+        // Re-throw other errors so the component can handle them
+        throw error;
+      })
     );
   }
   

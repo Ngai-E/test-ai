@@ -33,8 +33,7 @@ public class CartItem {
     private BigDecimal basePrice;
     private LocalDateTime addedAt;
     
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "cart_item_id")
+    @OneToMany(mappedBy = "cartItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItemAddon> addons = new ArrayList<>();
     
     @PrePersist

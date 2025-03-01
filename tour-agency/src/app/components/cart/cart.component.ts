@@ -74,6 +74,14 @@ export class CartComponent implements OnInit, OnDestroy {
       }
     });
     this.subscriptions.push(authSub);
+    
+    // Subscribe to cart changes
+    const cartSub = this.cartService.cartItems$.subscribe(items => {
+      console.log('Cart items updated from observable:', items);
+      this.cartItems = items;
+      this.calculateTotals();
+    });
+    this.subscriptions.push(cartSub);
   }
   
   ngOnDestroy(): void {
@@ -138,14 +146,17 @@ export class CartComponent implements OnInit, OnDestroy {
   }
 
   get hasItems(): boolean {
-    return this.cartItems.length > 0;
+    return this.cartItems && this.cartItems.length > 0;
   }
 
   loadCartItems(): void {
     this.loading = true;
+    this.errorMessage = '';
+    
     this.cartService.getCartItems()
       .pipe(
         catchError(error => {
+          console.error('Error loading cart items:', error);
           this.errorMessage = 'Failed to load cart items. Please try again.';
           return of([]);
         }),
@@ -155,6 +166,7 @@ export class CartComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe(items => {
+        console.log('Cart items loaded:', items);
         this.cartItems = items;
       });
   }
@@ -224,18 +236,31 @@ export class CartComponent implements OnInit, OnDestroy {
 
   removeItem(itemId: number): void {
     this.loading = true;
+    this.errorMessage = '';
+    console.log('Removing cart item with ID:', itemId);
+    console.log('Current user ID:', this.authService.getCurrentUserId());
+    
     this.cartService.removeCartItem(itemId)
       .pipe(
         catchError(error => {
-          this.errorMessage = 'Failed to remove item. Please try again.';
+          console.error('Error removing cart item:', error);
+          this.errorMessage = `Failed to remove item: ${error.error?.message || error.message || 'Unknown error'}`;
+          this.toastService.showError(this.errorMessage);
           return of(null);
         }),
         finalize(() => this.loading = false)
       )
-      .subscribe(response => {
-        if (response !== null) {
+      .subscribe({
+        next: () => {
+          console.log('Successfully removed cart item');
+          // The cartItems array should be automatically updated via the subscription to cartItems$
+          // but we'll also manually filter it just to be safe
           this.cartItems = this.cartItems.filter(item => item.id !== itemId);
           this.calculateTotals();
+          this.toastService.showSuccess('Item removed from cart');
+        },
+        error: (error) => {
+          console.error('Error in removeItem subscribe:', error);
         }
       });
   }
