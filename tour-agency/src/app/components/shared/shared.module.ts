@@ -22,7 +22,9 @@ import { ToastComponent } from './toast/toast.component';
   exports: [
     NavbarComponent,
     FooterComponent,
-    ToastComponent
+    ToastComponent,
+    FormsModule,
+    ReactiveFormsModule
   ]
 })
 export class SharedModule { }

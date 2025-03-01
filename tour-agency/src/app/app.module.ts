@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,6 +17,9 @@ import { AuthModule } from './components/auth/auth.module';
 import { UserModule } from './components/user/user.module';
 import { BookingModule } from './components/booking/booking.module';
 import { PackageModule } from './components/package/package.module';
+import { AdminModule } from './components/admin/admin.module';
+import { ContactModule } from './components/contact/contact.module';
+import { PackageDetailsModule } from './components/package-details/package-details.module';
 
 import { AuthService } from './services/auth.service';
 import { ToastService } from './services/toast.service';
@@ -26,6 +30,7 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { AddonTotalPipe } from './pipes/addon-total.pipe';
+import { CurrencyPipe } from './pipes/currency.pipe';
 
 @NgModule({
   declarations: [
@@ -34,19 +39,25 @@ import { AddonTotalPipe } from './pipes/addon-total.pipe';
     PackagesComponent,
     WishlistComponent,
     CartComponent,
-    AddonTotalPipe
+    AddonTotalPipe,
+    CurrencyPipe
   ],
   imports: [
     BrowserModule,
     CommonModule,
     RouterModule,
     HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
     AppRoutingModule,
     SharedModule,
     AuthModule,
     UserModule,
     BookingModule,
-    PackageModule
+    PackageModule,
+    AdminModule,
+    ContactModule,
+    PackageDetailsModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

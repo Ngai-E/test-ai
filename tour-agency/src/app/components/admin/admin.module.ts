@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { PackageManagementComponent } from './package-management/package-management.component';
 import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [
+    PackageManagementComponent
   ],
   imports: [
     CommonModule,
@@ -16,6 +18,7 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule
   ],
   exports: [
+    PackageManagementComponent
   ]
 })
-export class PackageModule { }
+export class AdminModule { }

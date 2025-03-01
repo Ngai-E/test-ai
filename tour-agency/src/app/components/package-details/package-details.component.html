@@ -16,15 +16,15 @@
     <div class="row">
       <!-- Package Details -->
       <div class="col-md-8">
-        <img [src]="package.imageUrl" [alt]="package.name" class="package-image mb-4">
+        <img [src]="package.image" [alt]="package.name" class="package-image mb-4">
         <h1 class="mb-4">{{ package.name }}</h1>
         
         <div class="package-info">
           <div class="d-flex align-items-center mb-3">
             <div class="rating me-3">
-              <i *ngFor="let star of getStars(package.rating)" [class]="star"></i>
+              <i *ngFor="let star of getStars(package.averageRating)" [class]="star"></i>
             </div>
-            <span class="text-muted">({{ package.reviews || 0 }} reviews)</span>
+            <span class="text-muted">({{ package.reviews?.length || 0 }} reviews)</span>
           </div>
 
           <p class="lead">{{ package.description }}</p>
@@ -39,19 +39,19 @@
             <div class="col-6 col-md-3">
               <div class="info-item">
                 <i class="fas fa-users"></i>
-                <span>{{ package.maxGroupSize }} people max</span>
+                <span>{{ package.groupSize }}</span>
               </div>
             </div>
             <div class="col-6 col-md-3">
               <div class="info-item">
                 <i class="fas fa-map-marker-alt"></i>
-                <span>{{ package.location }}</span>
+                <span>{{ package.country }}</span>
               </div>
             </div>
             <div class="col-6 col-md-3">
               <div class="info-item">
                 <i class="fas fa-tag"></i>
-                <span>${{ package.price }}</span>
+                <span>${{ package.basePrice }}</span>
               </div>
             </div>
           </div>
@@ -68,9 +68,19 @@
 
           <div class="itinerary">
             <h3>Itinerary</h3>
-            <div *ngFor="let day of package.itinerary; let i = index" class="mb-3">
-              <h4>Day {{ i + 1 }}</h4>
-              <p>{{ day }}</p>
+            <div *ngFor="let day of package.itinerary" class="mb-3">
+              <h4>Day {{ day.dayNumber }}: {{ day.title }}</h4>
+              <p>{{ day.description }}</p>
+              <div class="itinerary-details">
+                <p><strong>Accommodation:</strong> {{ day.accommodation }}</p>
+                <p><strong>Meals:</strong> {{ day.meals }}</p>
+                <div *ngIf="day.activities && day.activities.length > 0">
+                  <p><strong>Activities:</strong></p>
+                  <ul>
+                    <li *ngFor="let activity of day.activities">{{ activity }}</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -81,7 +91,7 @@
         <div class="booking-form">
           <h3>Book This Package</h3>
           <div class="price mb-4">
-            <span class="amount">${{ package.price }}</span>
+            <span class="amount">${{ package.basePrice }}</span>
             <span class="text-muted">/person</span>
           </div>
 
