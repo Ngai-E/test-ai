@@ -7,8 +7,13 @@ import { User, PasswordChange } from '../models/user.model';
 import { Router } from '@angular/router';
 
 interface AuthResponse {
+  id: number;
+  phoneNumber: string;
+  fullName: string;
+  email: string;
+  coinBalance: number;
+  referralCode: string;
   token: string;
-  user: User;
 }
 
 @Injectable({
@@ -55,10 +60,22 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { phoneNumber, password })
       .pipe(
         tap(response => {
+          // Convert the response to match our User model
+          const user: User = {
+            id: response.id,
+            username: response.phoneNumber,
+            email: response.email,
+            firstName: response.fullName.split(' ')[0],
+            lastName: response.fullName.split(' ').slice(1).join(' '),
+            phone: response.phoneNumber,
+            coins: response.coinBalance,
+            referralCode: response.referralCode
+          };
+          
           // Store user details and token in local storage
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          localStorage.setItem('currentUser', JSON.stringify(user));
           localStorage.setItem('token', response.token);
-          this.currentUserSubject.next(response.user);
+          this.currentUserSubject.next(user);
           this.autoLogout();
         }),
         catchError(error => {
@@ -72,10 +89,22 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { ...user, password })
       .pipe(
         tap(response => {
+          // Convert the response to match our User model
+          const savedUser: User = {
+            id: response.id,
+            username: response.phoneNumber,
+            email: response.email,
+            firstName: response.fullName.split(' ')[0],
+            lastName: response.fullName.split(' ').slice(1).join(' '),
+            phone: response.phoneNumber,
+            coins: response.coinBalance,
+            referralCode: response.referralCode
+          };
+          
           // Store user details and token in local storage
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          localStorage.setItem('currentUser', JSON.stringify(savedUser));
           localStorage.setItem('token', response.token);
-          this.currentUserSubject.next(response.user);
+          this.currentUserSubject.next(savedUser);
           this.autoLogout();
         }),
         catchError(error => {

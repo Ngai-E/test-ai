@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { User } from '../../../models/user.model';
+import { countryCodes, CountryCode } from '../../../models/country-codes';
 
 @Component({
   selector: 'app-register',
@@ -13,6 +14,8 @@ export class RegisterComponent {
   registerForm: FormGroup;
   loading = false;
   error = '';
+  countryCodes = countryCodes;
+  selectedCountry: CountryCode = this.countryCodes[0]; // Default to first country
 
   constructor(
     private formBuilder: FormBuilder,
@@ -20,7 +23,8 @@ export class RegisterComponent {
     private router: Router
   ) {
     this.registerForm = this.formBuilder.group({
-      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      countryCode: [this.selectedCountry.dialCode, Validators.required],
+      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{7,15}$')]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
       fullName: ['', Validators.required],
@@ -50,6 +54,13 @@ export class RegisterComponent {
     };
   }
 
+  onCountryChange(country: CountryCode) {
+    this.selectedCountry = country;
+    this.registerForm.patchValue({
+      countryCode: country.dialCode
+    });
+  }
+
   onSubmit() {
     if (this.registerForm.invalid) {
       return;
@@ -58,13 +69,16 @@ export class RegisterComponent {
     this.loading = true;
     this.error = '';
 
+    // Combine country code and phone number
+    const fullPhoneNumber = this.f['countryCode'].value + this.f['phoneNumber'].value;
+
     const user: User = {
       id: 0, // Will be assigned by the server
-      username: this.f['phoneNumber'].value, // Use phoneNumber as username
+      username: fullPhoneNumber, // Use phoneNumber as username
       email: this.f['email'].value,
       firstName: this.f['fullName'].value.split(' ')[0],
       lastName: this.f['fullName'].value.split(' ').slice(1).join(' '),
-      phone: this.f['phoneNumber'].value,
+      phone: fullPhoneNumber,
       referralCode: this.f['referralCode'].value || undefined
     };
 

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { countryCodes, CountryCode } from '../../../models/country-codes';
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,8 @@ export class LoginComponent {
   loginForm: FormGroup;
   loading = false;
   error = '';
+  countryCodes = countryCodes;
+  selectedCountry: CountryCode = this.countryCodes[0]; // Default to first country
 
   constructor(
     private formBuilder: FormBuilder,
@@ -19,12 +22,20 @@ export class LoginComponent {
     private router: Router
   ) {
     this.loginForm = this.formBuilder.group({
-      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      countryCode: [this.selectedCountry.dialCode, Validators.required],
+      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{7,15}$')]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
   get f() { return this.loginForm.controls; }
+
+  onCountryChange(country: CountryCode) {
+    this.selectedCountry = country;
+    this.loginForm.patchValue({
+      countryCode: country.dialCode
+    });
+  }
 
   onSubmit() {
     if (this.loginForm.invalid) {
@@ -34,10 +45,11 @@ export class LoginComponent {
     this.loading = true;
     this.error = '';
 
-    const phoneNumber = this.f['phoneNumber'].value;
+    // Combine country code and phone number
+    const fullPhoneNumber = this.f['countryCode'].value + this.f['phoneNumber'].value;
     const password = this.f['password'].value;
 
-    this.authService.login(phoneNumber, password)
+    this.authService.login(fullPhoneNumber, password)
       .subscribe({
         next: () => {
           this.router.navigate(['/']);

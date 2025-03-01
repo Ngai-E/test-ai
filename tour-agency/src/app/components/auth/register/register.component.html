@@ -38,16 +38,33 @@
         
         <div class="form-group">
           <label for="phoneNumber">Phone Number</label>
-          <input 
-            type="text" 
-            formControlName="phoneNumber" 
-            class="form-control" 
-            [ngClass]="{ 'is-invalid': f['phoneNumber'].touched && f['phoneNumber'].errors }"
-            placeholder="Enter your 10-digit phone number"
-          />
-          <div *ngIf="f['phoneNumber'].touched && f['phoneNumber'].errors" class="invalid-feedback">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="countryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  {{ selectedCountry.flag }} {{ selectedCountry.dialCode }}
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="countryDropdown">
+                  <li *ngFor="let country of countryCodes">
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="onCountryChange(country)">
+                      {{ country.flag }} {{ country.name }} ({{ country.dialCode }})
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <input 
+              type="text" 
+              formControlName="phoneNumber" 
+              class="form-control" 
+              [ngClass]="{ 'is-invalid': f['phoneNumber'].touched && f['phoneNumber'].errors }"
+              placeholder="Enter your phone number"
+            />
+            <input type="hidden" formControlName="countryCode">
+          </div>
+          <div *ngIf="f['phoneNumber'].touched && f['phoneNumber'].errors" class="invalid-feedback d-block">
             <div *ngIf="f['phoneNumber'].errors['required']">Phone number is required</div>
-            <div *ngIf="f['phoneNumber'].errors['pattern']">Phone number must be 10 digits</div>
+            <div *ngIf="f['phoneNumber'].errors['pattern']">Phone number must be valid</div>
           </div>
         </div>
         
