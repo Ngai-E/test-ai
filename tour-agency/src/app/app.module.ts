@@ -66,7 +66,9 @@ import { CurrencyPipe } from './pipes/currency.pipe';
     AuthService,
     ToastService,
     BookingService,
-    PackageService
+    PackageService,
+    AddonTotalPipe,
+    CurrencyPipe
   ],
   bootstrap: [AppComponent]
 })
