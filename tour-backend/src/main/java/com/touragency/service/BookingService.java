@@ -37,6 +37,31 @@ public class BookingService {
         return bookingRepository.findByUserIdAndBookingStatus(userId, status);
     }
     
+    public Booking getBookingById(Long bookingId) {
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+    }
+    
+    public Booking getUserBookingById(Long userId, Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        
+        if (!booking.getUser().getId().equals(userId)) {
+            throw new RuntimeException("Not authorized to view this booking");
+        }
+        
+        return booking;
+    }
+    
+    public List<Booking> getBookingsByPackage(Long packageId) {
+        // Check if package exists
+        if (!packageRepository.existsById(packageId)) {
+            throw new RuntimeException("Package not found");
+        }
+        
+        return bookingRepository.findByTourPackageId(packageId);
+    }
+    
     @Transactional
     public Booking createBooking(Long userId, BookingRequest request) {
         User user = userRepository.findById(userId)
@@ -59,8 +84,7 @@ public class BookingService {
         
         // Apply coupon if provided
         if (request.getCouponCode() != null && !request.getCouponCode().isEmpty()) {
-            Coupon coupon = couponRepository.findByCode(request.getCouponCode())
-                    .orElseThrow(() -> new RuntimeException("Invalid coupon code"));
+            Coupon coupon = validateCoupon(request.getCouponCode());
             
             if (coupon.getIsUsed()) {
                 throw new RuntimeException("Coupon has already been used");
@@ -123,6 +147,11 @@ public class BookingService {
         
         booking.setBookingStatus("CANCELLED");
         return bookingRepository.save(booking);
+    }
+    
+    public Coupon validateCoupon(String code) {
+        return couponRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException("Invalid coupon code"));
     }
     
     private BigDecimal calculateTotalPrice(com.touragency.model.Package tourPackage, Integer numberOfAdults, 

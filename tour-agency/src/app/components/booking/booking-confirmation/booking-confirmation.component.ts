@@ -2,85 +2,90 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookingService, Booking } from '../../../services/booking.service';
 import { AuthService } from '../../../services/auth.service';
+import { User } from '../../../models/user.model';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-booking-confirmation',
   templateUrl: './booking-confirmation.component.html',
-  styleUrls: ['./booking-confirmation.component.css']
+  styleUrls: ['./booking-confirmation.component.scss']
 })
 export class BookingConfirmationComponent implements OnInit {
+  bookingId: number = 0;
   booking: Booking | null = null;
-  loading = true;
-  error = '';
-  bookingId: number | null = null;
-
+  isLoading: boolean = true;
+  errorMessage: string = '';
+  currentUser: User | null = null;
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private bookingService: BookingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      if (params['id']) {
-        this.bookingId = +params['id'];
-        this.loadBooking();
-      } else {
-        this.error = 'Booking ID not found';
-        this.loading = false;
-      }
-    });
-  }
-
-  loadBooking(): void {
-    if (!this.bookingId) return;
-
-    const currentUser = this.authService.currentUserValue;
-    if (!currentUser) {
-      this.error = 'You must be logged in to view booking details';
-      this.loading = false;
-      return;
-    }
-
-    this.bookingService.getBooking(this.bookingId).subscribe({
-      next: (booking) => {
-        this.booking = booking;
-        this.loading = false;
-      },
-      error: (error) => {
-        this.error = 'Failed to load booking details. Please try again.';
-        this.loading = false;
-      }
-    });
-  }
-
-  viewAllBookings(): void {
-    this.router.navigate(['/bookings']);
-  }
-
-  cancelBooking(): void {
-    if (!this.bookingId) {
-      console.error('Booking ID is undefined');
-      return;
-    }
-    
-    const currentUser = this.authService.currentUserValue;
-    if (!currentUser || !currentUser.id) {
+    this.currentUser = this.authService.getCurrentUser();
+    if (!this.currentUser) {
       this.router.navigate(['/login']);
       return;
     }
     
-    this.loading = true;
-    this.bookingService.cancelBookingForUser(currentUser.id as number, Number(this.bookingId)).subscribe({
-      next: (booking) => {
-        this.booking = booking;
-        this.loading = false;
-      },
-      error: (error) => {
-        this.error = 'Failed to cancel booking. Please try again.';
-        this.loading = false;
+    this.route.params.subscribe(params => {
+      if (params['id']) {
+        this.bookingId = +params['id'];
+        this.loadBookingDetails();
+      } else {
+        this.errorMessage = 'Booking ID not found';
+        this.isLoading = false;
       }
     });
+  }
+
+  loadBookingDetails(): void {
+    this.bookingService.getBooking(this.bookingId).subscribe({
+      next: (booking: Booking) => {
+        this.booking = booking;
+        this.isLoading = false;
+      },
+      error: (error: any) => {
+        this.errorMessage = 'Failed to load booking details';
+        this.isLoading = false;
+        console.error('Error loading booking:', error);
+      }
+    });
+  }
+
+  cancelBooking(): void {
+    if (!this.booking || !this.currentUser) {
+      this.toastService.showError('Unable to cancel booking. Please try again later.');
+      return;
+    }
+    
+    if (confirm('Are you sure you want to cancel this booking?')) {
+      this.isLoading = true;
+      
+      this.bookingService.cancelBookingForUser(this.currentUser.id as number, Number(this.bookingId)).subscribe({
+        next: (booking: any) => {
+          this.toastService.showSuccess('Booking cancelled successfully');
+          this.booking!.status = 'cancelled';
+          this.isLoading = false;
+        },
+        error: (error: any) => {
+          this.toastService.showError('Failed to cancel booking');
+          this.isLoading = false;
+          console.error('Error cancelling booking:', error);
+        }
+      });
+    }
+  }
+
+  printBooking(): void {
+    window.print();
+  }
+
+  goBack(): void {
+    this.router.navigate(['/user/bookings']);
   }
 }

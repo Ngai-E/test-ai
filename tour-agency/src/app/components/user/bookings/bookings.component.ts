@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BookingService, Booking } from '../../../services/booking.service';
+import { ToastService } from '../../../services/toast.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
   selector: 'app-bookings',
   templateUrl: './bookings.component.html',
-  styleUrls: ['./bookings.component.css']
+  styleUrls: ['./bookings.component.scss']
 })
 export class BookingsComponent implements OnInit {
   bookings: Booking[] = [];
@@ -19,7 +20,8 @@ export class BookingsComponent implements OnInit {
 
   constructor(
     private bookingService: BookingService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -34,6 +36,7 @@ export class BookingsComponent implements OnInit {
       .pipe(
         catchError(error => {
           this.errorMessage = 'Failed to load bookings. Please try again.';
+          console.error('Error loading bookings:', error);
           return of([]);
         }),
         finalize(() => {
@@ -48,6 +51,11 @@ export class BookingsComponent implements OnInit {
   }
 
   onFilterChange(): void {
+    if (!this.bookings || this.bookings.length === 0) {
+      this.filteredBookings = [];
+      return;
+    }
+    
     this.filteredBookings = this.bookings.filter(booking => {
       // Apply status filter
       if (this.statusFilter !== 'all' && booking.status.toLowerCase() !== this.statusFilter.toLowerCase()) {
@@ -58,8 +66,9 @@ export class BookingsComponent implements OnInit {
       if (this.searchTerm) {
         const searchLower = this.searchTerm.toLowerCase();
         return (
-          booking.package.name.toLowerCase().includes(searchLower) ||
-          booking.package.destination.toLowerCase().includes(searchLower) ||
+          (booking.package?.name?.toLowerCase().includes(searchLower) || false) ||
+          (booking.package?.destination?.toLowerCase().includes(searchLower) || false) ||
+          (booking.bookingReference?.toLowerCase().includes(searchLower) || false) ||
           booking.id.toString().includes(searchLower)
         );
       }
@@ -85,12 +94,12 @@ export class BookingsComponent implements OnInit {
     }
     
     this.loading = true;
-    this.errorMessage = '';
     
     this.bookingService.cancelBooking(bookingId)
       .pipe(
         catchError(error => {
-          this.errorMessage = 'Failed to cancel booking. Please try again.';
+          this.toastService.showError('Failed to cancel booking. Please try again.');
+          console.error('Error cancelling booking:', error);
           return of(null);
         }),
         finalize(() => {
@@ -99,10 +108,12 @@ export class BookingsComponent implements OnInit {
       )
       .subscribe(result => {
         if (result) {
+          this.toastService.showSuccess('Booking cancelled successfully');
+          
           // Update the booking status in the local array
           const booking = this.bookings.find(b => b.id === bookingId);
           if (booking) {
-            booking.status = 'CANCELLED';
+            booking.status = 'cancelled';
           }
           
           // Reapply filters
@@ -112,6 +123,8 @@ export class BookingsComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -121,14 +134,16 @@ export class BookingsComponent implements OnInit {
   }
 
   getStatusClass(status: string): string {
-    switch (status.toUpperCase()) {
-      case 'CONFIRMED':
+    if (!status) return 'badge-secondary';
+    
+    switch (status.toLowerCase()) {
+      case 'confirmed':
         return 'badge-success';
-      case 'PENDING':
+      case 'pending':
         return 'badge-warning';
-      case 'CANCELLED':
+      case 'cancelled':
         return 'badge-danger';
-      case 'COMPLETED':
+      case 'completed':
         return 'badge-info';
       default:
         return 'badge-secondary';

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="008-add-faq-table" author="codeium">
+        <createTable tableName="faqs">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="question" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="answer" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="008-add-sample-faqs" author="codeium">
+        <insert tableName="faqs">
+            <column name="question" value="How do I book a tour?"/>
+            <column name="answer" value="You can book a tour by creating an account, selecting your desired package, and completing the booking process."/>
+            <column name="category" value="booking"/>
+            <column name="display_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="faqs">
+            <column name="question" value="What payment methods do you accept?"/>
+            <column name="answer" value="We accept credit cards, PayPal, bank transfers, and mobile money payments."/>
+            <column name="category" value="payment"/>
+            <column name="display_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="faqs">
+            <column name="question" value="Can I cancel my booking?"/>
+            <column name="answer" value="Yes, you can cancel your booking up to 48 hours before the scheduled departure. Cancellation fees may apply."/>
+            <column name="category" value="booking"/>
+            <column name="display_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="faqs">
+            <column name="question" value="Do you offer group discounts?"/>
+            <column name="answer" value="Yes, we offer discounts for groups of 5 or more people. Please contact our customer service for more information."/>
+            <column name="category" value="payment"/>
+            <column name="display_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="faqs">
+            <column name="question" value="What should I pack for my tour?"/>
+            <column name="answer" value="Packing requirements depend on your destination. We will provide a detailed packing list after your booking is confirmed."/>
+            <column name="category" value="preparation"/>
+            <column name="display_order" valueNumeric="1"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

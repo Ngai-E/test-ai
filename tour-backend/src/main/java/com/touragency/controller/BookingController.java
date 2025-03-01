@@ -2,6 +2,7 @@ package com.touragency.controller;
 
 import com.touragency.dto.BookingRequest;
 import com.touragency.model.Booking;
+import com.touragency.model.Coupon;
 import com.touragency.service.BookingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -70,5 +71,59 @@ public class BookingController {
             @Parameter(description = "ID of the user cancelling the booking") @PathVariable Long userId) {
         Booking booking = bookingService.cancelBooking(userId, bookingId);
         return ResponseEntity.ok(booking);
+    }
+    
+    @Operation(summary = "Validate coupon code", description = "Validates a coupon code and returns its details")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Coupon code is valid", 
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Coupon.class))),
+        @ApiResponse(responseCode = "404", description = "Coupon code not found or invalid", content = @Content)
+    })
+    @GetMapping("/coupons/{code}")
+    public ResponseEntity<Coupon> validateCoupon(
+            @Parameter(description = "Coupon code to validate") @PathVariable String code) {
+        Coupon coupon = bookingService.validateCoupon(code);
+        return ResponseEntity.ok(coupon);
+    }
+
+    @Operation(summary = "Get booking by ID", description = "Retrieves a specific booking by its ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved booking", 
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Booking.class))),
+        @ApiResponse(responseCode = "404", description = "Booking not found", content = @Content)
+    })
+    @GetMapping("/{bookingId}")
+    public ResponseEntity<Booking> getBookingById(
+            @Parameter(description = "ID of the booking to retrieve") @PathVariable Long bookingId) {
+        Booking booking = bookingService.getBookingById(bookingId);
+        return ResponseEntity.ok(booking);
+    }
+    
+    @Operation(summary = "Get user booking by ID", description = "Retrieves a specific booking for a user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved booking", 
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Booking.class))),
+        @ApiResponse(responseCode = "404", description = "Booking not found", content = @Content),
+        @ApiResponse(responseCode = "403", description = "User not authorized to view this booking", content = @Content)
+    })
+    @GetMapping("/user/{userId}/booking/{bookingId}")
+    public ResponseEntity<Booking> getUserBookingById(
+            @Parameter(description = "ID of the user") @PathVariable Long userId,
+            @Parameter(description = "ID of the booking to retrieve") @PathVariable Long bookingId) {
+        Booking booking = bookingService.getUserBookingById(userId, bookingId);
+        return ResponseEntity.ok(booking);
+    }
+
+    @Operation(summary = "Get bookings by package", description = "Retrieves all bookings for a specific package")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved bookings", 
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Booking.class))),
+        @ApiResponse(responseCode = "404", description = "Package not found", content = @Content)
+    })
+    @GetMapping("/package/{packageId}")
+    public ResponseEntity<List<Booking>> getBookingsByPackage(
+            @Parameter(description = "ID of the package") @PathVariable Long packageId) {
+        List<Booking> bookings = bookingService.getBookingsByPackage(packageId);
+        return ResponseEntity.ok(bookings);
     }
 }

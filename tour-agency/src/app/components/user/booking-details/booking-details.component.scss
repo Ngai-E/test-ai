@@ -1,0 +1,164 @@
+// Booking details styles
+.booking-details {
+  .booking-header {
+    margin-bottom: 2rem;
+    
+    h2 {
+      margin-bottom: 0;
+    }
+    
+    .booking-reference {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+  }
+  
+  .badge {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    
+    &.badge-success {
+      background-color: #28a745;
+      color: white;
+    }
+    
+    &.badge-warning {
+      background-color: #ffc107;
+      color: #212529;
+    }
+    
+    &.badge-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+    
+    &.badge-info {
+      background-color: #17a2b8;
+      color: white;
+    }
+    
+    &.badge-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+  }
+  
+  .card {
+    margin-bottom: 1.5rem;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    
+    .card-header {
+      background-color: #f8f9fa;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+      padding: 0.75rem 1.25rem;
+      
+      h5 {
+        margin-bottom: 0;
+        font-weight: 600;
+      }
+    }
+    
+    .card-body {
+      padding: 1.25rem;
+    }
+  }
+  
+  .detail-row {
+    display: flex;
+    margin-bottom: 0.75rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .detail-label {
+      font-weight: 600;
+      min-width: 120px;
+      color: #495057;
+    }
+    
+    .detail-value {
+      color: #212529;
+    }
+    
+    &.total {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #dee2e6;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+  }
+  
+  .list-group-item {
+    border-left: none;
+    border-right: none;
+    
+    &:first-child {
+      border-top: none;
+    }
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  
+  .btn-block {
+    display: block;
+    width: 100%;
+  }
+  
+  .text-success {
+    color: #28a745 !important;
+  }
+}
+
+// Print styles
+@media print {
+  .container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .btn, 
+  button {
+    display: none !important;
+  }
+  
+  .card {
+    border: 1px solid #dee2e6 !important;
+    margin-bottom: 1rem !important;
+    page-break-inside: avoid;
+  }
+  
+  .badge {
+    border: 1px solid #212529;
+    color: #212529 !important;
+    background-color: transparent !important;
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .booking-details {
+    .booking-header {
+      flex-direction: column;
+      
+      .booking-reference {
+        margin-top: 0.5rem;
+      }
+    }
+    
+    .detail-row {
+      flex-direction: column;
+      
+      .detail-label {
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
+}

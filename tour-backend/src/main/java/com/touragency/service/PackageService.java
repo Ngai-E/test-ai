@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PackageService {
@@ -58,11 +59,45 @@ public class PackageService {
         }
     }
     
+    public List<Package> searchPackages(String query) {
+        return packageRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(query, query);
+    }
+    
     public boolean deletePackage(Long id) {
         if (packageRepository.existsById(id)) {
             packageRepository.deleteById(id);
             return true;
         }
         return false;
+    }
+    
+    public List<Package> getUpcomingTours(int limit) {
+        // In a real application, we would query the database for packages with future departure dates
+        // and available slots
+        
+        // For now, we'll just return all packages
+        List<Package> allPackages = packageRepository.findAll();
+        
+        // Sort by departure date (assuming packages have a departureDate field)
+        // and filter to only include those with available slots
+        // This is a placeholder implementation
+        
+        return allPackages.stream()
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+    
+    public List<Package> getFeaturedPackages() {
+        // In a real application, we would query the database for packages marked as featured
+        
+        // For now, we'll just return all packages
+        List<Package> allPackages = packageRepository.findAll();
+        
+        // In a real implementation, we would filter by a 'featured' flag
+        // This is a placeholder implementation
+        
+        return allPackages.stream()
+                .limit(5) // Return top 5 packages as featured
+                .collect(Collectors.toList());
     }
 }

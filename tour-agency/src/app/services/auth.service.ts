@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { Router } from '@angular/router';
@@ -56,6 +56,10 @@ export class AuthService {
     return currentUser.id;
   }
 
+  getCurrentUser(): User | null {
+    return this.currentUserValue;
+  }
+
   login(phoneNumber: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { phoneNumber, password })
       .pipe(
@@ -71,6 +75,7 @@ export class AuthService {
             token: response.token
           };
           localStorage.setItem('currentUser', JSON.stringify(user));
+          localStorage.setItem('token', response.token); // Store token separately for easier access
           this.currentUserSubject.next(user);
           this.autoLogout();
         }),
@@ -96,6 +101,7 @@ export class AuthService {
             token: response.token
           };
           localStorage.setItem('currentUser', JSON.stringify(newUser));
+          localStorage.setItem('token', response.token); // Store token separately for easier access
           this.currentUserSubject.next(newUser);
           this.autoLogout();
         }),
@@ -140,7 +146,14 @@ export class AuthService {
    */
   getUserProfile(): Observable<User> {
     const userId = this.getCurrentUserId();
-    return this.http.get<User>(`${this.userUrl}/${userId}`);
+    return this.http.get<User>(`${this.userUrl}/${userId}/profile`)
+      .pipe(
+        catchError(error => {
+          console.error('Error fetching user profile:', error);
+          // Fallback to cached user data
+          return of(this.currentUserValue as User);
+        })
+      );
   }
 
   /**
@@ -152,13 +165,17 @@ export class AuthService {
     return this.http.put<User>(`${this.userUrl}/${userId}`, userData)
       .pipe(
         tap(updatedUser => {
-          // Update stored user data
+          // Update local storage with new user data
           const currentUser = this.currentUserValue;
           if (currentUser) {
-            const newUserData = { ...currentUser, ...updatedUser };
-            localStorage.setItem('currentUser', JSON.stringify(newUserData));
-            this.currentUserSubject.next(newUserData);
+            const mergedUser = { ...currentUser, ...updatedUser };
+            localStorage.setItem('currentUser', JSON.stringify(mergedUser));
+            this.currentUserSubject.next(mergedUser);
           }
+        }),
+        catchError(error => {
+          console.error('Error updating profile:', error);
+          throw error;
         })
       );
   }
@@ -167,38 +184,60 @@ export class AuthService {
    * Change the user's password
    * @param passwordData Password change data
    */
-  changePassword(passwordData: PasswordChange): Observable<{ message: string }> {
+  changePassword(passwordData: PasswordChange): Observable<any> {
     const userId = this.getCurrentUserId();
-    return this.http.post<{ message: string }>(`${this.userUrl}/${userId}/change-password`, passwordData);
+    const payload = {
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword
+    };
+    
+    return this.http.put<any>(`${this.userUrl}/${userId}`, payload)
+      .pipe(
+        catchError(error => {
+          console.error('Error changing password:', error);
+          throw error;
+        })
+      );
   }
 
   /**
    * Get user's referral information
    */
   getReferralInfo(): Observable<{ referralCode: string, referralCount: number, coinsEarned: number }> {
+    // Extract referral info from the cached user data
+    const user = this.currentUserValue;
+    if (!user) {
+      return throwError(() => new Error('User not authenticated'));
+    }
+    
+    return of({
+      referralCode: user.referralCode || '',
+      referralCount: 0, // This information is not available in the user profile
+      coinsEarned: user.coinBalance || 0
+    });
+  }
+
+  /**
+   * Generate a coupon from user's coin balance
+   * @param value The value of the coupon to generate
+   */
+  generateCoupon(value: number): Observable<any> {
     const userId = this.getCurrentUserId();
-    // Based on the API spec, we don't have a specific endpoint for referrals
-    // We'll use the user profile endpoint and extract the relevant information
-    return this.getUserProfile().pipe(
-      map(user => ({
-        referralCode: user.referralCode || '',
-        referralCount: 0, // This information is not available in the user profile
-        coinsEarned: user.coinBalance || 0
-      }))
-    );
+    return this.http.post<any>(`${this.userUrl}/${userId}/generate-coupon?value=${value}`, {});
   }
 
   /**
    * Check if user is authenticated
    */
   isAuthenticated(): boolean {
-    return !!this.currentUserValue;
+    return !!this.currentUserValue && !!this.getToken();
   }
 
   /**
    * Get authentication token
    */
   getToken(): string | null {
+    // Get token directly from localStorage for consistency
     return localStorage.getItem('token');
   }
 }

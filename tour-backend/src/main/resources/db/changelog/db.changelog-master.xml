@@ -11,4 +11,9 @@
     <include file="changes/004-update-package-types.xml" relativeToChangelogFile="true"/>
     <include file="changes/005-add-user-features.xml" relativeToChangelogFile="true"/>
     <include file="changes/006-add-sample-addons.xml" relativeToChangelogFile="true"/>
+    <include file="changes/007-add-notification-system.xml" relativeToChangelogFile="true"/>
+    <include file="changes/008-add-faq-system.xml" relativeToChangelogFile="true"/>
+    <include file="changes/009-add-payment-methods.xml" relativeToChangelogFile="true"/>
+    <include file="changes/010-add-contact-submissions.xml" relativeToChangelogFile="true"/>
+    <include file="changes/011-add-destinations.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="007-add-notification-table" author="codeium">
+        <createTable tableName="notifications">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_notification_user" references="users(id)"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notification_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_read" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action_url" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="007-add-sample-notifications" author="codeium">
+        <insert tableName="notifications">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="title" value="Welcome to Tour Agency"/>
+            <column name="message" value="Thank you for joining our platform. Explore our packages and start your journey!"/>
+            <column name="notification_type" value="SYSTEM"/>
+            <column name="is_read" valueBoolean="false"/>
+            <column name="action_url" value="/packages"/>
+        </insert>
+        <insert tableName="notifications">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="title" value="Special Offer"/>
+            <column name="message" value="Get 15% off on all European destinations this month!"/>
+            <column name="notification_type" value="PROMOTION"/>
+            <column name="is_read" valueBoolean="false"/>
+            <column name="action_url" value="/packages/region/Europe"/>
+        </insert>
+        <insert tableName="notifications">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="title" value="Earn Coins"/>
+            <column name="message" value="Refer friends and earn coins that you can use for discounts on your next booking."/>
+            <column name="notification_type" value="REWARD"/>
+            <column name="is_read" valueBoolean="false"/>
+            <column name="action_url" value="/rewards"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

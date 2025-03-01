@@ -13,6 +13,7 @@ import { BookingConfirmationComponent } from './components/booking/booking-confi
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { BookingsComponent } from './components/user/bookings/bookings.component';
 import { BookingDetailsComponent } from './components/user/booking-details/booking-details.component';
+import { AuthTestComponent } from './components/auth-test/auth-test.component';
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
@@ -29,6 +30,7 @@ const routes: Routes = [
   { path: 'bookings/:id', component: BookingDetailsComponent, canActivate: [AuthGuard] },
   { path: 'booking-confirmation/:id', component: BookingConfirmationComponent, canActivate: [AuthGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: 'auth-test', component: AuthTestComponent },
   { path: '**', redirectTo: '' }
 ];
 

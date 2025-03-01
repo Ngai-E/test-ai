@@ -1,0 +1,120 @@
+// Bookings component styles
+.bookings-list {
+  .card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    img {
+      height: 150px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    
+    h5 {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .booking-info {
+      margin-top: 1rem;
+      
+      p {
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+    }
+    
+    .badge {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      
+      &.badge-success {
+        background-color: #28a745;
+        color: white;
+      }
+      
+      &.badge-warning {
+        background-color: #ffc107;
+        color: #212529;
+      }
+      
+      &.badge-danger {
+        background-color: #dc3545;
+        color: white;
+      }
+      
+      &.badge-info {
+        background-color: #17a2b8;
+        color: white;
+      }
+      
+      &.badge-secondary {
+        background-color: #6c757d;
+        color: white;
+      }
+    }
+    
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+      border-radius: 0.2rem;
+    }
+  }
+}
+
+.empty-bookings, .no-results {
+  padding: 3rem 1rem;
+  
+  i {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+  }
+  
+  h3 {
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    max-width: 500px;
+    margin: 0 auto 1.5rem;
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .bookings-list {
+    .card {
+      .row {
+        flex-direction: column;
+      }
+      
+      .col-md-3, .col-md-6 {
+        width: 100%;
+        margin-bottom: 1rem;
+      }
+      
+      .col-md-3.text-right {
+        text-align: left !important;
+        
+        .badge {
+          display: inline-block;
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="011-add-destinations-table" author="codeium">
+        <createTable tableName="destinations">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_url" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="country" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="region" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_featured" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="latitude" type="DECIMAL(10,7)"/>
+            <column name="longitude" type="DECIMAL(10,7)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="011-add-sample-destinations" author="codeium">
+        <insert tableName="destinations">
+            <column name="name" value="Paris"/>
+            <column name="description" value="The City of Light, known for the Eiffel Tower, Louvre Museum, and charming cafes."/>
+            <column name="image_url" value="https://example.com/images/paris.jpg"/>
+            <column name="country" value="France"/>
+            <column name="region" value="Europe"/>
+            <column name="is_featured" valueBoolean="true"/>
+            <column name="latitude" valueNumeric="48.8566"/>
+            <column name="longitude" valueNumeric="2.3522"/>
+        </insert>
+        <insert tableName="destinations">
+            <column name="name" value="Bali"/>
+            <column name="description" value="A tropical paradise with beautiful beaches, lush rice terraces, and vibrant culture."/>
+            <column name="image_url" value="https://example.com/images/bali.jpg"/>
+            <column name="country" value="Indonesia"/>
+            <column name="region" value="Asia"/>
+            <column name="is_featured" valueBoolean="true"/>
+            <column name="latitude" valueNumeric="-8.3405"/>
+            <column name="longitude" valueNumeric="115.0920"/>
+        </insert>
+        <insert tableName="destinations">
+            <column name="name" value="New York City"/>
+            <column name="description" value="The Big Apple, featuring iconic landmarks like Times Square, Central Park, and the Statue of Liberty."/>
+            <column name="image_url" value="https://example.com/images/nyc.jpg"/>
+            <column name="country" value="United States"/>
+            <column name="region" value="North America"/>
+            <column name="is_featured" valueBoolean="true"/>
+            <column name="latitude" valueNumeric="40.7128"/>
+            <column name="longitude" valueNumeric="-74.0060"/>
+        </insert>
+        <insert tableName="destinations">
+            <column name="name" value="Cape Town"/>
+            <column name="description" value="A stunning coastal city with Table Mountain, beautiful beaches, and vibrant culture."/>
+            <column name="image_url" value="https://example.com/images/capetown.jpg"/>
+            <column name="country" value="South Africa"/>
+            <column name="region" value="Africa"/>
+            <column name="is_featured" valueBoolean="true"/>
+            <column name="latitude" valueNumeric="-33.9249"/>
+            <column name="longitude" valueNumeric="18.4241"/>
+        </insert>
+        <insert tableName="destinations">
+            <column name="name" value="Sydney"/>
+            <column name="description" value="Famous for its Opera House, Harbour Bridge, and beautiful beaches."/>
+            <column name="image_url" value="https://example.com/images/sydney.jpg"/>
+            <column name="country" value="Australia"/>
+            <column name="region" value="Oceania"/>
+            <column name="is_featured" valueBoolean="true"/>
+            <column name="latitude" valueNumeric="-33.8688"/>
+            <column name="longitude" valueNumeric="151.2093"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

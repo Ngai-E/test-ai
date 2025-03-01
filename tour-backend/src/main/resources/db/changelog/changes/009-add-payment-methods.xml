@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="009-add-payment-methods-table" author="codeium">
+        <createTable tableName="payment_methods">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_active" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="009-add-sample-payment-methods" author="codeium">
+        <insert tableName="payment_methods">
+            <column name="name" value="Credit Card"/>
+            <column name="description" value="Pay with Visa, Mastercard, or American Express"/>
+            <column name="icon" value="credit-card-icon"/>
+            <column name="display_order" valueNumeric="1"/>
+        </insert>
+        <insert tableName="payment_methods">
+            <column name="name" value="PayPal"/>
+            <column name="description" value="Pay with your PayPal account"/>
+            <column name="icon" value="paypal-icon"/>
+            <column name="display_order" valueNumeric="2"/>
+        </insert>
+        <insert tableName="payment_methods">
+            <column name="name" value="Bank Transfer"/>
+            <column name="description" value="Pay directly from your bank account"/>
+            <column name="icon" value="bank-transfer-icon"/>
+            <column name="display_order" valueNumeric="3"/>
+        </insert>
+        <insert tableName="payment_methods">
+            <column name="name" value="Mobile Money"/>
+            <column name="description" value="Pay using mobile money services"/>
+            <column name="icon" value="mobile-money-icon"/>
+            <column name="display_order" valueNumeric="4"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

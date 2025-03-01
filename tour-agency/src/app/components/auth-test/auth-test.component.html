@@ -1,0 +1,75 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2>Authentication Test Panel</h2>
+    </div>
+    <div class="card-body">
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header">
+              <h4>Authentication Status</h4>
+            </div>
+            <div class="card-body">
+              <p><strong>Is Authenticated:</strong> <span [ngClass]="isAuthenticated ? 'text-success' : 'text-danger'">
+                {{ isAuthenticated ? 'Yes' : 'No' }}
+              </span></p>
+              <p><strong>Current Token:</strong></p>
+              <div class="token-display">
+                <code>{{ currentToken || 'No token found' }}</code>
+              </div>
+              <button class="btn btn-secondary mt-2" (click)="checkAuthStatus()">Refresh Status</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">
+              <h4>Test with Interceptor</h4>
+            </div>
+            <div class="card-body">
+              <button class="btn btn-primary" (click)="testInterceptor()">Test Interceptor</button>
+              <div class="response-container mt-3">
+                <h5>Response:</h5>
+                <pre>{{ interceptorResponse || 'No response yet' }}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">
+              <h4>Test with Explicit Headers</h4>
+            </div>
+            <div class="card-body">
+              <button class="btn btn-primary" (click)="testExplicitHeaders()">Test Explicit Headers</button>
+              <div class="response-container mt-3">
+                <h5>Response:</h5>
+                <pre>{{ explicitHeadersResponse || 'No response yet' }}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header">
+              <h4>Test Public Endpoint</h4>
+            </div>
+            <div class="card-body">
+              <button class="btn btn-primary" (click)="testPublicEndpoint()">Test Public Endpoint</button>
+              <div class="response-container mt-3">
+                <h5>Response:</h5>
+                <pre>{{ publicEndpointResponse || 'No response yet' }}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

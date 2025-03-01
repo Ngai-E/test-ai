@@ -21,20 +21,12 @@ export class AuthInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Get the auth token from localStorage
-    const token = localStorage.getItem('token');
-
-    // Clone the request and add the authorization header if token exists
-    if (token) {
-      request = request.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-    }
-
+    // This interceptor now only handles error responses
+    // Token addition is handled by JwtInterceptor
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
+        console.log('Auth Interceptor - Error status:', error.status);
+        
         if (error.status === 401) {
           // Token expired or invalid
           this.authService.logout();
@@ -45,10 +37,11 @@ export class AuthInterceptor implements HttpInterceptor {
           this.router.navigate(['/login'], { queryParams: { returnUrl } });
         }
         else if (error.status === 403) {
+          console.error('Forbidden error:', error);
           this.toastService.showError('You do not have permission to perform this action');
         }
         
-        return throwError(error);
+        return throwError(() => error);
       })
     );
   }

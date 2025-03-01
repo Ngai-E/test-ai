@@ -3,6 +3,7 @@ package com.touragency.service;
 import com.touragency.dto.LoginRequest;
 import com.touragency.dto.RegisterRequest;
 import com.touragency.dto.UserResponse;
+import com.touragency.dto.UserUpdateRequest;
 import com.touragency.model.Package;
 import com.touragency.model.User;
 import com.touragency.repository.PackageRepository;
@@ -102,6 +103,45 @@ public class UserService {
     
     public void generateCoupon(Long userId, double value) {
         // Implementation for generating a coupon from user's coin balance
+    }
+    
+    public UserResponse getUserProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        return createUserResponse(user);
+    }
+    
+    public UserResponse updateUserProfile(Long userId, UserUpdateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // Update user fields if provided
+        if (request.getFullName() != null && !request.getFullName().isEmpty()) {
+            user.setFullName(request.getFullName());
+        }
+        
+        if (request.getEmail() != null && !request.getEmail().isEmpty()) {
+            user.setEmail(request.getEmail());
+        }
+        
+        if (request.getPhoneNumber() != null && !request.getPhoneNumber().isEmpty()) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+        
+        // Update password if provided
+        if (request.getCurrentPassword() != null && !request.getCurrentPassword().isEmpty() 
+                && request.getNewPassword() != null && !request.getNewPassword().isEmpty()) {
+            
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                throw new RuntimeException("Current password is incorrect");
+            }
+            
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }
+        
+        User updatedUser = userRepository.save(user);
+        return createUserResponse(updatedUser);
     }
     
     private UserResponse createUserResponse(User user) {

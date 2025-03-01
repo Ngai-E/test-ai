@@ -1,5 +1,7 @@
 package com.touragency.controller;
 
+import com.touragency.dto.UserResponse;
+import com.touragency.dto.UserUpdateRequest;
 import com.touragency.model.Package;
 import com.touragency.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -72,6 +74,47 @@ public class UserController {
             @Parameter(description = "ID of the package to check") @PathVariable Long packageId) {
         boolean isInWishlist = userService.isPackageInWishlist(userId, packageId);
         return ResponseEntity.ok(isInWishlist);
+    }
+    
+    @Operation(summary = "Get user profile", description = "Retrieves a user's profile information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved user profile", 
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponse.class))),
+        @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+    })
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponse> getUserProfile(
+            @Parameter(description = "ID of the user") @PathVariable Long userId) {
+        UserResponse userResponse = userService.getUserProfile(userId);
+        return ResponseEntity.ok(userResponse);
+    }
+    
+    @Operation(summary = "Get user profile", description = "Retrieves a user's profile information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved user profile", 
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponse.class))),
+        @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+    })
+    @GetMapping("/{userId}/profile")
+    public ResponseEntity<UserResponse> getUserProfileInfo(
+            @Parameter(description = "ID of the user") @PathVariable Long userId) {
+        UserResponse userResponse = userService.getUserProfile(userId);
+        return ResponseEntity.ok(userResponse);
+    }
+    
+    @Operation(summary = "Update user profile", description = "Updates a user's profile information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully updated user profile", 
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponse.class))),
+        @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+        @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content)
+    })
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserResponse> updateUserProfile(
+            @Parameter(description = "ID of the user") @PathVariable Long userId,
+            @Parameter(description = "Updated user information") @RequestBody UserUpdateRequest request) {
+        UserResponse userResponse = userService.updateUserProfile(userId, request);
+        return ResponseEntity.ok(userResponse);
     }
     
     @Operation(summary = "Generate coupon for user", description = "Generates a coupon from user's coin balance")

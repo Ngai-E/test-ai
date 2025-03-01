@@ -11,6 +11,7 @@ import { HomeComponent } from './components/home/home.component';
 import { PackagesComponent } from './components/packages/packages.component';
 import { WishlistComponent } from './components/wishlist/wishlist.component';
 import { CartComponent } from './components/cart/cart.component';
+import { AuthTestComponent } from './components/auth-test/auth-test.component';
 
 import { SharedModule } from './components/shared/shared.module';
 import { AuthModule } from './components/auth/auth.module';
@@ -25,6 +26,7 @@ import { AuthService } from './services/auth.service';
 import { ToastService } from './services/toast.service';
 import { BookingService } from './services/booking.service';
 import { PackageService } from './services/package.service';
+import { TestService } from './services/test.service';
 
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
@@ -39,6 +41,7 @@ import { CurrencyPipe } from './pipes/currency.pipe';
     PackagesComponent,
     WishlistComponent,
     CartComponent,
+    AuthTestComponent,
     AddonTotalPipe,
     CurrencyPipe
   ],
@@ -67,6 +70,7 @@ import { CurrencyPipe } from './pipes/currency.pipe';
     ToastService,
     BookingService,
     PackageService,
+    TestService,
     AddonTotalPipe,
     CurrencyPipe
   ],

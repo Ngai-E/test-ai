@@ -1,92 +1,95 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BookingService, Booking } from '../../../services/booking.service';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
   selector: 'app-booking-details',
   templateUrl: './booking-details.component.html',
-  styleUrls: ['./booking-details.component.css']
+  styleUrls: ['./booking-details.component.scss']
 })
 export class BookingDetailsComponent implements OnInit {
   booking: Booking | null = null;
-  loading = false;
-  errorMessage = '';
-  successMessage = '';
-
+  isLoading: boolean = true;
+  errorMessage: string = '';
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private authService: AuthService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const bookingId = Number(params.get('id'));
-      if (bookingId) {
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    
+    this.route.params.subscribe(params => {
+      if (params['id']) {
+        const bookingId = +params['id'];
         this.loadBookingDetails(bookingId);
       } else {
-        this.errorMessage = 'Invalid booking ID';
+        this.errorMessage = 'Booking ID not found';
+        this.isLoading = false;
       }
     });
   }
 
   loadBookingDetails(bookingId: number): void {
-    this.loading = true;
-    this.errorMessage = '';
-    
     this.bookingService.getBooking(bookingId)
-      .pipe(
-        catchError(error => {
-          this.errorMessage = 'Failed to load booking details. Please try again.';
-          return of(null);
-        }),
-        finalize(() => {
-          this.loading = false;
-        })
-      )
-      .subscribe(booking => {
-        this.booking = booking;
-      });
-  }
-
-  cancelBooking(): void {
-    if (!this.booking) return;
-    
-    if (!confirm('Are you sure you want to cancel this booking?')) {
-      return;
-    }
-    
-    this.loading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-    
-    this.bookingService.cancelBooking(this.booking.id)
-      .pipe(
-        catchError(error => {
-          this.errorMessage = 'Failed to cancel booking. Please try again.';
-          return of(null);
-        }),
-        finalize(() => {
-          this.loading = false;
-        })
-      )
-      .subscribe(result => {
-        if (result) {
-          this.successMessage = 'Booking cancelled successfully';
-          if (this.booking) {
-            this.booking.status = 'CANCELLED';
-          }
+      .subscribe({
+        next: (booking: Booking) => {
+          this.booking = booking;
+          this.isLoading = false;
+        },
+        error: (error: any) => {
+          this.errorMessage = 'Failed to load booking details';
+          this.isLoading = false;
+          console.error('Error loading booking:', error);
         }
       });
   }
 
+  cancelBooking(): void {
+    if (!this.booking) {
+      this.toastService.showError('Unable to cancel booking. Please try again later.');
+      return;
+    }
+    
+    if (confirm('Are you sure you want to cancel this booking?')) {
+      this.isLoading = true;
+      
+      this.bookingService.cancelBooking(this.booking.id).subscribe({
+        next: () => {
+          this.toastService.showSuccess('Booking cancelled successfully');
+          this.booking!.status = 'cancelled';
+          this.isLoading = false;
+        },
+        error: (error: any) => {
+          this.toastService.showError('Failed to cancel booking');
+          this.isLoading = false;
+          console.error('Error cancelling booking:', error);
+        }
+      });
+    }
+  }
+
+  printBooking(): void {
+    window.print();
+  }
+
   goBack(): void {
-    this.router.navigate(['/bookings']);
+    this.router.navigate(['/user/bookings']);
   }
 
   formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -96,6 +99,8 @@ export class BookingDetailsComponent implements OnInit {
   }
 
   getStatusClass(status: string): string {
+    if (!status) return 'badge-secondary';
+    
     switch (status.toUpperCase()) {
       case 'CONFIRMED':
         return 'badge-success';

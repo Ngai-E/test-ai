@@ -55,6 +55,41 @@ public class PackageController {
                 .orElse(ResponseEntity.notFound().build());
     }
     
+    @Operation(summary = "Search packages", description = "Search for packages by name or description")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved packages", 
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Package.class)))
+    })
+    @GetMapping("/search")
+    public ResponseEntity<List<Package>> searchPackages(
+            @Parameter(description = "Search query") @RequestParam String query) {
+        List<Package> packages = packageService.searchPackages(query);
+        return ResponseEntity.ok(packages);
+    }
+    
+    @Operation(summary = "Get upcoming tours", description = "Retrieves upcoming tours with available slots")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved upcoming tours", 
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Package.class)))
+    })
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<Package>> getUpcomingTours(
+            @Parameter(description = "Maximum number of tours to return") @RequestParam(required = false, defaultValue = "10") int limit) {
+        List<Package> packages = packageService.getUpcomingTours(limit);
+        return ResponseEntity.ok(packages);
+    }
+    
+    @Operation(summary = "Get featured packages", description = "Retrieves featured tour packages")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved featured packages", 
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Package.class)))
+    })
+    @GetMapping("/featured")
+    public ResponseEntity<List<Package>> getFeaturedPackages() {
+        List<Package> packages = packageService.getFeaturedPackages();
+        return ResponseEntity.ok(packages);
+    }
+    
     @Operation(summary = "Create a new package", description = "Creates a new tour package")
     @ApiResponse(responseCode = "201", description = "Package successfully created", 
                 content = @Content(mediaType = "application/json", schema = @Schema(implementation = Package.class)))

@@ -11,11 +11,12 @@
     <div class="spinner-border text-primary" role="status">
       <span class="sr-only">Loading...</span>
     </div>
+    <p class="mt-3">Loading your bookings...</p>
   </div>
   
   <!-- Error Message -->
   <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
-    {{ errorMessage }}
+    <i class="fa fa-exclamation-circle mr-2"></i> {{ errorMessage }}
     <button type="button" class="close" (click)="errorMessage = ''">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -38,7 +39,12 @@
     <div class="col-md-6">
       <div class="form-group">
         <label for="searchBookings">Search Bookings</label>
-        <input type="text" id="searchBookings" class="form-control" placeholder="Search by tour name, destination, or booking ID" (input)="onSearch($event)">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fa fa-search"></i></span>
+          </div>
+          <input type="text" id="searchBookings" class="form-control" placeholder="Search by tour name, destination, or booking ID" (input)="onSearch($event)">
+        </div>
       </div>
     </div>
   </div>
@@ -49,7 +55,9 @@
       <i class="fa fa-calendar-o fa-4x mb-3 text-muted"></i>
       <h3>No bookings found</h3>
       <p class="text-muted">You haven't made any tour bookings yet.</p>
-      <a routerLink="/packages" class="btn btn-primary mt-3">Browse Tour Packages</a>
+      <a routerLink="/packages" class="btn btn-primary mt-3">
+        <i class="fa fa-search mr-2"></i> Browse Tour Packages
+      </a>
     </div>
   </div>
   
@@ -60,7 +68,7 @@
       <h3>No results found</h3>
       <p class="text-muted">Try adjusting your filters or search terms.</p>
       <button class="btn btn-outline-secondary mt-3" (click)="statusFilter = 'all'; searchTerm = ''; onFilterChange()">
-        Clear Filters
+        <i class="fa fa-refresh mr-2"></i> Clear Filters
       </button>
     </div>
   </div>
@@ -71,38 +79,38 @@
       <div class="card-body">
         <div class="row">
           <div class="col-md-3">
-            <img [src]="booking.package.image" [alt]="booking.package.name" class="img-fluid rounded">
+            <img [src]="booking.package?.image || 'assets/images/placeholder.jpg'" [alt]="booking.package?.name || 'Tour Package'" class="img-fluid rounded">
           </div>
           <div class="col-md-6">
-            <h5 class="mb-1">{{ booking.package.name }}</h5>
+            <h5 class="mb-1">{{ booking.package?.name || 'Tour Package' }}</h5>
             <p class="text-muted mb-2">
-              <i class="fa fa-map-marker mr-1"></i> {{ booking.package.destination }}
+              <i class="fa fa-map-marker mr-1"></i> {{ booking.package?.destination || 'Destination' }}
             </p>
             <div class="booking-info">
               <p class="mb-1">
-                <strong>Booking ID:</strong> #{{ booking.id }}
+                <strong>Booking Reference:</strong> {{ booking.bookingReference || 'N/A' }}
               </p>
               <p class="mb-1">
-                <strong>Booking Date:</strong> {{ formatDate(booking.bookingDate) }}
+                <strong>Travel Date:</strong> {{ formatDate(booking.travelDate) }}
               </p>
               <p class="mb-0">
-                <strong>Total Amount:</strong> ${{ booking.finalAmount | number:'1.2-2' }}
+                <strong>Total Amount:</strong> ${{ booking.finalAmount }}
                 <span *ngIf="booking.discountAmount > 0" class="text-success ml-2">
-                  (Saved ${{ booking.discountAmount | number:'1.2-2' }})
+                  (Saved ${{ booking.discountAmount }})
                 </span>
               </p>
             </div>
           </div>
           <div class="col-md-3 text-right">
-            <span class="badge" [ngClass]="getStatusClass(booking.status)">{{ booking.status }}</span>
+            <span class="badge" [ngClass]="getStatusClass(booking.status)">{{ booking.status | uppercase }}</span>
             <div class="mt-3">
               <button class="btn btn-sm btn-outline-primary mr-2" (click)="viewBookingDetails(booking.id); $event.stopPropagation()">
-                View Details
+                <i class="fa fa-eye mr-1"></i> View Details
               </button>
-              <button *ngIf="booking.status.toUpperCase() !== 'CANCELLED' && booking.status.toUpperCase() !== 'COMPLETED'" 
+              <button *ngIf="booking.status.toLowerCase() !== 'cancelled' && booking.status.toLowerCase() !== 'completed'" 
                       class="btn btn-sm btn-outline-danger" 
                       (click)="cancelBooking(booking.id, $event)">
-                Cancel
+                <i class="fa fa-times-circle mr-1"></i> Cancel
               </button>
             </div>
           </div>

@@ -141,7 +141,11 @@ export class ProfileComponent implements OnInit {
     this.authService.changePassword(passwordData)
       .pipe(
         catchError(error => {
-          this.errorMessage = error.error?.message || 'Failed to change password. Please try again.';
+          if (error.status === 400) {
+            this.errorMessage = 'Current password is incorrect. Please try again.';
+          } else {
+            this.errorMessage = error.error?.message || 'Failed to change password. Please try again.';
+          }
           return of(null);
         }),
         finalize(() => this.loading = false)
