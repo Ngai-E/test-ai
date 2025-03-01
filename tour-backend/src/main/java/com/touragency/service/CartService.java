@@ -154,4 +154,95 @@ public class CartService {
         logger.info("Cart total for user ID: {} is {}", userId, total);
         return total;
     }
+    
+    @Transactional
+    public CartItem updateCartItemQuantity(Long userId, Long cartItemId, Integer quantity) {
+        logger.info("Updating quantity for cart item ID: {} to {} for user ID: {}", cartItemId, quantity, userId);
+        
+        if (quantity < 1) {
+            logger.error("Invalid quantity: {}, must be at least 1", quantity);
+            throw new IllegalArgumentException("Quantity must be at least 1");
+        }
+        
+        Optional<CartItem> cartItemOpt = cartItemRepository.findById(cartItemId);
+        if (!cartItemOpt.isPresent()) {
+            logger.error("Cart item not found with ID: {}", cartItemId);
+            throw new RuntimeException("Cart item not found");
+        }
+        
+        CartItem cartItem = cartItemOpt.get();
+        
+        if (cartItem.getUser() == null) {
+            logger.error("Cart item ID: {} has no associated user", cartItemId);
+            throw new RuntimeException("Cart item has no associated user");
+        }
+        
+        if (!cartItem.getUser().getId().equals(userId)) {
+            logger.error("User ID: {} not authorized to update cart item ID: {} (belongs to user ID: {})", 
+                    userId, cartItemId, cartItem.getUser().getId());
+            throw new RuntimeException("Not authorized to update this cart item");
+        }
+        
+        logger.info("Updating cart item ID: {} quantity from {} to {}", 
+                cartItemId, cartItem.getNumberOfAdults(), quantity);
+        cartItem.setNumberOfAdults(quantity);
+        
+        return cartItemRepository.save(cartItem);
+    }
+    
+    @Transactional
+    public CartItem updateAddonQuantity(Long userId, Long cartItemId, Long addonId, Integer quantity) {
+        logger.info("Updating addon ID: {} quantity to {} for cart item ID: {} for user ID: {}", 
+                addonId, quantity, cartItemId, userId);
+        
+        if (quantity < 0) {
+            logger.error("Invalid quantity: {}, must be at least 0", quantity);
+            throw new IllegalArgumentException("Quantity must be at least 0");
+        }
+        
+        Optional<CartItem> cartItemOpt = cartItemRepository.findById(cartItemId);
+        if (!cartItemOpt.isPresent()) {
+            logger.error("Cart item not found with ID: {}", cartItemId);
+            throw new RuntimeException("Cart item not found");
+        }
+        
+        CartItem cartItem = cartItemOpt.get();
+        
+        if (cartItem.getUser() == null) {
+            logger.error("Cart item ID: {} has no associated user", cartItemId);
+            throw new RuntimeException("Cart item has no associated user");
+        }
+        
+        if (!cartItem.getUser().getId().equals(userId)) {
+            logger.error("User ID: {} not authorized to update cart item ID: {} (belongs to user ID: {})", 
+                    userId, cartItemId, cartItem.getUser().getId());
+            throw new RuntimeException("Not authorized to update this cart item");
+        }
+        
+        CartItemAddon addonToUpdate = null;
+        for (CartItemAddon addon : cartItem.getAddons()) {
+            if (addon.getAddon().getId().equals(addonId)) {
+                addonToUpdate = addon;
+                break;
+            }
+        }
+        
+        if (addonToUpdate == null) {
+            logger.error("Addon ID: {} not found in cart item ID: {}", addonId, cartItemId);
+            throw new RuntimeException("Addon not found in cart item");
+        }
+        
+        logger.info("Updating addon ID: {} quantity from {} to {}", 
+                addonId, addonToUpdate.getQuantity(), quantity);
+        
+        if (quantity == 0) {
+            // Remove the addon if quantity is 0
+            logger.info("Removing addon ID: {} from cart item ID: {} as quantity is 0", addonId, cartItemId);
+            cartItem.getAddons().remove(addonToUpdate);
+        } else {
+            addonToUpdate.setQuantity(quantity);
+        }
+        
+        return cartItemRepository.save(cartItem);
+    }
 }

@@ -34,6 +34,13 @@ export class NotificationService {
   }
 
   /**
+   * Alias for getUserNotifications to match the method name used in navbar
+   */
+  getNotifications(): Observable<Notification[]> {
+    return this.getUserNotifications();
+  }
+
+  /**
    * Get unread notifications for the current user
    */
   getUnreadNotifications(): Observable<Notification[]> {

@@ -102,4 +102,52 @@ public class CartController {
             throw e;
         }
     }
+    
+    @PutMapping("/user/{userId}/item/{cartItemId}")
+    public ResponseEntity<CartItemDto> updateCartItemQuantity(
+            @PathVariable Long userId, 
+            @PathVariable Long cartItemId,
+            @RequestParam Integer quantity) {
+        logger.info("Updating quantity for cart item {} to {} for user {}", cartItemId, quantity, userId);
+        try {
+            CartItem updatedItem = cartService.updateCartItemQuantity(userId, cartItemId, quantity);
+            CartItemDto cartItemDto = cartItemMapper.toDto(updatedItem);
+            logger.info("Successfully updated cart item {} quantity to {}", cartItemId, quantity);
+            return ResponseEntity.ok(cartItemDto);
+        } catch (Exception e) {
+            logger.error("Error updating cart item {} quantity for user {}: {}", cartItemId, userId, e.getMessage());
+            if (e.getMessage().contains("Cart item not found")) {
+                return ResponseEntity.notFound().build();
+            } else if (e.getMessage().contains("Not authorized")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else {
+                throw e;
+            }
+        }
+    }
+    
+    @PutMapping("/user/{userId}/item/{cartItemId}/addon/{addonId}")
+    public ResponseEntity<CartItemDto> updateAddonQuantity(
+            @PathVariable Long userId, 
+            @PathVariable Long cartItemId,
+            @PathVariable Long addonId,
+            @RequestParam Integer quantity) {
+        logger.info("Updating addon {} quantity to {} for cart item {} for user {}", addonId, quantity, cartItemId, userId);
+        try {
+            CartItem updatedItem = cartService.updateAddonQuantity(userId, cartItemId, addonId, quantity);
+            CartItemDto cartItemDto = cartItemMapper.toDto(updatedItem);
+            logger.info("Successfully updated addon {} quantity to {} for cart item {}", addonId, quantity, cartItemId);
+            return ResponseEntity.ok(cartItemDto);
+        } catch (Exception e) {
+            logger.error("Error updating addon {} quantity for cart item {} for user {}: {}", 
+                    addonId, cartItemId, userId, e.getMessage());
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.notFound().build();
+            } else if (e.getMessage().contains("Not authorized")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            } else {
+                throw e;
+            }
+        }
+    }
 }
