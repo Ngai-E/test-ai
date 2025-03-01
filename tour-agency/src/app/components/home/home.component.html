@@ -61,11 +61,20 @@
       <!-- Packages display -->
       <div *ngIf="!isLoading && !errorMessage" class="row">
         <div class="col-md-6 mb-4" *ngFor="let package of featuredPackages">
-          <div class="card h-100">
-            <img [src]="package.image" class="card-img-top" [alt]="package.name">
+          <div class="card h-100 package-card">
+            <div class="position-relative">
+              <img [src]="package.image" class="card-img-top" [alt]="package.name">
+              <button class="btn wishlist-btn" (click)="toggleWishlist(package.id, $event)">
+                <i class="fas" [ngClass]="isInWishlist(package.id) ? 'fa-heart text-danger' : 'fa-heart-o'"></i>
+              </button>
+            </div>
             <div class="card-body">
               <h5 class="card-title">{{ package.name }}</h5>
-              <p class="card-text">{{ package.description }}</p>
+              <p class="card-text">{{ package.description | slice:0:120 }}...</p>
+              <div class="package-info mb-3">
+                <span class="badge bg-info me-2">{{ package.duration }} days</span>
+                <span class="badge bg-secondary">{{ package.country }}</span>
+              </div>
               <div class="d-flex justify-content-between align-items-center">
                 <span class="price">
                   From ${{ package.basePrice }}

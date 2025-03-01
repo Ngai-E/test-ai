@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { catchError, map } from 'rxjs/operators';
 
 export interface PackageType {
   id?: number;
@@ -63,6 +64,16 @@ export class PackageService {
 
   getAllPackages(): Observable<Package[]> {
     return this.http.get<Package[]>(this.apiUrl);
+  }
+
+  getFeaturedPackages(): Observable<Package[]> {
+    return this.http.get<Package[]>(`${this.apiUrl}/featured`).pipe(
+      catchError(() => {
+        return this.getAllPackages().pipe(
+          map(packages => packages.slice(0, 4))
+        );
+      })
+    );
   }
 
   getPackageById(id: number): Observable<Package> {

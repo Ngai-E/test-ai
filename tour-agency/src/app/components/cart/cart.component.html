@@ -43,48 +43,52 @@
         </div>
         <div class="card-body p-0">
           <div class="cart-items">
-            <div *ngFor="let item of cartItems" class="cart-item">
+            <div *ngFor="let item of cartItems; let i = index" class="cart-item">
               <div class="row align-items-center">
-                <div class="col-md-3">
-                  <img [src]="item.packageImage" alt="{{ item.packageName }}" class="img-fluid rounded">
+                <div class="col-md-3 position-relative">
+                  <img [src]="item.packageImage" class="img-fluid rounded-start" [alt]="item.packageName">
+                  <button class="btn wishlist-btn-small" (click)="toggleWishlist(item.packageId, $event)">
+                    <i class="fas" [ngClass]="isInWishlist(item.packageId) ? 'fa-heart text-danger' : 'fa-heart-o'"></i>
+                  </button>
                 </div>
                 <div class="col-md-9">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                      <h5>{{ item.packageName }}</h5>
-                      <p class="text-muted">{{ item.packageCountry }}</p>
-                      <div class="d-flex align-items-center mt-2">
-                        <div class="quantity-control">
-                          <button class="btn btn-sm btn-outline-secondary" (click)="updateQuantity(item, -1)">-</button>
-                          <span class="mx-2">{{ item.numberOfAdults }}</span>
-                          <button class="btn btn-sm btn-outline-secondary" (click)="updateQuantity(item, 1)">+</button>
-                        </div>
-                        <div class="price ml-3">
-                          <span class="text-primary">${{ item.basePrice | number:'1.2-2' }}</span>
-                        </div>
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <h5 class="card-title">{{ item.packageName }}</h5>
+                      <button class="btn btn-sm btn-link text-danger" (click)="removeItem(item.id)">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </div>
+                    
+                    <p class="text-muted">{{ item.packageCountry }}</p>
+                    <div class="d-flex align-items-center mt-2">
+                      <div class="quantity-control">
+                        <button class="btn btn-sm btn-outline-secondary" (click)="updateQuantity(item, -1)">-</button>
+                        <span class="mx-2">{{ item.numberOfAdults }}</span>
+                        <button class="btn btn-sm btn-outline-secondary" (click)="updateQuantity(item, 1)">+</button>
+                      </div>
+                      <div class="price ml-3">
+                        <span class="text-primary">${{ item.basePrice | number:'1.2-2' }}</span>
                       </div>
                     </div>
-                    <button class="btn btn-sm btn-link text-danger" (click)="removeItem(item.id)">
-                      <i class="fa fa-trash"></i>
-                    </button>
-                  </div>
-                  
-                  <!-- Addons -->
-                  <div *ngIf="item.addons && item.addons.length > 0" class="addons mt-3">
-                    <h6>Add-ons:</h6>
-                    <div *ngFor="let addon of item.addons" class="addon-item d-flex justify-content-between align-items-center">
-                      <div>
-                        <span>{{ addon.addonName }}</span>
-                        <small class="text-muted ml-2">${{ addon.price | number:'1.2-2' }} each</small>
-                      </div>
-                      <div class="d-flex align-items-center">
-                        <div class="quantity-control">
-                          <button class="btn btn-sm btn-outline-secondary" (click)="updateAddonQuantity(item, addon, -1)">-</button>
-                          <span class="mx-2">{{ addon.quantity }}</span>
-                          <button class="btn btn-sm btn-outline-secondary" (click)="updateAddonQuantity(item, addon, 1)">+</button>
+                    
+                    <!-- Addons -->
+                    <div *ngIf="item.addons && item.addons.length > 0" class="addons mt-3">
+                      <h6>Add-ons:</h6>
+                      <div *ngFor="let addon of item.addons" class="addon-item d-flex justify-content-between align-items-center">
+                        <div>
+                          <span>{{ addon.addonName }}</span>
+                          <small class="text-muted ml-2">${{ addon.price | number:'1.2-2' }} each</small>
                         </div>
-                        <div class="price ml-3">
-                          <span>${{ addon.price * addon.quantity | number:'1.2-2' }}</span>
+                        <div class="d-flex align-items-center">
+                          <div class="quantity-control">
+                            <button class="btn btn-sm btn-outline-secondary" (click)="updateAddonQuantity(item, addon, -1)">-</button>
+                            <span class="mx-2">{{ addon.quantity }}</span>
+                            <button class="btn btn-sm btn-outline-secondary" (click)="updateAddonQuantity(item, addon, 1)">+</button>
+                          </div>
+                          <div class="price ml-3">
+                            <span>${{ addon.price * addon.quantity | number:'1.2-2' }}</span>
+                          </div>
                         </div>
                       </div>
                     </div>

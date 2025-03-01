@@ -1,20 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CartService, CartItem, CartItemAddon } from '../../services/cart.service';
 import { CouponService, Coupon } from '../../services/coupon.service';
 import { BookingService } from '../../services/booking.service';
 import { AuthService } from '../../services/auth.service';
+import { WishlistService } from '../../services/wishlist.service';
+import { ToastService } from '../../services/toast.service';
 import { AddonTotalPipe } from '../../pipes/addon-total.pipe';
 import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
   couponForm: FormGroup;
   bookingForm: FormGroup;
@@ -30,11 +32,17 @@ export class CartComponent implements OnInit {
   discount = 0;
   total = 0;
   
+  isLoggedIn = false;
+  wishlistItems: number[] = [];
+  private subscriptions: Subscription[] = [];
+  
   constructor(
     private cartService: CartService,
     private couponService: CouponService,
     private bookingService: BookingService,
     private authService: AuthService,
+    private wishlistService: WishlistService,
+    private toastService: ToastService,
     private router: Router,
     private fb: FormBuilder,
     private addonTotalPipe: AddonTotalPipe
@@ -55,6 +63,78 @@ export class CartComponent implements OnInit {
   ngOnInit(): void {
     this.loadCartItems();
     this.prefillUserInfo();
+    
+    // Subscribe to auth changes
+    const authSub = this.authService.currentUser$.subscribe(user => {
+      this.isLoggedIn = !!user;
+      if (this.isLoggedIn) {
+        this.loadWishlist();
+      } else {
+        this.wishlistItems = [];
+      }
+    });
+    this.subscriptions.push(authSub);
+  }
+  
+  ngOnDestroy(): void {
+    // Unsubscribe from all subscriptions
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
+
+  loadWishlist(): void {
+    if (!this.isLoggedIn) return;
+    
+    const wishlistSub = this.wishlistService.getWishlist().subscribe({
+      next: (wishlistPackages: any[]) => {
+        this.wishlistItems = wishlistPackages.map(pkg => pkg.id);
+      },
+      error: (error: any) => {
+        console.error('Error loading wishlist:', error);
+      }
+    });
+    this.subscriptions.push(wishlistSub);
+  }
+
+  isInWishlist(packageId: number): boolean {
+    return this.wishlistItems.includes(packageId);
+  }
+
+  toggleWishlist(packageId: number, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (!this.isLoggedIn) {
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: '/cart' }
+      });
+      return;
+    }
+
+    if (this.isInWishlist(packageId)) {
+      const removeSub = this.wishlistService.removeFromWishlist(packageId).subscribe({
+        next: () => {
+          this.wishlistItems = this.wishlistItems.filter(id => id !== packageId);
+          this.toastService.showSuccess('Removed from wishlist');
+        },
+        error: (error: any) => {
+          console.error('Error removing from wishlist:', error);
+          this.toastService.showError('Failed to remove from wishlist');
+        }
+      });
+      this.subscriptions.push(removeSub);
+    } else {
+      const addSub = this.wishlistService.addToWishlist(packageId).subscribe({
+        next: () => {
+          this.wishlistItems.push(packageId);
+          this.toastService.showSuccess('Added to wishlist');
+        },
+        error: (error: any) => {
+          console.error('Error adding to wishlist:', error);
+          this.toastService.showError('Failed to add to wishlist');
+        }
+      });
+      this.subscriptions.push(addSub);
+    }
   }
 
   get hasItems(): boolean {
@@ -199,16 +279,38 @@ export class CartComponent implements OnInit {
       return total + itemTotal + addonTotal;
     }, 0);
     
-    // Calculate discount if coupon is applied
-    this.discount = this.appliedCoupon ? 
-      this.couponService.calculateDiscount(this.appliedCoupon, this.subtotal) : 0;
+    // Apply discount if coupon is present
+    if (this.appliedCoupon) {
+      if (this.appliedCoupon.discountType === 'PERCENTAGE') {
+        this.discount = (this.subtotal * this.appliedCoupon.discountValue) / 100;
+        // Apply maximum discount cap if set
+        if (this.appliedCoupon.maxDiscountAmount && this.discount > this.appliedCoupon.maxDiscountAmount) {
+          this.discount = this.appliedCoupon.maxDiscountAmount;
+        }
+      } else {
+        this.discount = this.appliedCoupon.discountValue;
+      }
+      
+      // Ensure discount doesn't exceed subtotal
+      this.discount = Math.min(this.discount, this.subtotal);
+    } else {
+      this.discount = 0;
+    }
     
     // Calculate total
     this.total = this.subtotal - this.discount;
   }
 
   checkout(): void {
-    if (this.bookingForm.invalid) return;
+    if (this.bookingForm.invalid) {
+      this.bookingForm.markAllAsTouched();
+      return;
+    }
+    
+    if (!this.hasItems) {
+      this.errorMessage = 'Your cart is empty. Please add items before checkout.';
+      return;
+    }
     
     this.bookingLoading = true;
     this.errorMessage = '';
@@ -229,15 +331,18 @@ export class CartComponent implements OnInit {
           this.errorMessage = error.error?.message || 'Failed to create booking. Please try again.';
           return of(null);
         }),
-        finalize(() => {
-          this.bookingLoading = false;
-        })
+        finalize(() => this.bookingLoading = false)
       )
       .subscribe(response => {
         if (response) {
           this.successMessage = 'Booking created successfully!';
-          this.cartService.clearCart().subscribe();
-          this.router.navigate(['/bookings', response.id]);
+          this.cartService.clearCart().subscribe(() => {
+            this.cartItems = [];
+            this.calculateTotals();
+            setTimeout(() => {
+              this.router.navigate(['/bookings', response.id]);
+            }, 2000);
+          });
         }
       });
   }
