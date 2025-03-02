@@ -55,6 +55,7 @@ export class BookingManagementComponent implements OnInit {
     this.loading = true;
     this.adminService.getBookings().subscribe(
       (data) => {
+        console.log('Bookings data:', data);
         this.bookings = data;
         this.filteredBookings = [...this.bookings];
         this.loading = false;

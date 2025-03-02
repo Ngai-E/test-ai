@@ -2,7 +2,7 @@
   <div class="header">
     <h1>Package Management</h1>
     <button class="btn btn-primary" (click)="openPackageModal()">
-      <i class="bi bi-plus-circle"></i> Add New Package
+      <i class="fas fa-plus-circle"></i> Add New Package
     </button>
   </div>
 
@@ -14,7 +14,7 @@
   </div>
 
   <div *ngIf="error" class="alert alert-danger" role="alert">
-    <i class="bi bi-exclamation-triangle-fill"></i> 
+    <i class="fas fa-exclamation-triangle"></i> 
     Error loading packages. Please try refreshing the page.
   </div>
 
@@ -105,16 +105,16 @@
                 <td>
                   <div class="btn-group">
                     <button class="btn btn-sm btn-outline-primary" (click)="openPackageModal(package)">
-                      <i class="bi bi-pencil"></i>
+                      <i class="fas fa-pencil-alt"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(package)">
-                      <i class="bi bi-trash"></i>
+                      <i class="fas fa-trash"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-info" [routerLink]="['/admin/packages', package.id, 'addons']">
-                      <i class="bi bi-plus-circle"></i> Addons
+                      <i class="fas fa-plus-circle"></i> Addons
                     </button>
                     <button class="btn btn-sm btn-outline-success" [routerLink]="['/admin/packages', package.id, 'itinerary']">
-                      <i class="bi bi-calendar-week"></i> Itinerary
+                      <i class="fas fa-calendar-week"></i> Itinerary
                     </button>
                   </div>
                 </td>

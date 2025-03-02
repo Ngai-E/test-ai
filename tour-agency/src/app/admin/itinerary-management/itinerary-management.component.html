@@ -2,12 +2,12 @@
   <div class="header">
     <h1>
       <a [routerLink]="['/admin/packages']" class="btn btn-sm btn-outline-secondary me-2">
-        <i class="bi bi-arrow-left"></i>
+        <i class="fas fa-arrow-left"></i>
       </a>
       Itinerary Management: {{ packageName }}
     </h1>
     <button class="btn btn-primary" (click)="openItineraryModal()">
-      <i class="bi bi-plus-circle"></i> Add New Day
+      <i class="fas fa-plus-circle"></i> Add New Day
     </button>
   </div>
 
@@ -19,7 +19,7 @@
   </div>
 
   <div *ngIf="error" class="alert alert-danger" role="alert">
-    <i class="bi bi-exclamation-triangle-fill"></i> 
+    <i class="fas fa-exclamation-triangle"></i> 
     Error loading itinerary. Please try refreshing the page.
   </div>
 
@@ -27,7 +27,7 @@
     <div *ngIf="itineraryDays.length === 0" class="text-center py-5">
       <p class="mb-3">No itinerary days have been added for this package yet.</p>
       <button class="btn btn-primary" (click)="openItineraryModal()">
-        <i class="bi bi-plus-circle"></i> Add First Day
+        <i class="fas fa-plus-circle"></i> Add First Day
       </button>
     </div>
 
@@ -38,10 +38,10 @@
           <h5 class="mb-0">Day {{ day.dayNumber }}: {{ day.title }}</h5>
           <div class="btn-group">
             <button class="btn btn-sm btn-outline-primary" (click)="openItineraryModal(day)">
-              <i class="bi bi-pencil"></i>
+              <i class="fas fa-pencil-alt"></i>
             </button>
             <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(day)">
-              <i class="bi bi-trash"></i>
+              <i class="fas fa-trash"></i>
             </button>
           </div>
         </div>
@@ -50,16 +50,16 @@
           
           <div class="row mt-3">
             <div class="col-md-6">
-              <h6 class="mb-2"><i class="bi bi-house-door"></i> Accommodation</h6>
+              <h6 class="mb-2"><i class="fas fa-home"></i> Accommodation</h6>
               <p>{{ day.accommodation || 'Not specified' }}</p>
             </div>
             <div class="col-md-6">
-              <h6 class="mb-2"><i class="bi bi-cup-hot"></i> Meals</h6>
+              <h6 class="mb-2"><i class="fas fa-coffee"></i> Meals</h6>
               <p>{{ day.meals || 'Not specified' }}</p>
             </div>
           </div>
           
-          <h6 class="mt-3 mb-2"><i class="bi bi-calendar-check"></i> Activities</h6>
+          <h6 class="mt-3 mb-2"><i class="fas fa-calendar-check"></i> Activities</h6>
           <ul class="list-group">
             <li *ngFor="let activity of day.activities" class="list-group-item">
               {{ activity }}
@@ -134,13 +134,13 @@
             </div>
             <button type="button" class="btn btn-outline-danger ms-2" (click)="removeActivity(i)" 
                     [disabled]="activitiesArray.length === 1">
-              <i class="bi bi-trash"></i>
+              <i class="fas fa-trash"></i>
             </button>
           </div>
         </div>
         
         <button type="button" class="btn btn-outline-primary mt-2" (click)="addActivity()">
-          <i class="bi bi-plus-circle"></i> Add Activity
+          <i class="fas fa-plus-circle"></i> Add Activity
         </button>
       </div>
     </form>

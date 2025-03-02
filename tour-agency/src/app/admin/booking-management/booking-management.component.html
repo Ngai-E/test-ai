@@ -2,7 +2,7 @@
   <div class="header">
     <h1>Booking Management</h1>
     <button class="btn btn-outline-primary" (click)="refreshBookings()">
-      <i class="bi bi-arrow-clockwise"></i> Refresh
+      <i class="fas fa-sync-alt"></i> Refresh
     </button>
   </div>
 
@@ -16,7 +16,7 @@
 
   <!-- Error message -->
   <div *ngIf="error" class="alert alert-danger" role="alert">
-    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <i class="fas fa-exclamation-triangle me-2"></i>
     Error loading bookings. Please try again later.
   </div>
 
@@ -92,7 +92,14 @@
                 </td>
                 <td>{{ booking.packageName }}</td>
                 <td>{{ booking.startDate | date:'mediumDate' }}</td>
-                <td>${{ booking.amount | number:'1.2-2' }}</td>
+                <td>
+                  <span *ngIf="booking.amount">
+                    ${{ booking.amount | number:'1.2-2' }}
+                  </span>
+                  <span *ngIf="!booking.amount">
+                    $0.00
+                  </span>
+                </td>
                 <td>
                   <span class="badge" [ngClass]="getStatusClass(booking.status)">
                     {{ booking.status }}
@@ -106,21 +113,21 @@
                 <td>
                   <div class="action-buttons">
                     <button class="btn btn-sm btn-outline-primary me-1" (click)="viewBookingDetails(booking)" title="View Details">
-                      <i class="bi bi-eye"></i>
+                      <i class="fas fa-eye"></i>
                     </button>
                     <div class="btn-group" role="group">
                       <button class="btn btn-sm btn-outline-success" (click)="updateBookingStatus(booking, 'Confirmed')" *ngIf="booking.status !== 'Confirmed'" title="Mark as Confirmed">
-                        <i class="bi bi-check-circle"></i>
+                        <i class="fas fa-check-circle"></i>
                       </button>
                       <button class="btn btn-sm btn-outline-warning" (click)="updateBookingStatus(booking, 'Pending')" *ngIf="booking.status !== 'Pending'" title="Mark as Pending">
-                        <i class="bi bi-clock"></i>
+                        <i class="fas fa-clock"></i>
                       </button>
                       <button class="btn btn-sm btn-outline-danger" (click)="updateBookingStatus(booking, 'Cancelled')" *ngIf="booking.status !== 'Cancelled'" title="Mark as Cancelled">
-                        <i class="bi bi-x-circle"></i>
+                        <i class="fas fa-times-circle"></i>
                       </button>
                     </div>
                     <button class="btn btn-sm btn-outline-danger ms-1" (click)="confirmDelete(booking)" title="Delete">
-                      <i class="bi bi-trash"></i>
+                      <i class="fas fa-trash"></i>
                     </button>
                   </div>
                 </td>
@@ -173,11 +180,18 @@
       </div>
       <div class="col-md-6">
         <h5>Booking Details</h5>
-        <p><strong>Adults:</strong> {{ selectedBooking.adults }}</p>
-        <p><strong>Children:</strong> {{ selectedBooking.children }}</p>
-        <p><strong>Base Price:</strong> ${{ selectedBooking.packagePrice | number:'1.2-2' }}</p>
+        <p><strong>Adults:</strong> {{ selectedBooking.adults || 0 }}</p>
+        <p><strong>Children:</strong> {{ selectedBooking.children || 0 }}</p>
+        <p><strong>Base Price:</strong> ${{ selectedBooking.packagePrice || 0 | number:'1.2-2' }}</p>
         <p *ngIf="selectedBooking.discountAmount"><strong>Discount:</strong> ${{ selectedBooking.discountAmount | number:'1.2-2' }}</p>
-        <p><strong>Total Amount:</strong> ${{ selectedBooking.amount | number:'1.2-2' }}</p>
+        <p><strong>Total Amount:</strong> 
+          <span *ngIf="selectedBooking.amount">
+            ${{ selectedBooking.amount | number:'1.2-2' }}
+          </span>
+          <span *ngIf="!selectedBooking.amount">
+            $0.00
+          </span>
+        </p>
       </div>
     </div>
     
@@ -226,13 +240,13 @@
     <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
     <div class="btn-group" *ngIf="selectedBooking">
       <button type="button" class="btn btn-success" (click)="updateBookingStatus(selectedBooking, 'Confirmed'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Confirmed'">
-        <i class="bi bi-check-circle"></i> Confirm
+        <i class="fas fa-check-circle"></i> Confirm
       </button>
       <button type="button" class="btn btn-warning" (click)="updateBookingStatus(selectedBooking, 'Pending'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Pending'">
-        <i class="bi bi-clock"></i> Pending
+        <i class="fas fa-clock"></i> Pending
       </button>
       <button type="button" class="btn btn-danger" (click)="updateBookingStatus(selectedBooking, 'Cancelled'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Cancelled'">
-        <i class="bi bi-x-circle"></i> Cancel
+        <i class="fas fa-times-circle"></i> Cancel
       </button>
     </div>
   </div>

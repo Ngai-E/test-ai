@@ -2,7 +2,7 @@
   <div class="dashboard-header">
     <h1>Dashboard</h1>
     <button class="btn btn-outline-primary" (click)="refresh()">
-      <i class="bi bi-arrow-clockwise"></i> Refresh
+      <i class="fas fa-sync-alt"></i> Refresh
     </button>
   </div>
 
@@ -14,7 +14,7 @@
   </div>
 
   <div *ngIf="error" class="alert alert-danger" role="alert">
-    <i class="bi bi-exclamation-triangle-fill"></i> 
+    <i class="fas fa-exclamation-triangle"></i> 
     Error loading dashboard data. Please try refreshing the page.
   </div>
 
@@ -26,7 +26,7 @@
           <div class="card-body">
             <h5 class="card-title">Total Bookings</h5>
             <p class="metric-value">{{ totalBookings }}</p>
-            <p class="metric-icon"><i class="bi bi-calendar-check"></i></p>
+            <p class="metric-icon"><i class="fas fa-calendar-check"></i></p>
           </div>
         </div>
       </div>
@@ -35,7 +35,7 @@
           <div class="card-body">
             <h5 class="card-title">Total Users</h5>
             <p class="metric-value">{{ totalUsers }}</p>
-            <p class="metric-icon"><i class="bi bi-people"></i></p>
+            <p class="metric-icon"><i class="fas fa-users"></i></p>
           </div>
         </div>
       </div>
@@ -44,7 +44,7 @@
           <div class="card-body">
             <h5 class="card-title">Total Packages</h5>
             <p class="metric-value">{{ totalPackages }}</p>
-            <p class="metric-icon"><i class="bi bi-box"></i></p>
+            <p class="metric-icon"><i class="fas fa-box"></i></p>
           </div>
         </div>
       </div>
@@ -53,7 +53,7 @@
           <div class="card-body">
             <h5 class="card-title">Total Revenue</h5>
             <p class="metric-value">${{ totalRevenue | number }}</p>
-            <p class="metric-icon"><i class="bi bi-cash"></i></p>
+            <p class="metric-icon"><i class="fas fa-money-bill-wave"></i></p>
           </div>
         </div>
       </div>

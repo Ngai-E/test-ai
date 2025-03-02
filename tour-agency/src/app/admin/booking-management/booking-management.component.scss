@@ -55,6 +55,7 @@
   .action-buttons {
     display: flex;
     align-items: center;
+    white-space: nowrap;
     
     .btn-group {
       margin: 0 0.25rem;
@@ -62,6 +63,13 @@
     
     .btn {
       padding: 0.25rem 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      
+      i {
+        font-size: 0.875rem;
+      }
       
       &:hover {
         transform: translateY(-1px);
