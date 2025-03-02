@@ -65,7 +65,7 @@
             <div class="position-relative">
               <img [src]="package.image" class="card-img-top" [alt]="package.name">
               <button class="btn wishlist-btn" (click)="toggleWishlist(package.id, $event)">
-                <i class="fas" [ngClass]="isInWishlist(package.id) ? 'fa-heart text-danger' : 'fa-heart-o'"></i>
+                <i class="fas" [ngClass]="isInWishlist(package.id) ? 'fa-heart text-danger' : 'fa-heart text-black'"></i>
               </button>
             </div>
             <div class="card-body">

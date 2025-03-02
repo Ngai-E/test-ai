@@ -48,7 +48,7 @@
                 <div class="col-md-3 position-relative">
                   <img [src]="item.packageImage" class="img-fluid rounded-start" [alt]="item.packageName">
                   <button class="btn wishlist-btn-small" (click)="toggleWishlist(item.packageId, $event)">
-                    <i class="fas" [ngClass]="isInWishlist(item.packageId) ? 'fa-heart text-danger' : 'fa-heart-o'"></i>
+                    <i class="fas" [ngClass]="isInWishlist(item.packageId) ? 'fa-heart text-danger' : 'fa-heart text-black'"></i>
                   </button>
                 </div>
                 <div class="col-md-9">

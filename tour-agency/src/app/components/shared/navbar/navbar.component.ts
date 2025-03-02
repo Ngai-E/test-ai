@@ -11,8 +11,8 @@ import { NotificationService } from '../../../services/notification.service';
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container">
         <a class="navbar-brand" routerLink="/">
-          <img src="https://cdn-icons-png.flaticon.com/512/201/201623.png" alt="Dream Vacations Logo" height="30" class="d-inline-block align-text-top me-2">
-          Dream Vacations
+          <img src="https://cdn-icons-png.flaticon.com/512/201/201623.png" alt="NEA Travels Logo" height="30" class="d-inline-block align-text-top me-2">
+          NEA Travels
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
