@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CartService, CartItem, CartItemAddon } from '../../services/cart.service';
+import { CartService, CartItem, CartItemAddon, AddonSelectionDto } from '../../services/cart.service';
 import { CouponService, Coupon } from '../../services/coupon.service';
-import { BookingService } from '../../services/booking.service';
+import { BookingService, BookingRequest } from '../../services/booking.service';
 import { AuthService } from '../../services/auth.service';
 import { WishlistService } from '../../services/wishlist.service';
 import { ToastService } from '../../services/toast.service';
@@ -346,34 +346,56 @@ export class CartComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.successMessage = '';
     
-    const bookingData = {
-      ...this.bookingForm.value,
-      cartItems: this.cartItems.map(item => item.id),
-      couponCode: this.appliedCoupon?.code || null,
-      subtotal: this.subtotal,
-      discount: this.discount,
-      total: this.total
-    };
+    // Create booking requests for each cart item
+    const bookingPromises = this.cartItems.map(item => {
+      const bookingRequest: BookingRequest = {
+        packageId: item.packageId,
+        startDate: item.startDate,
+        endDate: item.endDate,
+        numberOfAdults: item.numberOfAdults,
+        numberOfChildren: item.numberOfChildren,
+        selectedAddons: (item.addons || []).map(addon => ({
+          addonId: addon.addonId,
+          quantity: addon.quantity
+        })),
+        couponCode: this.appliedCoupon?.code
+      };
+      
+      return this.bookingService.createBooking(bookingRequest).toPromise();
+    });
     
-    this.bookingService.createBooking(bookingData)
-      .pipe(
-        catchError(error => {
-          this.errorMessage = error.error?.message || 'Failed to create booking. Please try again.';
-          return of(null);
-        }),
-        finalize(() => this.bookingLoading = false)
-      )
-      .subscribe(response => {
-        if (response) {
-          this.successMessage = 'Booking created successfully!';
-          this.cartService.clearCart().subscribe(() => {
-            this.cartItems = [];
-            this.calculateTotals();
+    Promise.all(bookingPromises)
+      .then(bookings => {
+        this.successMessage = 'Bookings created successfully!';
+        this.cartService.clearCart().subscribe(() => {
+          this.cartItems = [];
+          this.calculateTotals();
+          
+          // Navigate to the first booking detail page
+          if (bookings && bookings.length > 0) {
+            const bookingId = bookings[0]?.id;
+            if (bookingId) {
+              setTimeout(() => {
+                this.router.navigate(['/booking-confirmation', bookingId]);
+              }, 2000);
+            } else {
+              setTimeout(() => {
+                this.router.navigate(['/user/bookings']);
+              }, 2000);
+            }
+          } else {
             setTimeout(() => {
-              this.router.navigate(['/bookings', response.id]);
+              this.router.navigate(['/user/bookings']);
             }, 2000);
-          });
-        }
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Error creating bookings:', error);
+        this.errorMessage = error.error?.message || 'Failed to create bookings. Please try again.';
+      })
+      .finally(() => {
+        this.bookingLoading = false;
       });
   }
 }

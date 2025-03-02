@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -27,48 +27,55 @@ export interface TourPackage {
 export interface Coupon {
   id: number;
   code: string;
-  description: string;
-  discountPercentage: number;
-  validUntil: string;
+  value: number;
+  type: string;
+  validFrom: string;
+  validTo: string;
+  isUsed: boolean;
+  createdAt: string;
+}
+
+export interface AddonSelectionDto {
+  addonId: number;
+  quantity: number;
+}
+
+export interface BookingRequest {
+  packageId: number;
+  startDate: string;
+  endDate: string;
+  numberOfAdults: number;
+  numberOfChildren: number;
+  selectedAddons: AddonSelectionDto[];
+  couponCode?: string;
 }
 
 export interface Booking {
   id: number;
-  userId: number;
-  packageId: number;
-  package: TourPackage;
+  userId?: number;
+  packageId?: number;
+  package?: TourPackage;
   tourPackage?: TourPackage;
-  bookingDate: string;
-  travelDate: string;
-  startDate?: string;
-  endDate?: string;
-  status: string;
-  bookingStatus?: string;
-  paymentStatus?: string;
-  totalAmount: number;
-  packagePrice?: number;
-  addonsTotalPrice?: number;
-  totalPrice?: number;
-  discountAmount: number;
-  finalAmount: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  numberOfAdults?: number;
-  numberOfChildren?: number;
-  bookingReference?: string;
-  specialRequests?: string;
+  startDate: string;
+  endDate: string;
+  numberOfAdults: number;
+  numberOfChildren: number;
+  totalPrice: number;
+  bookingStatus: string;
+  paymentStatus: string;
+  bookingReference: string;
+  createdAt: string;
+  updatedAt: string;
+  couponCode?: string;
+  discountAmount?: number;
   addons?: Addon[];
-  coupon?: Coupon;
-  createdAt?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
-  private apiUrl = `${environment.apiUrl}/bookings`;
+  private apiUrl = `${environment.apiUrl}`;
   
   constructor(
     private http: HttpClient,
@@ -76,44 +83,12 @@ export class BookingService {
   ) { }
   
   getUserBookings(): Observable<Booking[]> {
-    // Mock implementation since the endpoint doesn't exist
-    return of([]);
+    const userId = this.authService.getCurrentUserId();
+    return this.http.get<Booking[]>(`${this.apiUrl}/bookings/user/${userId}`);
   }
   
   getBookingDetails(bookingId: number): Observable<Booking> {
-    // Mock implementation with all required properties
-    const mockPackage: TourPackage = {
-      id: 1,
-      name: 'Mock Tour Package',
-      description: 'A beautiful tour package for testing',
-      destination: 'Test Destination',
-      price: 1000,
-      image: 'assets/images/package1.jpg',
-      duration: 7
-    };
-    
-    return of({
-      id: bookingId,
-      packageId: 1,
-      package: mockPackage,
-      userId: this.authService.getCurrentUserId(),
-      bookingDate: new Date().toISOString(),
-      travelDate: new Date().toISOString(),
-      status: 'confirmed',
-      paymentStatus: 'paid',
-      totalAmount: 1200,
-      discountAmount: 0,
-      finalAmount: 1200,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john.doe@example.com',
-      phone: '+1234567890',
-      numberOfAdults: 2,
-      numberOfChildren: 1,
-      bookingReference: `BOOK-${bookingId}`,
-      addons: [],
-      createdAt: new Date().toISOString()
-    });
+    return this.http.get<Booking>(`${this.apiUrl}/bookings/${bookingId}`);
   }
   
   // Alias for getBookingDetails to maintain compatibility
@@ -121,41 +96,36 @@ export class BookingService {
     return this.getBookingDetails(id);
   }
   
-  createBooking(bookingData: any): Observable<Booking> {
-    // Mock implementation since the endpoint doesn't exist
-    return of({
-      id: Math.floor(Math.random() * 1000),
-      ...bookingData,
-      userId: this.authService.getCurrentUserId(),
-      status: 'confirmed',
-      paymentStatus: 'paid',
-      bookingDate: new Date().toISOString()
-    });
+  getUserBookingById(bookingId: number): Observable<Booking> {
+    const userId = this.authService.getCurrentUserId();
+    return this.http.get<Booking>(`${this.apiUrl}/bookings/user/${userId}/booking/${bookingId}`);
   }
   
-  cancelBooking(bookingId: number): Observable<any> {
-    // Mock implementation since the endpoint doesn't exist
-    return of({ message: 'Booking cancelled successfully' });
+  createBooking(bookingData: BookingRequest): Observable<Booking> {
+    const userId = this.authService.getCurrentUserId();
+    return this.http.post<Booking>(`${this.apiUrl}/bookings/user/${userId}`, bookingData);
+  }
+  
+  cancelBooking(bookingId: number): Observable<Booking> {
+    const userId = this.authService.getCurrentUserId();
+    return this.http.put<Booking>(`${this.apiUrl}/bookings/${bookingId}/user/${userId}/cancel`, {});
   }
   
   // Additional methods to maintain compatibility with existing components
-  cancelBookingForUser(userId: number, bookingId: number): Observable<any> {
-    return this.cancelBooking(bookingId);
+  cancelBookingForUser(userId: number, bookingId: number): Observable<Booking> {
+    return this.http.put<Booking>(`${this.apiUrl}/bookings/${bookingId}/user/${userId}/cancel`, {});
   }
   
   getUserBookingsByStatus(status: string): Observable<Booking[]> {
-    // Mock implementation
-    return of([]);
+    const userId = this.authService.getCurrentUserId();
+    return this.http.get<Booking[]>(`${this.apiUrl}/bookings/user/${userId}/status/${status}`);
   }
   
   validateCoupon(code: string): Observable<Coupon> {
-    // Mock implementation
-    return of({
-      id: 1,
-      code: code,
-      description: 'Discount coupon',
-      discountPercentage: 10,
-      validUntil: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString()
-    });
+    return this.http.get<Coupon>(`${this.apiUrl}/bookings/coupons/${code}`);
+  }
+  
+  getBookingsByPackage(packageId: number): Observable<Booking[]> {
+    return this.http.get<Booking[]>(`${this.apiUrl}/bookings/package/${packageId}`);
   }
 }

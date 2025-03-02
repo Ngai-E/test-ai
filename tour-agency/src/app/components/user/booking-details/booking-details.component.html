@@ -31,7 +31,7 @@
             <span class="booking-reference">Booking Reference: {{ booking.bookingReference || 'N/A' }}</span>
           </div>
           <div class="mt-2">
-            <span class="badge" [ngClass]="getStatusClass(booking.status)">{{ booking.status | uppercase }}</span>
+            <span class="badge" [ngClass]="getStatusClass(booking.bookingStatus)">{{ booking.bookingStatus | uppercase }}</span>
           </div>
         </div>
       </div>
@@ -47,22 +47,22 @@
           <div class="card-body">
             <div class="row">
               <div class="col-md-4">
-                <img [src]="booking.package?.image || 'assets/images/placeholder.jpg'" alt="Package Image" class="img-fluid rounded">
+                <img [src]="booking.tourPackage?.image || 'assets/images/placeholder.jpg'" alt="Package Image" class="img-fluid rounded">
               </div>
               <div class="col-md-8">
-                <h4>{{ booking.package?.name || 'Package Name Not Available' }}</h4>
-                <p>{{ booking.package?.description || 'No description available' }}</p>
+                <h4>{{ booking.tourPackage?.name || 'Package Name Not Available' }}</h4>
+                <p>{{ booking.tourPackage?.description || 'No description available' }}</p>
                 <div class="detail-row">
                   <span class="detail-label">Destination:</span>
-                  <span class="detail-value">{{ booking.package?.destination || 'N/A' }}</span>
+                  <span class="detail-value">{{ booking.tourPackage?.destination || 'N/A' }}</span>
                 </div>
                 <div class="detail-row">
                   <span class="detail-label">Duration:</span>
-                  <span class="detail-value">{{ booking.package?.duration || 0 }} days</span>
+                  <span class="detail-value">{{ booking.tourPackage?.duration || 0 }} days</span>
                 </div>
                 <div class="detail-row">
                   <span class="detail-label">Travel Date:</span>
-                  <span class="detail-value">{{ formatDate(booking.travelDate) }}</span>
+                  <span class="detail-value">{{ formatDate(booking.startDate) }}</span>
                 </div>
               </div>
             </div>
@@ -100,15 +100,15 @@
           <div class="card-body">
             <div class="detail-row">
               <span class="detail-label">Name:</span>
-              <span class="detail-value">{{ booking.firstName }} {{ booking.lastName }}</span>
+              <span class="detail-value">{{ getUserName() }}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">Email:</span>
-              <span class="detail-value">{{ booking.email }}</span>
+              <span class="detail-value">{{ getUserEmail() }}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">Phone:</span>
-              <span class="detail-value">{{ booking.phone }}</span>
+              <span class="detail-value">{{ getUserPhone() }}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">Adults:</span>
@@ -129,19 +129,19 @@
           <div class="card-body">
             <div class="detail-row">
               <span class="detail-label">Package Price:</span>
-              <span class="detail-value">${{ booking.package?.price || 0 }}</span>
+              <span class="detail-value">${{ booking.tourPackage?.price || 0 }}</span>
             </div>
             <div class="detail-row" *ngIf="booking.addons && booking.addons.length > 0">
               <span class="detail-label">Add-ons:</span>
-              <span class="detail-value">${{ getTotalAddonsPrice() }}</span>
+              <span class="detail-value">${{ calculateTotalAddonsPrice() }}</span>
             </div>
-            <div class="detail-row" *ngIf="booking.discountAmount > 0">
+            <div class="detail-row" *ngIf="booking.discountAmount && booking.discountAmount > 0">
               <span class="detail-label">Discount:</span>
-              <span class="detail-value text-success">-${{ booking.discountAmount }}</span>
+              <span class="detail-value">-${{ booking.discountAmount }}</span>
             </div>
             <div class="detail-row total">
-              <span class="detail-label">Total:</span>
-              <span class="detail-value">${{ booking.finalAmount }}</span>
+              <span class="detail-label">Total Amount:</span>
+              <span class="detail-value">${{ booking.totalPrice }}</span>
             </div>
           </div>
         </div>
@@ -155,7 +155,7 @@
             <button class="btn btn-primary btn-block mb-2" (click)="printBooking()">
               <i class="fa fa-print mr-2"></i> Print Booking
             </button>
-            <button class="btn btn-danger btn-block" *ngIf="booking.status.toLowerCase() !== 'cancelled'" (click)="cancelBooking()">
+            <button class="btn btn-danger btn-block" *ngIf="booking.bookingStatus.toLowerCase() !== 'cancelled'" (click)="cancelBooking()">
               <i class="fa fa-times-circle mr-2"></i> Cancel Booking
             </button>
           </div>

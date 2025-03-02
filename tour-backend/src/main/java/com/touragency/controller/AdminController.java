@@ -6,6 +6,9 @@ import com.touragency.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import com.touragency.model.Package;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -96,6 +99,16 @@ public class AdminController {
     }
     
     // Package management endpoints
+
+    @Operation(summary = "Get all packages", description = "Retrieves a list of all available tour packages")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved list of packages",
+            content = @Content(mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = Package.class))))
+    @GetMapping("/packages")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Package> getAllPackages() {
+        return packageService.getAllPackages();
+    }
     
     @Operation(summary = "Create package", description = "Creates a new tour package")
     @ApiResponse(responseCode = "200", description = "Successfully created package")

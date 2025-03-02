@@ -66,11 +66,11 @@
         <div class="payment-info">
           <div class="payment-row">
             <div class="payment-label">Package Price:</div>
-            <div class="payment-value">${{ booking?.packagePrice | number:'1.2-2' }}</div>
+            <div class="payment-value">${{ booking?.tourPackage?.price | number:'1.2-2' }}</div>
           </div>
           <div class="payment-row">
             <div class="payment-label">Add-ons:</div>
-            <div class="payment-value">${{ booking?.addonsTotalPrice | number:'1.2-2' }}</div>
+            <div class="payment-value">${{ getTotalAddonsPrice() | number:'1.2-2' }}</div>
           </div>
           <div *ngIf="booking?.discountAmount && (booking?.discountAmount ?? 0) > 0" class="payment-row discount">
             <div class="payment-label">Discount:</div>

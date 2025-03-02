@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
 import { PackageService } from '../../services/package.service';
-import { BookingService } from '../../services/booking.service';
+import { BookingService, BookingRequest, AddonSelectionDto } from '../../services/booking.service';
 import { ToastService } from '../../services/toast.service';
 import { WishlistService } from '../../services/wishlist.service';
 import { CartService } from '../../services/cart.service';
@@ -877,6 +877,11 @@ export class PackageDetailsComponent implements OnInit, OnDestroy {
   }
 
   submitBooking(): void {
+    if (this.bookingForm.invalid) {
+      this.toastService.showError('Please fill all required fields');
+      return;
+    }
+
     if (!this.isLoggedIn) {
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: `/packages/${this.package.id}` }
@@ -884,28 +889,33 @@ export class PackageDetailsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.bookingForm.invalid) {
-      this.toastService.showError('Please fill in all required fields');
-      return;
-    }
-
     const formValue = this.bookingForm.value;
-
-    // Get selected addons
-    const selectedAddons = this.package.addons && this.package.addons.length > 0 ?
-      this.package.addons.filter((addon: Addon) => addon.selected) : [];
-
-    // Create booking data object that matches what the service expects
-    const bookingData = {
+    const selectedAddons = this.package.addons.filter((addon: Addon) => addon.selected);
+    
+    // Create date range (start date to end date based on package duration)
+    const startDate = new Date(formValue.date);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + this.package.duration);
+    
+    // Format dates as ISO strings
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
+    // Create booking request according to the API spec
+    const bookingRequest: BookingRequest = {
       packageId: this.package.id,
-      travelDate: formValue.date,
-      numberOfPeople: formValue.guests,
-      specialRequirements: formValue.specialRequirements || '',
-      addons: selectedAddons.map((addon: Addon) => addon.id),
-      useCoins: formValue.useCoin
+      startDate: startDateStr,
+      endDate: endDateStr,
+      numberOfAdults: formValue.guests,
+      numberOfChildren: 0, // Default to 0 if not specified in the form
+      selectedAddons: selectedAddons.map((addon: Addon): AddonSelectionDto => ({
+        addonId: addon.id,
+        quantity: 1 // Default quantity to 1 if not specified
+      })),
+      couponCode: '' // Add coupon code if available
     };
 
-    this.bookingService.createBooking(bookingData).subscribe({
+    this.bookingService.createBooking(bookingRequest).subscribe({
       next: (response) => {
         this.toastService.showSuccess('Booking created successfully');
         this.router.navigate(['/booking-confirmation', response.id]);

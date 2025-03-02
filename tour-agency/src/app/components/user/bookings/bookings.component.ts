@@ -58,7 +58,7 @@ export class BookingsComponent implements OnInit {
     
     this.filteredBookings = this.bookings.filter(booking => {
       // Apply status filter
-      if (this.statusFilter !== 'all' && booking.status.toLowerCase() !== this.statusFilter.toLowerCase()) {
+      if (this.statusFilter !== 'all' && booking.bookingStatus?.toLowerCase() !== this.statusFilter.toLowerCase()) {
         return false;
       }
       
@@ -66,8 +66,8 @@ export class BookingsComponent implements OnInit {
       if (this.searchTerm) {
         const searchLower = this.searchTerm.toLowerCase();
         return (
-          (booking.package?.name?.toLowerCase().includes(searchLower) || false) ||
-          (booking.package?.destination?.toLowerCase().includes(searchLower) || false) ||
+          (booking.tourPackage?.name?.toLowerCase().includes(searchLower) || false) ||
+          (booking.tourPackage?.destination?.toLowerCase().includes(searchLower) || false) ||
           (booking.bookingReference?.toLowerCase().includes(searchLower) || false) ||
           booking.id.toString().includes(searchLower)
         );
@@ -83,7 +83,7 @@ export class BookingsComponent implements OnInit {
   }
 
   viewBookingDetails(bookingId: number): void {
-    this.router.navigate(['/bookings', bookingId]);
+    this.router.navigate(['/user/booking-details', bookingId]);
   }
 
   cancelBooking(bookingId: number, event: Event): void {
@@ -106,14 +106,14 @@ export class BookingsComponent implements OnInit {
           this.loading = false;
         })
       )
-      .subscribe(result => {
-        if (result) {
+      .subscribe(updatedBooking => {
+        if (updatedBooking) {
           this.toastService.showSuccess('Booking cancelled successfully');
           
-          // Update the booking status in the local array
-          const booking = this.bookings.find(b => b.id === bookingId);
-          if (booking) {
-            booking.status = 'cancelled';
+          // Update the booking in the local array
+          const index = this.bookings.findIndex(b => b.id === bookingId);
+          if (index !== -1) {
+            this.bookings[index] = updatedBooking;
           }
           
           // Reapply filters

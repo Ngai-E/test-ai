@@ -44,7 +44,7 @@ export class BookingConfirmationComponent implements OnInit {
   }
 
   loadBookingDetails(): void {
-    this.bookingService.getBooking(this.bookingId).subscribe({
+    this.bookingService.getUserBookingById(this.bookingId).subscribe({
       next: (booking: Booking) => {
         this.booking = booking;
         this.isLoading = false;
@@ -66,10 +66,10 @@ export class BookingConfirmationComponent implements OnInit {
     if (confirm('Are you sure you want to cancel this booking?')) {
       this.isLoading = true;
       
-      this.bookingService.cancelBookingForUser(this.currentUser.id as number, Number(this.bookingId)).subscribe({
-        next: (booking: any) => {
+      this.bookingService.cancelBooking(this.bookingId).subscribe({
+        next: (updatedBooking: Booking) => {
           this.toastService.showSuccess('Booking cancelled successfully');
-          this.booking!.status = 'cancelled';
+          this.booking = updatedBooking;
           this.isLoading = false;
         },
         error: (error: any) => {
@@ -87,5 +87,13 @@ export class BookingConfirmationComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/user/bookings']);
+  }
+  
+  getTotalAddonsPrice(): number {
+    if (!this.booking || !this.booking.addons) return 0;
+    
+    return this.booking.addons.reduce((total, addon) => {
+      return total + (addon.price * addon.quantity);
+    }, 0);
   }
 }
