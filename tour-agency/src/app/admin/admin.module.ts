@@ -14,6 +14,7 @@ import { ReviewManagementComponent } from './review-management/review-management
 import { UserManagementComponent } from './user-management/user-management.component';
 import { AddonManagementComponent } from './addon-management/addon-management.component';
 import { ItineraryManagementComponent } from './itinerary-management/itinerary-management.component';
+import { PackageEditComponent } from './package-edit/package-edit.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ItineraryManagementComponent } from './itinerary-management/itinerary-m
     ReviewManagementComponent,
     UserManagementComponent,
     AddonManagementComponent,
-    ItineraryManagementComponent
+    ItineraryManagementComponent,
+    PackageEditComponent
   ],
   imports: [
     CommonModule,

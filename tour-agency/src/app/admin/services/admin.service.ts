@@ -116,6 +116,12 @@ export class AdminService {
     );
   }
 
+  getPackage(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/packages/${id}`).pipe(
+      catchError(this.handleError('getPackage', null))
+    );
+  }
+
   createPackage(packageData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/packages`, packageData).pipe(
       catchError(this.handleError('createPackage', {}))

@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AdminLayoutComponent } from './admin-layout/admin-layout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { PackageManagementComponent } from './package-management/package-management.component';
+import { PackageEditComponent } from './package-edit/package-edit.component';
 import { BookingManagementComponent } from './booking-management/booking-management.component';
 import { ReviewManagementComponent } from './review-management/review-management.component';
 import { UserManagementComponent } from './user-management/user-management.component';
@@ -19,6 +20,8 @@ const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'packages', component: PackageManagementComponent },
+      { path: 'packages/new', component: PackageEditComponent },
+      { path: 'packages/:id/edit', component: PackageEditComponent },
       { path: 'packages/:id/addons', component: AddonManagementComponent },
       { path: 'packages/:id/itinerary', component: ItineraryManagementComponent },
       { path: 'bookings', component: BookingManagementComponent },

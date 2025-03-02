@@ -118,6 +118,21 @@ public class AdminController {
         Package createdPackage = packageService.createPackage(tourPackage);
         return ResponseEntity.ok(createdPackage);
     }
+
+    @Operation(summary = "Get package by ID", description = "Retrieves a specific tour package by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the package",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Package.class))),
+            @ApiResponse(responseCode = "404", description = "Package not found", content = @Content)
+    })
+    @GetMapping("/packages/{packageId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Package> getPackageById(
+            @Parameter(description = "ID of the package to retrieve") @PathVariable Long packageId) {
+        return packageService.getPackageById(packageId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
     
     @Operation(summary = "Update package", description = "Updates an existing tour package")
     @ApiResponses(value = {

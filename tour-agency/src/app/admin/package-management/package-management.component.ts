@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AdminService } from '../services/admin.service';
 import { ToastService } from '../../services/toast.service';
+import { Router } from '@angular/router';
 
 interface Package {
   id: number;
@@ -62,7 +63,8 @@ export class PackageManagementComponent implements OnInit {
     private adminService: AdminService,
     private formBuilder: FormBuilder,
     private modalService: NgbModal,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -163,41 +165,13 @@ export class PackageManagementComponent implements OnInit {
   }
 
   openPackageModal(pkg?: Package): void {
-    this.editMode = !!pkg;
-    
     if (pkg) {
-      // Edit mode - populate form with package data
-      this.packageForm.patchValue({
-        id: pkg.id,
-        name: pkg.name,
-        destination: pkg.destination || '',
-        country: pkg.country || '',
-        duration: pkg.duration,
-        price: pkg.price || 0,
-        basePrice: pkg.basePrice || 0,
-        description: pkg.description,
-        imageUrl: pkg.imageUrl || '',
-        image: pkg.image || '',
-        highlights: pkg.highlights || '',
-        inclusions: pkg.inclusions || '',
-        exclusions: pkg.exclusions || '',
-        bestTimeToVisit: pkg.bestTimeToVisit || '',
-        groupSize: pkg.groupSize || '',
-        featured: pkg.featured,
-        available: pkg.available
-      });
+      // Edit mode - navigate to edit page
+      this.router.navigate(['/admin/packages', pkg.id, 'edit']);
     } else {
-      // Add mode - reset form
-      this.packageForm.reset({
-        featured: false,
-        available: true,
-        duration: 1,
-        price: 0,
-        basePrice: 0
-      });
+      // Add mode - navigate to new package page
+      this.router.navigate(['/admin/packages/new']);
     }
-    
-    this.modalService.open(this.packageModal, { size: 'lg', centered: true });
   }
 
   confirmDelete(pkg: Package): void {

@@ -1,0 +1,193 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2>{{ isEditMode ? 'Edit Package' : 'Create New Package' }}</h2>
+    </div>
+    <div class="col-md-4 text-end">
+      <button class="btn btn-secondary me-2" (click)="cancel()">
+        <i class="fas fa-arrow-left"></i> Back to Packages
+      </button>
+      <button class="btn btn-primary" [disabled]="packageForm.invalid || loading" (click)="savePackage()">
+        <i class="fas fa-save"></i> {{ isEditMode ? 'Update' : 'Create' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading" class="card">
+    <div class="card-body">
+      <form [formGroup]="packageForm">
+        <!-- Basic Information -->
+        <div class="card mb-4">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Basic Information</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="name" class="form-label">Package Name*</label>
+                <input type="text" class="form-control" id="name" formControlName="name">
+                <div *ngIf="submitted && packageForm.get('name')?.invalid" class="text-danger">
+                  Package name is required (min 3 characters)
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="duration" class="form-label">Duration (days)*</label>
+                <input type="number" class="form-control" id="duration" formControlName="duration" min="1">
+                <div *ngIf="submitted && packageForm.get('duration')?.invalid" class="text-danger">
+                  Valid duration is required
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="destination" class="form-label">Destination*</label>
+                <input type="text" class="form-control" id="destination" formControlName="destination">
+                <div *ngIf="submitted && packageForm.get('destination')?.invalid" class="text-danger">
+                  Destination is required
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="country" class="form-label">Country</label>
+                <input type="text" class="form-control" id="country" formControlName="country">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="price" class="form-label">Price ($)*</label>
+                <input type="number" class="form-control" id="price" formControlName="price" min="0">
+                <div *ngIf="submitted && packageForm.get('price')?.invalid" class="text-danger">
+                  Valid price is required
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="basePrice" class="form-label">Base Price ($)</label>
+                <input type="number" class="form-control" id="basePrice" formControlName="basePrice" min="0">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label for="description" class="form-label">Description*</label>
+                <textarea class="form-control" id="description" formControlName="description" rows="4"></textarea>
+                <div *ngIf="submitted && packageForm.get('description')?.invalid" class="text-danger">
+                  Description is required
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Images -->
+        <div class="card mb-4">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Images</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="imageUrl" class="form-label">Primary Image URL</label>
+                <input type="text" class="form-control" id="imageUrl" formControlName="imageUrl">
+                <div *ngIf="packageForm.get('imageUrl')?.value" class="mt-2">
+                  <img [src]="packageForm.get('imageUrl')?.value" alt="Package image preview" class="img-thumbnail" style="max-height: 150px;">
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="image" class="form-label">Alternative Image URL</label>
+                <input type="text" class="form-control" id="image" formControlName="image">
+                <div *ngIf="packageForm.get('image')?.value" class="mt-2">
+                  <img [src]="packageForm.get('image')?.value" alt="Package image preview" class="img-thumbnail" style="max-height: 150px;">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="card mb-4">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Package Details</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label for="highlights" class="form-label">Highlights</label>
+                <textarea class="form-control" id="highlights" formControlName="highlights" rows="4" 
+                  placeholder="Enter package highlights separated by new lines"></textarea>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="inclusions" class="form-label">Inclusions</label>
+                <textarea class="form-control" id="inclusions" formControlName="inclusions" rows="6" 
+                  placeholder="Enter inclusions separated by new lines"></textarea>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="exclusions" class="form-label">Exclusions</label>
+                <textarea class="form-control" id="exclusions" formControlName="exclusions" rows="6" 
+                  placeholder="Enter exclusions separated by new lines"></textarea>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="bestTimeToVisit" class="form-label">Best Time to Visit</label>
+                <input type="text" class="form-control" id="bestTimeToVisit" formControlName="bestTimeToVisit">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="groupSize" class="form-label">Group Size</label>
+                <input type="text" class="form-control" id="groupSize" formControlName="groupSize">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="card mb-4">
+          <div class="card-header bg-light">
+            <h5 class="mb-0">Package Settings</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="featured" formControlName="featured">
+                  <label class="form-check-label" for="featured">
+                    Featured Package
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="available" formControlName="available">
+                  <label class="form-check-label" for="available">
+                    Available for Booking
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-12 text-end">
+      <button class="btn btn-secondary me-2" (click)="cancel()">
+        Cancel
+      </button>
+      <button class="btn btn-primary" [disabled]="packageForm.invalid || loading" (click)="savePackage()">
+        <i class="fas fa-save"></i> {{ isEditMode ? 'Update Package' : 'Create Package' }}
+      </button>
+    </div>
+  </div>
+</div>
