@@ -79,12 +79,14 @@
       <div class="card-body">
         <div class="row">
           <div class="col-md-3">
-            <img [src]="booking.package?.image || 'assets/images/placeholder.jpg'" [alt]="booking.package?.name || 'Tour Package'" class="img-fluid rounded">
+            <img [src]="booking.tourPackage?.image || 'assets/images/placeholder.jpg'" 
+                 [alt]="booking.tourPackage?.name || 'Tour Package'" 
+                 class="img-fluid rounded" style="max-height: 150px; width: 100%; object-fit: cover;">
           </div>
           <div class="col-md-6">
-            <h5 class="mb-1">{{ booking.package?.name || 'Tour Package' }}</h5>
+            <h5 class="mb-1">{{ booking.tourPackage?.name || 'Tour Package' }}</h5>
             <p class="text-muted mb-2">
-              <i class="fa fa-map-marker mr-1"></i> {{ booking.package?.destination || 'Destination' }}
+              <i class="fa fa-map-marker mr-1"></i> {{ booking.tourPackage?.destination || 'Destination' }}
             </p>
             <div class="booking-info">
               <p class="mb-1">

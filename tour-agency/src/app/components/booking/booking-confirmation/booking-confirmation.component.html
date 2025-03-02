@@ -32,7 +32,9 @@
 
       <div class="package-details">
         <div class="package-image">
-          <img [src]="booking?.tourPackage?.image || 'assets/images/placeholder.jpg'" [alt]="booking?.tourPackage?.name || 'Package'">
+          <img [src]="booking?.tourPackage?.image || 'assets/images/placeholder.jpg'" 
+               [alt]="booking?.tourPackage?.name || 'Package'"
+               class="img-fluid" style="max-height: 200px; object-fit: cover;">
         </div>
         <div class="package-info">
           <h2 class="package-name">{{ booking?.tourPackage?.name || 'Unknown Package' }}</h2>
