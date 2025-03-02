@@ -23,6 +23,7 @@ export interface AdminAddon {
     id: number;
     name: string;
     description: string;
+    detailedDescription?: string;
     price: number;
     category?: string;
   };
@@ -39,11 +40,15 @@ export interface AdminBooking {
   userId: number;
   userName: string;
   userEmail: string;
+  userPhone?: string;
   startDate: string;
   endDate: string;
+  travelDate?: string;
   duration?: number;
   adults: number;
   children?: number;
+  numberOfAdults?: number;
+  numberOfChildren?: number;
   amount: number;
   status: string;
   paymentStatus: string;
@@ -55,6 +60,7 @@ export interface AdminBooking {
   couponCode?: string;
   discountAmount?: number;
   addons?: AdminAddon[];
+  tourPackage?: any;
 }
 
 export interface Addon {
@@ -208,25 +214,33 @@ export class AdminService {
     );
   }
 
+  updateBooking(id: number, booking: Partial<AdminBooking>): Observable<AdminBooking> {
+    return this.http.put<any>(`${this.apiUrl}/bookings/${id}`, booking).pipe(
+      map(response => this.mapBookingResponse(response)),
+      catchError(this.handleError('updateBooking', {} as AdminBooking))
+    );
+  }
+
   private mapBookingsResponse(bookings: any[]): AdminBooking[] {
     return bookings.map(booking => this.mapBookingResponse(booking));
   }
 
   private mapBookingResponse(booking: any): AdminBooking {
-    // Calculate total amount if it's not provided
-    let amount = booking.amount;
+    // Calculate total amount if it's not provided directly
+    let amount = booking.totalPrice || booking.amount;
+    
     if (!amount && booking.tourPackage) {
       // Base calculation on package price
-      amount = booking.tourPackage.price || 0;
+      amount = booking.tourPackage.basePrice || booking.tourPackage.price || 0;
       
       // Multiply by number of adults
-      if (booking.adults) {
-        amount *= booking.adults;
+      if (booking.numberOfAdults) {
+        amount *= booking.numberOfAdults;
       }
       
       // Add children at half price if applicable
-      if (booking.children) {
-        amount += (booking.tourPackage.price * 0.5 * booking.children);
+      if (booking.numberOfChildren) {
+        amount += (booking.tourPackage.basePrice * 0.5 * booking.numberOfChildren);
       }
       
       // Subtract discount if applicable
@@ -248,18 +262,22 @@ export class AdminService {
       id: booking.id,
       packageId: booking.tourPackage?.id || booking.packageId,
       packageName: booking.tourPackage?.name || booking.packageName,
-      packageImage: booking.tourPackage?.imageUrl || booking.packageImage,
-      packagePrice: booking.tourPackage?.price || booking.packagePrice,
+      packageImage: booking.tourPackage?.image || booking.tourPackage?.imageUrl || booking.packageImage,
+      packagePrice: booking.tourPackage?.basePrice || booking.tourPackage?.price || booking.packagePrice,
       userId: booking.user?.id || booking.userId,
       userName: booking.user?.name || booking.userName,
       userEmail: booking.user?.email || booking.userEmail,
+      userPhone: booking.user?.phone || booking.userPhone,
       startDate: booking.startDate || booking.date,
       endDate: booking.endDate,
+      travelDate: booking.travelDate,
       duration: booking.duration || (booking.tourPackage?.duration || 1),
-      adults: booking.adults,
-      children: booking.children,
+      adults: booking.numberOfAdults || booking.adults || 0,
+      children: booking.numberOfChildren || booking.children || 0,
+      numberOfAdults: booking.numberOfAdults,
+      numberOfChildren: booking.numberOfChildren,
       amount: amount,
-      status: booking.status,
+      status: booking.bookingStatus || booking.status,
       paymentStatus: booking.paymentStatus,
       bookingReference: booking.bookingReference || `BK-${booking.id}`,
       createdAt: booking.createdAt,
@@ -283,16 +301,21 @@ export class AdminService {
         userId: 1,
         userName: 'John Doe',
         userEmail: 'john.doe@example.com',
+        userPhone: '+1234567890',
         startDate: '2025-03-02',
         endDate: '2025-03-09',
+        travelDate: '2025-03-02',
         duration: 7,
         adults: 2,
         children: 1,
+        numberOfAdults: 2,
+        numberOfChildren: 1,
         amount: 3499.99,
         status: 'Pending',
         paymentStatus: 'Pending',
         bookingReference: 'BK-1001',
         createdAt: '2025-02-15T10:30:00',
+        notes: 'Special request for gluten-free meals',
         addons: [
           {
             id: 1,
@@ -316,11 +339,15 @@ export class AdminService {
         userId: 2,
         userName: 'Jane Smith',
         userEmail: 'jane.smith@example.com',
+        userPhone: '+9876543210',
         startDate: '2025-03-02',
         endDate: '2025-03-09',
+        travelDate: '2025-03-02',
         duration: 7,
         adults: 1,
         children: 0,
+        numberOfAdults: 1,
+        numberOfChildren: 0,
         amount: 1699.99,
         status: 'Pending',
         paymentStatus: 'Pending',

@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AdminService } from '../services/admin.service';
 import { ToastService } from '../../services/toast.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AdminBooking } from '../services/admin.service';
 
 interface BookingFilters {
@@ -19,19 +20,22 @@ interface BookingFilters {
 export class BookingManagementComponent implements OnInit {
   @ViewChild('bookingDetailsModal') bookingDetailsModal!: TemplateRef<any>;
   @ViewChild('deleteModal') deleteModal!: TemplateRef<any>;
+  @ViewChild('editBookingModal') editBookingModal!: TemplateRef<any>;
 
   bookings: AdminBooking[] = [];
   filteredBookings: AdminBooking[] = [];
   packages: any[] = [];
   
+  selectedBooking: AdminBooking | null = null;
+  bookingToDelete: AdminBooking | null = null;
+  editingBooking: AdminBooking | null = null;
+  editBookingForm!: FormGroup;
+  
   loading = true;
   error = false;
   
-  selectedBooking: AdminBooking | null = null;
-  bookingToDelete: AdminBooking | null = null;
-  
-  bookingStatusOptions = ['Pending', 'Confirmed', 'Cancelled'];
-  paymentStatusOptions = ['Pending', 'Paid', 'Refunded'];
+  bookingStatusOptions = ['PENDING', 'BOOKED', 'CONFIRMED', 'CANCELLED', 'REFUNDED', 'Pending', 'Confirmed', 'Cancelled'];
+  paymentStatusOptions = ['PENDING', 'PAID', 'REFUNDED', 'FAILED', 'Pending', 'Paid', 'Refunded'];
   
   filters: BookingFilters = {
     search: '',
@@ -43,7 +47,8 @@ export class BookingManagementComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private modalService: NgbModal,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private formBuilder: FormBuilder
   ) { }
 
   ngOnInit(): void {
@@ -162,26 +167,39 @@ export class BookingManagementComponent implements OnInit {
   }
 
   getStatusClass(status: string): string {
-    switch (status) {
-      case 'Confirmed':
+    if (!status) return 'bg-secondary';
+    
+    const normalizedStatus = status.toUpperCase();
+    
+    switch (normalizedStatus) {
+      case 'CONFIRMED':
+      case 'BOOKED':
         return 'bg-success';
-      case 'Pending':
+      case 'PENDING':
         return 'bg-warning text-dark';
-      case 'Cancelled':
+      case 'CANCELLED':
         return 'bg-danger';
+      case 'REFUNDED':
+        return 'bg-info';
       default:
         return 'bg-secondary';
     }
   }
 
   getPaymentStatusClass(status: string): string {
-    switch (status) {
-      case 'Paid':
+    if (!status) return 'bg-secondary';
+    
+    const normalizedStatus = status.toUpperCase();
+    
+    switch (normalizedStatus) {
+      case 'PAID':
         return 'bg-success';
-      case 'Pending':
+      case 'PENDING':
         return 'bg-warning text-dark';
-      case 'Refunded':
+      case 'REFUNDED':
         return 'bg-info';
+      case 'FAILED':
+        return 'bg-danger';
       default:
         return 'bg-secondary';
     }
@@ -199,6 +217,88 @@ export class BookingManagementComponent implements OnInit {
   
   calculateAddonItemTotal(addon: any): number {
     const price = addon.priceAtBooking || (addon.addon ? addon.addon.price : 0) || 0;
-    return price * addon.quantity;
+    const quantity = addon.quantity || 1;
+    return price * quantity;
+  }
+
+  openEditBookingModal(booking: AdminBooking): void {
+    this.editingBooking = { ...booking }; // Create a copy to avoid modifying the original
+    
+    // Initialize the form with the booking data
+    this.initEditBookingForm();
+    
+    // Open the modal
+    this.modalService.dismissAll(); // Close any open modals
+    this.modalService.open(this.editBookingModal, { size: 'lg', centered: true });
+  }
+
+  initEditBookingForm(): void {
+    if (!this.editingBooking) return;
+    
+    // Convert date string to appropriate format for date input (YYYY-MM-DD)
+    let travelDate = this.editingBooking.travelDate;
+    if (travelDate && typeof travelDate === 'string') {
+      // Handle different date formats
+      const dateObj = new Date(travelDate);
+      if (!isNaN(dateObj.getTime())) {
+        travelDate = dateObj.toISOString().split('T')[0];
+      }
+    }
+    
+    this.editBookingForm = this.formBuilder.group({
+      customerName: [this.editingBooking.userName || '', Validators.required],
+      customerEmail: [this.editingBooking.userEmail || '', [Validators.required, Validators.email]],
+      customerPhone: [this.editingBooking.userPhone || ''],
+      travelDate: [travelDate || '', Validators.required],
+      numberOfAdults: [this.editingBooking.numberOfAdults || 1, [Validators.required, Validators.min(1)]],
+      numberOfChildren: [this.editingBooking.numberOfChildren || 0, [Validators.required, Validators.min(0)]],
+      status: [this.editingBooking.status || 'Pending', Validators.required],
+      paymentStatus: [this.editingBooking.paymentStatus || 'Pending', Validators.required],
+      amount: [this.editingBooking.amount || 0, [Validators.required, Validators.min(0)]],
+      notes: [this.editingBooking.notes || '']
+    });
+  }
+
+  saveBookingChanges(): void {
+    if (this.editBookingForm.invalid || !this.editingBooking) {
+      this.toastService.showError('Please fill in all required fields correctly');
+      return;
+    }
+
+    const formValues = this.editBookingForm.value;
+    
+    // Create updated booking object
+    const updatedBooking: Partial<AdminBooking> = {
+      id: this.editingBooking.id,
+      userName: formValues.customerName,
+      userEmail: formValues.customerEmail,
+      userPhone: formValues.customerPhone,
+      travelDate: formValues.travelDate,
+      numberOfAdults: formValues.numberOfAdults,
+      numberOfChildren: formValues.numberOfChildren,
+      status: formValues.status,
+      paymentStatus: formValues.paymentStatus,
+      amount: formValues.amount,
+      notes: formValues.notes
+    };
+
+    // Call service to update booking
+    this.adminService.updateBooking(updatedBooking.id!, updatedBooking).subscribe(
+      (response) => {
+        // Update the booking in the local array
+        const index = this.bookings.findIndex(b => b.id === updatedBooking.id);
+        if (index !== -1) {
+          // Merge the updated fields with the existing booking
+          this.bookings[index] = { ...this.bookings[index], ...updatedBooking };
+          this.applyFilters(); // Refresh the filtered list
+        }
+        
+        this.toastService.showSuccess(`Booking #${updatedBooking.id} updated successfully`);
+      },
+      (error) => {
+        console.error('Error updating booking:', error);
+        this.toastService.showError('Failed to update booking');
+      }
+    );
   }
 }

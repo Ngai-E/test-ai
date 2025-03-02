@@ -96,7 +96,10 @@
                   <span *ngIf="booking.amount">
                     ${{ booking.amount | number:'1.2-2' }}
                   </span>
-                  <span *ngIf="!booking.amount">
+                  <span *ngIf="!booking.amount && booking.packagePrice">
+                    ${{ booking.packagePrice | number:'1.2-2' }}
+                  </span>
+                  <span *ngIf="!booking.amount && !booking.packagePrice">
                     $0.00
                   </span>
                 </td>
@@ -182,13 +185,16 @@
         <h5>Booking Details</h5>
         <p><strong>Adults:</strong> {{ selectedBooking.adults || 0 }}</p>
         <p><strong>Children:</strong> {{ selectedBooking.children || 0 }}</p>
-        <p><strong>Base Price:</strong> ${{ selectedBooking.packagePrice || 0 | number:'1.2-2' }}</p>
+        <p><strong>Base Price:</strong> ${{ selectedBooking.packagePrice | number:'1.2-2' }}</p>
         <p *ngIf="selectedBooking.discountAmount"><strong>Discount:</strong> ${{ selectedBooking.discountAmount | number:'1.2-2' }}</p>
         <p><strong>Total Amount:</strong> 
           <span *ngIf="selectedBooking.amount">
             ${{ selectedBooking.amount | number:'1.2-2' }}
           </span>
-          <span *ngIf="!selectedBooking.amount">
+          <span *ngIf="!selectedBooking.amount && selectedBooking.packagePrice">
+            ${{ selectedBooking.packagePrice | number:'1.2-2' }}
+          </span>
+          <span *ngIf="!selectedBooking.amount && !selectedBooking.packagePrice">
             $0.00
           </span>
         </p>
@@ -213,8 +219,8 @@
           <tbody>
             <tr *ngFor="let addon of selectedBooking.addons">
               <td>{{ addon.addon?.name || 'Unknown Addon' }}</td>
-              <td>{{ addon.addon?.description || 'No description available' }}</td>
-              <td>{{ addon.quantity }}</td>
+              <td>{{ addon.addon?.description || addon.addon?.detailedDescription || 'No description available' }}</td>
+              <td>{{ addon.quantity || 1 }}</td>
               <td>${{ addon.priceAtBooking || addon.addon?.price || 0 | number:'1.2-2' }}</td>
               <td>${{ calculateAddonItemTotal(addon) | number:'1.2-2' }}</td>
             </tr>
@@ -238,6 +244,9 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+    <button type="button" class="btn btn-primary" (click)="openEditBookingModal(selectedBooking!)" *ngIf="selectedBooking">
+      <i class="fas fa-edit"></i> Edit Booking
+    </button>
     <div class="btn-group" *ngIf="selectedBooking">
       <button type="button" class="btn btn-success" (click)="updateBookingStatus(selectedBooking, 'Confirmed'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Confirmed'">
         <i class="fas fa-check-circle"></i> Confirm
@@ -249,6 +258,91 @@
         <i class="fas fa-times-circle"></i> Cancel
       </button>
     </div>
+  </div>
+</ng-template>
+
+<!-- Edit Booking Modal -->
+<ng-template #editBookingModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Edit Booking #{{ editingBooking?.id }}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body" *ngIf="editingBooking">
+    <form [formGroup]="editBookingForm">
+      <!-- Customer Information -->
+      <h5>Customer Information</h5>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="customerName" class="form-label">Customer Name</label>
+          <input type="text" class="form-control" id="customerName" formControlName="customerName">
+        </div>
+        <div class="col-md-6">
+          <label for="customerEmail" class="form-label">Email</label>
+          <input type="email" class="form-control" id="customerEmail" formControlName="customerEmail">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="customerPhone" class="form-label">Phone</label>
+          <input type="tel" class="form-control" id="customerPhone" formControlName="customerPhone">
+        </div>
+      </div>
+
+      <!-- Booking Details -->
+      <h5 class="mt-4">Booking Details</h5>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="travelDate" class="form-label">Travel Date</label>
+          <input type="date" class="form-control" id="travelDate" formControlName="travelDate">
+        </div>
+        <div class="col-md-6">
+          <label for="numberOfAdults" class="form-label">Number of Adults</label>
+          <input type="number" class="form-control" id="numberOfAdults" formControlName="numberOfAdults" min="1">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="numberOfChildren" class="form-label">Number of Children</label>
+          <input type="number" class="form-control" id="numberOfChildren" formControlName="numberOfChildren" min="0">
+        </div>
+        <div class="col-md-6">
+          <label for="status" class="form-label">Booking Status</label>
+          <select class="form-select" id="status" formControlName="status">
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Cancelled">Cancelled</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label for="paymentStatus" class="form-label">Payment Status</label>
+          <select class="form-select" id="paymentStatus" formControlName="paymentStatus">
+            <option value="Pending">Pending</option>
+            <option value="Paid">Paid</option>
+            <option value="Failed">Failed</option>
+            <option value="Refunded">Refunded</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="amount" class="form-label">Total Amount ($)</label>
+          <input type="number" class="form-control" id="amount" formControlName="amount" min="0" step="0.01">
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="mb-3">
+        <label for="notes" class="form-label">Notes</label>
+        <textarea class="form-control" id="notes" rows="3" formControlName="notes"></textarea>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="saveBookingChanges(); modal.dismiss()" [disabled]="editBookingForm.invalid">
+      <i class="fas fa-save"></i> Save Changes
+    </button>
   </div>
 </ng-template>
 

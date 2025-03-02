@@ -93,44 +93,88 @@
         </div>
 
         <!-- Itinerary Section -->
+        <!-- Itinerary Section -->
         <div class="content-section mb-5">
           <h2 class="section-title">Itinerary</h2>
           <div class="accordion" id="itineraryAccordion">
-            <div class="accordion-item" *ngFor="let day of [1, 2, 3, 4, 5]; let i = index">
-              <h2 class="accordion-header" [id]="'heading' + i">
-                <button class="accordion-button" [class.collapsed]="i !== 0" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse' + i" [attr.aria-expanded]="i === 0 ? 'true' : 'false'" [attr.aria-controls]="'collapse' + i">
-                  <span class="day-number">Day {{ day }}</span> {{ package['day' + day + 'Title'] || 'Explore & Adventure' }}
-                </button>
-              </h2>
-              <div [id]="'collapse' + i" class="accordion-collapse collapse" [class.show]="i === 0" [attr.aria-labelledby]="'heading' + i" data-bs-parent="#itineraryAccordion">
-                <div class="accordion-body">
-                  <p>{{ package['day' + day + 'Description'] || 'Experience the beauty and culture of this amazing destination with guided tours, delicious local cuisine, and unforgettable adventures.' }}</p>
-                  <div class="itinerary-details">
-                    <div class="detail-item">
-                      <i class="fas fa-utensils"></i>
-                      <div>
-                        <h6>Meals</h6>
-                        <p>Breakfast, Lunch, Dinner</p>
+            <!-- If package has itinerary array, use it -->
+            <ng-container *ngIf="package.itinerary && package.itinerary.length > 0">
+              <div class="accordion-item" *ngFor="let day of package.itinerary; let i = index">
+                <h2 class="accordion-header" [id]="'heading' + i">
+                  <button class="accordion-button" [class.collapsed]="i !== 0" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse' + i" [attr.aria-expanded]="i === 0 ? 'true' : 'false'" [attr.aria-controls]="'collapse' + i">
+                    <span class="day-number">Day {{ day.dayNumber }}</span> {{ day.title }}
+                  </button>
+                </h2>
+                <div [id]="'collapse' + i" class="accordion-collapse collapse" [class.show]="i === 0" [attr.aria-labelledby]="'heading' + i" data-bs-parent="#itineraryAccordion">
+                  <div class="accordion-body">
+                    <p>{{ day.description }}</p>
+                    <div class="itinerary-details">
+                      <div class="detail-item">
+                        <i class="fas fa-utensils"></i>
+                        <div>
+                          <h6>Meals</h6>
+                          <p>{{ day.meals || 'Breakfast, Lunch, Dinner' }}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div class="detail-item">
-                      <i class="fas fa-bed"></i>
-                      <div>
-                        <h6>Accommodation</h6>
-                        <p>{{ package.accommodation || 'Luxury Hotel' }}</p>
+                      <div class="detail-item">
+                        <i class="fas fa-bed"></i>
+                        <div>
+                          <h6>Accommodation</h6>
+                          <p>{{ day.accommodation || package.accommodation || 'Luxury Hotel' }}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div class="detail-item">
-                      <i class="fas fa-route"></i>
-                      <div>
-                        <h6>Activities</h6>
-                        <p>Guided tour, Local experiences, Free time for exploration</p>
+                      <div class="detail-item">
+                        <i class="fas fa-route"></i>
+                        <div>
+                          <h6>Activities</h6>
+                          <p *ngIf="day.activities && day.activities.length > 0">{{ day.activities.join(', ') }}</p>
+                          <p *ngIf="!day.activities || day.activities.length === 0">Guided tour, Local experiences, Free time for exploration</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </ng-container>
+            
+            <!-- Fallback if no itinerary array -->
+            <ng-container *ngIf="!package.itinerary || package.itinerary.length === 0">
+              <div class="accordion-item" *ngFor="let day of getDayNumbers(); let i = index">
+                <h2 class="accordion-header" [id]="'heading' + i">
+                  <button class="accordion-button" [class.collapsed]="i !== 0" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse' + i" [attr.aria-expanded]="i === 0 ? 'true' : 'false'" [attr.aria-controls]="'collapse' + i">
+                    <span class="day-number">Day {{ day }}</span> {{ package['day' + day + 'Title'] || 'Explore & Adventure' }}
+                  </button>
+                </h2>
+                <div [id]="'collapse' + i" class="accordion-collapse collapse" [class.show]="i === 0" [attr.aria-labelledby]="'heading' + i" data-bs-parent="#itineraryAccordion">
+                  <div class="accordion-body">
+                    <p>{{ package['day' + day + 'Description'] || 'Experience the beauty and culture of this amazing destination with guided tours, delicious local cuisine, and unforgettable adventures.' }}</p>
+                    <div class="itinerary-details">
+                      <div class="detail-item">
+                        <i class="fas fa-utensils"></i>
+                        <div>
+                          <h6>Meals</h6>
+                          <p>Breakfast, Lunch, Dinner</p>
+                        </div>
+                      </div>
+                      <div class="detail-item">
+                        <i class="fas fa-bed"></i>
+                        <div>
+                          <h6>Accommodation</h6>
+                          <p>{{ package.accommodation || 'Luxury Hotel' }}</p>
+                        </div>
+                      </div>
+                      <div class="detail-item">
+                        <i class="fas fa-route"></i>
+                        <div>
+                          <h6>Activities</h6>
+                          <p>Guided tour, Local experiences, Free time for exploration</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
           </div>
         </div>
 

@@ -12,6 +12,11 @@ interface Package {
   price: number;
   description: string;
   imageUrl?: string;
+  highlights?: string;
+  inclusions?: string;
+  exclusions?: string;
+  bestTimeToVisit?: string;
+  groupSize?: string;
   featured: boolean;
   available: boolean;
 }
@@ -71,6 +76,11 @@ export class PackageManagementComponent implements OnInit {
       price: ['', [Validators.required, Validators.min(1)]],
       description: ['', Validators.required],
       imageUrl: [''],
+      highlights: [''],
+      inclusions: [''],
+      exclusions: [''],
+      bestTimeToVisit: [''],
+      groupSize: [''],
       featured: [false],
       available: [true]
     });
@@ -141,6 +151,11 @@ export class PackageManagementComponent implements OnInit {
         price: pkg.price,
         description: pkg.description,
         imageUrl: pkg.imageUrl || '',
+        highlights: pkg.highlights || '',
+        inclusions: pkg.inclusions || '',
+        exclusions: pkg.exclusions || '',
+        bestTimeToVisit: pkg.bestTimeToVisit || '',
+        groupSize: pkg.groupSize || '',
         featured: pkg.featured,
         available: pkg.available
       });

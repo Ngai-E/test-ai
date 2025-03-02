@@ -1004,6 +1004,15 @@ export class PackageDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  getDayNumbers(): number[] {
+    if (!this.package || !this.package.duration) {
+      return [1, 2, 3, 4, 5]; // Default 5 days if no duration
+    }
+    
+    // Create an array of day numbers based on the package duration
+    return Array.from({ length: this.package.duration }, (_, i) => i + 1);
+  }
+
   getStars(rating: number): string[] {
     const stars: string[] = [];
     const ratingValue = rating || 0;
