@@ -93,9 +93,9 @@
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
                     <h6 class="mb-0">{{ pkg.name }}</h6>
-                    <small class="text-muted">{{ pkg.destination }}</small>
+                    <small class="text-muted">{{ pkg.country || pkg.destination }}</small>
                   </div>
-                  <span class="badge bg-primary rounded-pill">{{ pkg.bookings }} bookings</span>
+                  <span class="badge bg-primary rounded-pill">{{ pkg.bookingCount || pkg.bookings }} bookings</span>
                 </div>
               </li>
             </ul>
@@ -123,7 +123,7 @@
                 <tbody>
                   <tr *ngFor="let booking of recentBookings">
                     <td>#{{ booking.id }}</td>
-                    <td>{{ booking.customerName }}</td>
+                    <td>{{ booking.userName || booking.customerName }}</td>
                     <td>{{ booking.packageName }}</td>
                     <td><span [class]="getStatusClass(booking.status)">{{ booking.status }}</span></td>
                   </tr>
@@ -149,8 +149,8 @@
                     <small class="text-muted">{{ review.date | date:'shortDate' }}</small>
                   </div>
                   <p class="mb-1 text-warning">{{ getRatingStars(review.rating) }}</p>
-                  <p class="mb-1 review-comment">{{ review.comment }}</p>
-                  <small class="text-muted">By {{ review.userName }}</small>
+                  <p class="mb-1 review-comment">{{ review.comment || review.content }}</p>
+                  <small class="text-muted">By {{ review.userName || review.user?.fullName || 'Anonymous' }}</small>
                 </div>
               </li>
             </ul>

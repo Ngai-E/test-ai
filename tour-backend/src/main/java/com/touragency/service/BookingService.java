@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BookingService {
@@ -217,5 +218,55 @@ public class BookingService {
         return bookings.stream()
                 .map(Booking::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    
+    public List<Booking> getRecentBookings(int limit) {
+        return bookingRepository.findAll(org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "createdAt"))
+                .stream()
+                .limit(limit)
+                .collect(java.util.stream.Collectors.toList());
+    }
+    
+    public List<Map<String, Object>> getRevenueByMonth(int months) {
+        LocalDateTime startDate = LocalDateTime.now().minusMonths(months - 1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        List<Booking> bookings = bookingRepository.findByBookingStatusNotAndCreatedAtAfter("CANCELLED", startDate);
+        
+        // Group bookings by month and calculate revenue
+        Map<String, BigDecimal> revenueByMonth = new java.util.LinkedHashMap<>();
+        
+        // Initialize all months with zero
+        for (int i = 0; i < months; i++) {
+            String monthKey = LocalDateTime.now().minusMonths(i).getMonth().toString().substring(0, 3) + " " +
+                    LocalDateTime.now().minusMonths(i).getYear();
+            revenueByMonth.put(monthKey, BigDecimal.ZERO);
+        }
+        
+        // Add revenue for each booking
+        for (Booking booking : bookings) {
+            String monthKey = booking.getCreatedAt().getMonth().toString().substring(0, 3) + " " +
+                    booking.getCreatedAt().getYear();
+            if (revenueByMonth.containsKey(monthKey)) {
+                revenueByMonth.put(monthKey, revenueByMonth.get(monthKey).add(booking.getTotalPrice()));
+            }
+        }
+        
+        // Convert to list of maps for JSON response
+        List<Map<String, Object>> result = new java.util.ArrayList<>();
+        for (Map.Entry<String, BigDecimal> entry : revenueByMonth.entrySet()) {
+            Map<String, Object> monthData = new java.util.HashMap<>();
+            monthData.put("month", entry.getKey());
+            monthData.put("revenue", entry.getValue());
+            result.add(monthData);
+        }
+        
+        // Sort by month (most recent first)
+        result.sort((a, b) -> {
+            String monthA = (String) a.get("month");
+            String monthB = (String) b.get("month");
+            return monthB.compareTo(monthA);
+        });
+        
+        return result;
     }
 }

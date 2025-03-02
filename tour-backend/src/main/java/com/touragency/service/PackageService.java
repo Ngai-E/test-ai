@@ -116,4 +116,12 @@ public class PackageService {
         }
         return packages.get(0);
     }
+    
+    public List<Package> getPopularPackages(int limit) {
+        // Find the packages with the highest booking count
+        return packageRepository.findAll(Sort.by(Sort.Direction.DESC, "bookingCount"))
+                .stream()
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
 }

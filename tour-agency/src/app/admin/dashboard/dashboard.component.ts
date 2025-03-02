@@ -19,7 +19,7 @@ export class DashboardComponent implements OnInit {
   totalPackages = 0;
   totalRevenue = 0;
   
-  // Mock data for components that expect the old dashboard structure
+  // Data from backend
   popularPackages: any[] = [];
   recentBookings: any[] = [];
   recentReviews: any[] = [];
@@ -64,9 +64,12 @@ export class DashboardComponent implements OnInit {
       (data) => {
         this.stats = data;
         this.updateMetrics();
-        this.generateMockData();
-        this.configureRevenueChart();
-        this.loading = false;
+        
+        // Load additional dashboard data
+        this.loadPopularPackages();
+        this.loadRecentBookings();
+        this.loadRecentReviews();
+        this.loadRevenueChartData();
       },
       (error) => {
         console.error('Error loading dashboard data:', error);
@@ -86,62 +89,90 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // Generate mock data for components that expect the old dashboard structure
-  generateMockData(): void {
-    if (this.stats) {
-      // Create mock popular packages
-      this.popularPackages = [
-        { name: 'Paris Adventure', destination: 'Paris, France', bookings: 24 },
-        { name: 'Tokyo Explorer', destination: 'Tokyo, Japan', bookings: 18 },
-        { name: 'New York City Tour', destination: 'New York, USA', bookings: 15 }
-      ];
-      
-      // Create mock recent bookings
-      this.recentBookings = [
-        { id: 1001, customerName: 'John Doe', packageName: 'Paris Adventure', status: 'Confirmed' },
-        { id: 1002, customerName: 'Jane Smith', packageName: 'Tokyo Explorer', status: 'Pending' },
-        { id: 1003, customerName: 'Bob Johnson', packageName: 'New York City Tour', status: 'Cancelled' }
-      ];
-      
-      // Create mock recent reviews
-      this.recentReviews = [
-        { packageName: 'Paris Adventure', rating: 5, date: new Date(), comment: 'Amazing experience!' },
-        { packageName: 'Tokyo Explorer', rating: 4, date: new Date(), comment: 'Great tour, but a bit rushed.' },
-        { packageName: 'New York City Tour', rating: 3, date: new Date(), comment: 'Good but expensive.' }
-      ];
-    }
+  // Load popular packages from the backend
+  loadPopularPackages(): void {
+    this.adminService.getPopularPackages(3).subscribe(
+      (data) => {
+        this.popularPackages = data;
+      },
+      (error) => {
+        console.error('Error loading popular packages:', error);
+        this.popularPackages = [];
+      }
+    );
   }
 
-  configureRevenueChart(): void {
-    if (this.stats) {
-      // Create mock revenue chart data
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-      const revenueData = [1000, 1500, 1200, 1800, 2000, 2500];
-      
-      this.revenueChartLabels = months;
-      this.revenueChartData = [
-        {
-          data: revenueData,
-          label: 'Monthly Revenue',
-          borderColor: '#1976d2',
-          backgroundColor: 'rgba(25, 118, 210, 0.2)',
-          pointBackgroundColor: '#1976d2',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: '#1976d2'
+  // Load recent bookings from the backend
+  loadRecentBookings(): void {
+    this.adminService.getRecentBookings(3).subscribe(
+      (data) => {
+        this.recentBookings = data;
+      },
+      (error) => {
+        console.error('Error loading recent bookings:', error);
+        this.recentBookings = [];
+      }
+    );
+  }
+
+  // Load recent reviews from the backend
+  loadRecentReviews(): void {
+    this.adminService.getRecentReviews(3).subscribe(
+      (data) => {
+        this.recentReviews = data;
+      },
+      (error) => {
+        console.error('Error loading recent reviews:', error);
+        this.recentReviews = [];
+      }
+    );
+  }
+
+  // Load revenue chart data from the backend
+  loadRevenueChartData(): void {
+    this.adminService.getRevenueByMonth(6).subscribe(
+      (data) => {
+        if (data && data.length > 0) {
+          const months = data.map(item => item.month);
+          const revenueData = data.map(item => item.revenue);
+          
+          this.revenueChartLabels = months;
+          this.revenueChartData = [
+            {
+              data: revenueData,
+              label: 'Monthly Revenue',
+              borderColor: '#1976d2',
+              backgroundColor: 'rgba(25, 118, 210, 0.2)',
+              pointBackgroundColor: '#1976d2',
+              pointBorderColor: '#fff',
+              pointHoverBackgroundColor: '#fff',
+              pointHoverBorderColor: '#1976d2'
+            }
+          ];
         }
-      ];
-    }
+        this.loading = false;
+      },
+      (error) => {
+        console.error('Error loading revenue chart data:', error);
+        this.loading = false;
+      }
+    );
   }
 
   getStatusClass(status: string): string {
-    switch (status.toLowerCase()) {
-      case 'confirmed':
+    if (!status) return 'badge bg-secondary';
+    
+    switch (status.toUpperCase()) {
+      case 'CONFIRMED':
         return 'badge bg-success';
-      case 'pending':
+      case 'PENDING':
         return 'badge bg-warning text-dark';
-      case 'cancelled':
+      case 'CANCELLED':
         return 'badge bg-danger';
+      case 'COMPLETED':
+        return 'badge bg-info';
+      case 'PROCESSING':
+        return 'badge bg-primary';
       default:
         return 'badge bg-secondary';
     }

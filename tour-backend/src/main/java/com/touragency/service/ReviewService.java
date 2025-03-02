@@ -109,4 +109,12 @@ public class ReviewService {
         
         return average.orElse(0.0);
     }
+    
+    public List<Review> getRecentReviews(int limit) {
+        return reviewRepository.findAll(org.springframework.data.domain.Sort.by(
+                org.springframework.data.domain.Sort.Direction.DESC, "createdAt"))
+                .stream()
+                .limit(limit)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

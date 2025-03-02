@@ -103,6 +103,31 @@ export class AdminService {
     );
   }
 
+  getPopularPackages(limit: number = 5): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/packages/popular?limit=${limit}`).pipe(
+      catchError(this.handleError('getPopularPackages', []))
+    );
+  }
+
+  getRecentBookings(limit: number = 5): Observable<AdminBooking[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/bookings/recent?limit=${limit}`).pipe(
+      map(bookings => this.mapBookingsResponse(bookings)),
+      catchError(this.handleError('getRecentBookings', []))
+    );
+  }
+
+  getRecentReviews(limit: number = 5): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/reviews/recent?limit=${limit}`).pipe(
+      catchError(this.handleError('getRecentReviews', []))
+    );
+  }
+
+  getRevenueByMonth(months: number = 6): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/bookings/revenue-by-month?months=${months}`).pipe(
+      catchError(this.handleError('getRevenueByMonth', []))
+    );
+  }
+
   // Package Management
   getPackages(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/packages`).pipe(

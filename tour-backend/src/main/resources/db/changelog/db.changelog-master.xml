@@ -17,4 +17,5 @@
     <include file="changes/010-add-contact-submissions.xml" relativeToChangelogFile="true"/>
     <include file="changes/011-add-destinations.xml" relativeToChangelogFile="true"/>
     <include file="changes/012-add-role-column.xml" relativeToChangelogFile="true"/>
+    <include file="changes/013-add-sample-dashboard-data.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

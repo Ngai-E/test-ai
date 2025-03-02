@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+
+    <changeSet id="013-add-sample-dashboard-data" author="touragency">
+        <!-- Add more sample users -->
+        <insert tableName="users">
+            <column name="phone_number">+1987654321</column>
+            <column name="password">$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG</column> <!-- password: password123 -->
+            <column name="full_name">Jane Smith</column>
+            <column name="email">jane.smith@example.com</column>
+            <column name="coin_balance">150</column>
+            <column name="referral_code">REF54321</column>
+            <column name="created_at">2025-02-01 00:00:00</column>
+            <column name="updated_at">2025-02-01 00:00:00</column>
+            <column name="role">USER</column>
+        </insert>
+        
+        <insert tableName="users">
+            <column name="phone_number">+1122334455</column>
+            <column name="password">$2a$10$dXJ3SW6G7P50lGmMkkmwe.20cQQubK3.HZWzG3YB1tlRy.fqvM/BG</column> <!-- password: password123 -->
+            <column name="full_name">Michael Johnson</column>
+            <column name="email">michael.johnson@example.com</column>
+            <column name="coin_balance">75</column>
+            <column name="referral_code">REF67890</column>
+            <column name="created_at">2025-02-15 00:00:00</column>
+            <column name="updated_at">2025-02-15 00:00:00</column>
+            <column name="role">USER</column>
+        </insert>
+        
+        <!-- Add sample bookings - using user_id=1 for all to ensure it exists -->
+        <insert tableName="bookings">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="1"/>
+            <column name="start_date">2025-03-01</column>
+            <column name="end_date">2025-03-07</column>
+            <column name="number_of_adults" valueNumeric="2"/>
+            <column name="number_of_children" valueNumeric="0"/>
+            <column name="booking_status">CONFIRMED</column>
+            <column name="payment_status">PAID</column>
+            <column name="total_price" valueNumeric="1750.00"/>
+            <column name="booking_reference">BK-2025-001</column>
+            <column name="created_at">2025-02-01 14:30:00</column>
+            <column name="updated_at">2025-02-01 14:30:00</column>
+        </insert>
+        
+        <insert tableName="bookings">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="2"/>
+            <column name="start_date">2025-03-15</column>
+            <column name="end_date">2025-03-22</column>
+            <column name="number_of_adults" valueNumeric="2"/>
+            <column name="number_of_children" valueNumeric="1"/>
+            <column name="booking_status">PENDING</column>
+            <column name="payment_status">PENDING</column>
+            <column name="total_price" valueNumeric="2200.00"/>
+            <column name="booking_reference">BK-2025-002</column>
+            <column name="created_at">2025-02-10 09:15:00</column>
+            <column name="updated_at">2025-02-10 09:15:00</column>
+        </insert>
+        
+        <insert tableName="bookings">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="3"/>
+            <column name="start_date">2025-04-05</column>
+            <column name="end_date">2025-04-12</column>
+            <column name="number_of_adults" valueNumeric="1"/>
+            <column name="number_of_children" valueNumeric="0"/>
+            <column name="booking_status">CONFIRMED</column>
+            <column name="payment_status">PAID</column>
+            <column name="total_price" valueNumeric="1950.00"/>
+            <column name="booking_reference">BK-2025-003</column>
+            <column name="created_at">2025-02-20 16:45:00</column>
+            <column name="updated_at">2025-02-20 16:45:00</column>
+        </insert>
+        
+        <insert tableName="bookings">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="4"/>
+            <column name="start_date">2025-04-20</column>
+            <column name="end_date">2025-04-27</column>
+            <column name="number_of_adults" valueNumeric="2"/>
+            <column name="number_of_children" valueNumeric="2"/>
+            <column name="booking_status">CONFIRMED</column>
+            <column name="payment_status">PAID</column>
+            <column name="total_price" valueNumeric="2500.00"/>
+            <column name="booking_reference">BK-2025-004</column>
+            <column name="created_at">2025-02-25 11:30:00</column>
+            <column name="updated_at">2025-02-25 11:30:00</column>
+        </insert>
+        
+        <insert tableName="bookings">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="5"/>
+            <column name="start_date">2025-05-10</column>
+            <column name="end_date">2025-05-17</column>
+            <column name="number_of_adults" valueNumeric="2"/>
+            <column name="number_of_children" valueNumeric="0"/>
+            <column name="booking_status">PENDING</column>
+            <column name="payment_status">PENDING</column>
+            <column name="total_price" valueNumeric="1800.00"/>
+            <column name="booking_reference">BK-2025-005</column>
+            <column name="created_at">2025-03-01 10:00:00</column>
+            <column name="updated_at">2025-03-01 10:00:00</column>
+        </insert>
+        
+        <!-- Add more sample reviews -->
+        <insert tableName="reviews">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="2"/>
+            <column name="rating" valueNumeric="4"/>
+            <column name="comment">Great trip to Paris! The Eiffel Tower tour was spectacular. The hotel was in a perfect location. Would definitely book again.</column>
+            <column name="created_at">2025-02-20 09:45:00</column>
+            <column name="updated_at">2025-02-20 09:45:00</column>
+        </insert>
+        
+        <insert tableName="reviews">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="3"/>
+            <column name="rating" valueNumeric="5"/>
+            <column name="comment">The Bali retreat was absolutely magical! The villa was stunning and the included activities were top-notch. The staff was incredibly friendly and helpful.</column>
+            <column name="created_at">2025-02-25 14:20:00</column>
+            <column name="updated_at">2025-02-25 14:20:00</column>
+        </insert>
+        
+        <insert tableName="reviews">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="4"/>
+            <column name="rating" valueNumeric="4"/>
+            <column name="comment">The New York City tour was fantastic! Times Square, Central Park, and the Statue of Liberty were all highlights. The only downside was the hotel room was a bit small.</column>
+            <column name="created_at">2025-03-01 16:30:00</column>
+            <column name="updated_at">2025-03-01 16:30:00</column>
+        </insert>
+        
+        <insert tableName="reviews">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="package_id" valueNumeric="5"/>
+            <column name="rating" valueNumeric="3"/>
+            <column name="comment">Tokyo was interesting but the tour felt a bit rushed. The robot restaurant was amazing though! Would have liked more free time to explore on our own.</column>
+            <column name="created_at">2025-03-02 11:15:00</column>
+            <column name="updated_at">2025-03-02 11:15:00</column>
+        </insert>
+        
+        <!-- Update package booking counts and ratings -->
+        <update tableName="packages">
+            <column name="booking_count" valueNumeric="25"/>
+            <column name="average_rating" valueNumeric="4.7"/>
+            <where>id = 1</where>
+        </update>
+        
+        <update tableName="packages">
+            <column name="booking_count" valueNumeric="18"/>
+            <column name="average_rating" valueNumeric="4.2"/>
+            <where>id = 2</where>
+        </update>
+        
+        <update tableName="packages">
+            <column name="booking_count" valueNumeric="22"/>
+            <column name="average_rating" valueNumeric="4.9"/>
+            <where>id = 3</where>
+        </update>
+        
+        <update tableName="packages">
+            <column name="booking_count" valueNumeric="15"/>
+            <column name="average_rating" valueNumeric="4.1"/>
+            <where>id = 4</where>
+        </update>
+        
+        <update tableName="packages">
+            <column name="booking_count" valueNumeric="12"/>
+            <column name="average_rating" valueNumeric="3.8"/>
+            <where>id = 5</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

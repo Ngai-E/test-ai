@@ -344,4 +344,44 @@ public class AdminController {
         
         return ResponseEntity.ok(statistics);
     }
+    
+    @Operation(summary = "Get popular packages", description = "Retrieves the most popular packages based on booking count")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved popular packages")
+    @GetMapping("/packages/popular")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Package>> getPopularPackages(
+            @RequestParam(defaultValue = "5") int limit) {
+        List<Package> popularPackages = packageService.getPopularPackages(limit);
+        return ResponseEntity.ok(popularPackages);
+    }
+    
+    @Operation(summary = "Get recent bookings", description = "Retrieves the most recent bookings")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved recent bookings")
+    @GetMapping("/bookings/recent")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Booking>> getRecentBookings(
+            @RequestParam(defaultValue = "5") int limit) {
+        List<Booking> recentBookings = bookingService.getRecentBookings(limit);
+        return ResponseEntity.ok(recentBookings);
+    }
+    
+    @Operation(summary = "Get recent reviews", description = "Retrieves the most recent reviews")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved recent reviews")
+    @GetMapping("/reviews/recent")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Review>> getRecentReviews(
+            @RequestParam(defaultValue = "5") int limit) {
+        List<Review> recentReviews = reviewService.getRecentReviews(limit);
+        return ResponseEntity.ok(recentReviews);
+    }
+    
+    @Operation(summary = "Get revenue by month", description = "Retrieves revenue data grouped by month")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved revenue data")
+    @GetMapping("/bookings/revenue-by-month")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Map<String, Object>>> getRevenueByMonth(
+            @RequestParam(defaultValue = "6") int months) {
+        List<Map<String, Object>> revenueData = bookingService.getRevenueByMonth(months);
+        return ResponseEntity.ok(revenueData);
+    }
 }
