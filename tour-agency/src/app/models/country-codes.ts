@@ -37,6 +37,12 @@ export const countryCodes: CountryCode[] = [
     flag: '🇳🇬'
   },
   {
+    name: 'Cameroon',
+    code: 'CM',
+    dialCode: '+237',
+    flag: '🇨🇲'
+  },
+  {
     name: 'Ghana',
     code: 'GH',
     dialCode: '+233',

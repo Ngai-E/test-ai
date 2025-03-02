@@ -5,6 +5,7 @@ import com.touragency.model.Package;
 import com.touragency.model.PackageType;
 import com.touragency.repository.PackageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -99,5 +100,20 @@ public class PackageService {
         return allPackages.stream()
                 .limit(5) // Return top 5 packages as featured
                 .collect(Collectors.toList());
+    }
+    
+    // Admin-specific methods
+    
+    public long getTotalPackageCount() {
+        return packageRepository.count();
+    }
+    
+    public Package getMostPopularPackage() {
+        // Find the package with the highest booking count
+        List<Package> packages = packageRepository.findAll(Sort.by(Sort.Direction.DESC, "bookingCount"));
+        if (packages.isEmpty()) {
+            return null;
+        }
+        return packages.get(0);
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -178,5 +179,43 @@ public class BookingService {
         }
         
         return total;
+    }
+    
+    // Admin-specific methods
+    
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
+    
+    public Booking updateBookingStatus(Long bookingId, String status) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        
+        booking.setBookingStatus(status);
+        return bookingRepository.save(booking);
+    }
+    
+    public long getTotalBookingCount() {
+        return bookingRepository.count();
+    }
+    
+    public long getBookingsThisMonth() {
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        return bookingRepository.countByCreatedAtAfter(startOfMonth);
+    }
+    
+    public BigDecimal getTotalRevenue() {
+        List<Booking> bookings = bookingRepository.findByBookingStatusNot("CANCELLED");
+        return bookings.stream()
+                .map(Booking::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    
+    public BigDecimal getRevenueThisMonth() {
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        List<Booking> bookings = bookingRepository.findByBookingStatusNotAndCreatedAtAfter("CANCELLED", startOfMonth);
+        return bookings.stream()
+                .map(Booking::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

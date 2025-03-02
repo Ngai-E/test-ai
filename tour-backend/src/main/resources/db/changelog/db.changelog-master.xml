@@ -16,4 +16,5 @@
     <include file="changes/009-add-payment-methods.xml" relativeToChangelogFile="true"/>
     <include file="changes/010-add-contact-submissions.xml" relativeToChangelogFile="true"/>
     <include file="changes/011-add-destinations.xml" relativeToChangelogFile="true"/>
+    <include file="changes/012-add-role-column.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

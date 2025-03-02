@@ -6,6 +6,7 @@ export interface User {
   coinBalance?: number;
   referralCode?: string;
   token?: string;
+  role?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }

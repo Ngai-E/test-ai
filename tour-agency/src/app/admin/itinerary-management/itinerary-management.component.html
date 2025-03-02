@@ -1,0 +1,170 @@
+<div class="itinerary-management-container">
+  <div class="header">
+    <h1>
+      <a [routerLink]="['/admin/packages']" class="btn btn-sm btn-outline-secondary me-2">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      Itinerary Management: {{ packageName }}
+    </h1>
+    <button class="btn btn-primary" (click)="openItineraryModal()">
+      <i class="bi bi-plus-circle"></i> Add New Day
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading itinerary...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill"></i> 
+    Error loading itinerary. Please try refreshing the page.
+  </div>
+
+  <div *ngIf="!loading && !error" class="content">
+    <div *ngIf="itineraryDays.length === 0" class="text-center py-5">
+      <p class="mb-3">No itinerary days have been added for this package yet.</p>
+      <button class="btn btn-primary" (click)="openItineraryModal()">
+        <i class="bi bi-plus-circle"></i> Add First Day
+      </button>
+    </div>
+
+    <!-- Itinerary Timeline -->
+    <div *ngIf="itineraryDays.length > 0" class="itinerary-timeline">
+      <div *ngFor="let day of itineraryDays" class="itinerary-day card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Day {{ day.dayNumber }}: {{ day.title }}</h5>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-outline-primary" (click)="openItineraryModal(day)">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(day)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ day.description }}</p>
+          
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <h6 class="mb-2"><i class="bi bi-house-door"></i> Accommodation</h6>
+              <p>{{ day.accommodation || 'Not specified' }}</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="mb-2"><i class="bi bi-cup-hot"></i> Meals</h6>
+              <p>{{ day.meals || 'Not specified' }}</p>
+            </div>
+          </div>
+          
+          <h6 class="mt-3 mb-2"><i class="bi bi-calendar-check"></i> Activities</h6>
+          <ul class="list-group">
+            <li *ngFor="let activity of day.activities" class="list-group-item">
+              {{ activity }}
+            </li>
+            <li *ngIf="!day.activities || day.activities.length === 0" class="list-group-item text-muted">
+              No activities specified
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Itinerary Modal -->
+<ng-template #itineraryModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{ editMode ? 'Edit Itinerary Day' : 'Add New Itinerary Day' }}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="itineraryForm">
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label for="dayNumber" class="form-label">Day Number*</label>
+          <input type="number" class="form-control" id="dayNumber" formControlName="dayNumber" min="1">
+          <div *ngIf="itineraryForm.get('dayNumber')?.invalid && itineraryForm.get('dayNumber')?.touched" class="text-danger">
+            Valid day number is required
+          </div>
+        </div>
+        <div class="col-md-8 mb-3">
+          <label for="title" class="form-label">Day Title*</label>
+          <input type="text" class="form-control" id="title" formControlName="title">
+          <div *ngIf="itineraryForm.get('title')?.invalid && itineraryForm.get('title')?.touched" class="text-danger">
+            Title is required (min 3 characters)
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <label for="description" class="form-label">Description*</label>
+          <textarea class="form-control" id="description" formControlName="description" rows="3"></textarea>
+          <div *ngIf="itineraryForm.get('description')?.invalid && itineraryForm.get('description')?.touched" class="text-danger">
+            Description is required
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="accommodation" class="form-label">Accommodation</label>
+          <input type="text" class="form-control" id="accommodation" formControlName="accommodation">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="meals" class="form-label">Meals</label>
+          <input type="text" class="form-control" id="meals" formControlName="meals" 
+                 placeholder="e.g., Breakfast, Lunch, Dinner">
+        </div>
+      </div>
+
+      <div class="activities-section mb-3">
+        <label class="form-label">Activities*</label>
+        
+        <div formArrayName="activities">
+          <div *ngFor="let activityGroup of activitiesArray.controls; let i = index" class="mb-2 d-flex">
+            <div [formGroupName]="i" class="flex-grow-1">
+              <input type="text" class="form-control" formControlName="activity" placeholder="Enter activity">
+              <div *ngIf="activityGroup.get('activity')?.invalid && activityGroup.get('activity')?.touched" class="text-danger">
+                Activity is required
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline-danger ms-2" (click)="removeActivity(i)" 
+                    [disabled]="activitiesArray.length === 1">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+        
+        <button type="button" class="btn btn-outline-primary mt-2" (click)="addActivity()">
+          <i class="bi bi-plus-circle"></i> Add Activity
+        </button>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" [disabled]="itineraryForm.invalid" (click)="saveItineraryDay()">
+      {{ editMode ? 'Update' : 'Create' }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #deleteModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Confirm Delete</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to delete Day {{ dayToDelete?.dayNumber }}: <strong>{{ dayToDelete?.title }}</strong>?</p>
+    <p class="text-danger">This action cannot be undone.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-danger" (click)="deleteItineraryDay()">Delete</button>
+  </div>
+</ng-template>

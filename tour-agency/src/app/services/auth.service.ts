@@ -14,6 +14,7 @@ interface AuthResponse {
   coinBalance: number;
   referralCode: string;
   token: string;
+  role: string;
 }
 
 @Injectable({
@@ -72,7 +73,8 @@ export class AuthService {
             email: response.email,
             coinBalance: response.coinBalance,
             referralCode: response.referralCode,
-            token: response.token
+            token: response.token,
+            role: response.role
           };
           localStorage.setItem('currentUser', JSON.stringify(user));
           localStorage.setItem('token', response.token); // Store token separately for easier access
@@ -98,7 +100,8 @@ export class AuthService {
             email: response.email,
             coinBalance: response.coinBalance,
             referralCode: response.referralCode,
-            token: response.token
+            token: response.token,
+            role: response.role
           };
           localStorage.setItem('currentUser', JSON.stringify(newUser));
           localStorage.setItem('token', response.token); // Store token separately for easier access
@@ -206,17 +209,12 @@ export class AuthService {
    */
   isAdmin(): boolean {
     const currentUser = this.currentUserValue;
-    // In a real application, you would check the user's role from the token or user object
-    // For now, we'll simulate this with a simple check
     if (!currentUser) {
       return false;
     }
     
-    // Check if user has admin role - this would be based on your actual user model
-    // For example: return currentUser.role === 'admin';
-    
-    // For development purposes, we'll return true to allow access to admin pages
-    return true;
+    // Check if user has admin role
+    return currentUser.role === 'ADMIN';
   }
 
   /**

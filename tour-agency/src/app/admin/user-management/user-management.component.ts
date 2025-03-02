@@ -133,12 +133,13 @@ export class UserManagementComponent implements OnInit {
   }
 
   updateUserRole(user: User, role: string): void {
-    this.adminService.updateUserRole(user.id, role).subscribe(
+    // Since we removed updateUserRole from AdminService, we'll use the general update method
+    this.adminService.updateUser(user.id, { role }).subscribe(
       () => {
         user.role = role;
         this.toastService.showSuccess(`User ${user.name}'s role updated to ${role}`);
       },
-      (error) => {
+      (error: any) => {
         console.error('Error updating user role:', error);
         this.toastService.showError('Failed to update user role');
       }
@@ -146,12 +147,13 @@ export class UserManagementComponent implements OnInit {
   }
 
   activateUser(user: User): void {
-    this.adminService.activateUser(user.id).subscribe(
+    // Since we removed activateUser from AdminService, we'll use the general update method
+    this.adminService.updateUser(user.id, { status: 'Active' }).subscribe(
       () => {
         user.status = 'Active';
         this.toastService.showSuccess(`User ${user.name} has been activated`);
       },
-      (error) => {
+      (error: any) => {
         console.error('Error activating user:', error);
         this.toastService.showError('Failed to activate user');
       }
@@ -159,12 +161,13 @@ export class UserManagementComponent implements OnInit {
   }
 
   deactivateUser(user: User): void {
-    this.adminService.deactivateUser(user.id).subscribe(
+    // Since we removed deactivateUser from AdminService, we'll use the general update method
+    this.adminService.updateUser(user.id, { status: 'Inactive' }).subscribe(
       () => {
         user.status = 'Inactive';
         this.toastService.showSuccess(`User ${user.name} has been deactivated`);
       },
-      (error) => {
+      (error: any) => {
         console.error('Error deactivating user:', error);
         this.toastService.showError('Failed to deactivate user');
       }

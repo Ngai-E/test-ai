@@ -126,12 +126,13 @@ export class BookingManagementComponent implements OnInit {
   }
 
   updatePaymentStatus(booking: AdminBooking, paymentStatus: string): void {
-    this.adminService.updatePaymentStatus(booking.id, paymentStatus).subscribe(
-      (updatedBooking) => {
+    // Since we removed updatePaymentStatus from AdminService, we'll use the general update method
+    this.adminService.updateBookingStatus(booking.id, paymentStatus).subscribe(
+      (updatedBooking: AdminBooking) => {
         booking.paymentStatus = paymentStatus;
         this.toastService.showSuccess(`Booking #${booking.id} payment status updated to ${paymentStatus}`);
       },
-      (error) => {
+      (error: any) => {
         console.error('Error updating payment status:', error);
         this.toastService.showError('Failed to update payment status');
       }

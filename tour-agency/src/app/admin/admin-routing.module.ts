@@ -6,7 +6,9 @@ import { PackageManagementComponent } from './package-management/package-managem
 import { BookingManagementComponent } from './booking-management/booking-management.component';
 import { ReviewManagementComponent } from './review-management/review-management.component';
 import { UserManagementComponent } from './user-management/user-management.component';
-import { AdminGuard } from './guards/admin.guard';
+import { AddonManagementComponent } from './addon-management/addon-management.component';
+import { ItineraryManagementComponent } from './itinerary-management/itinerary-management.component';
+import { AdminGuard } from '../guards/admin.guard';
 
 const routes: Routes = [
   {
@@ -17,6 +19,8 @@ const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'packages', component: PackageManagementComponent },
+      { path: 'packages/:id/addons', component: AddonManagementComponent },
+      { path: 'packages/:id/itinerary', component: ItineraryManagementComponent },
       { path: 'bookings', component: BookingManagementComponent },
       { path: 'reviews', component: ReviewManagementComponent },
       { path: 'users', component: UserManagementComponent }

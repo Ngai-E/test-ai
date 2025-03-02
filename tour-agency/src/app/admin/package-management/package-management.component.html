@@ -110,6 +110,12 @@
                     <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(package)">
                       <i class="bi bi-trash"></i>
                     </button>
+                    <button class="btn btn-sm btn-outline-info" [routerLink]="['/admin/packages', package.id, 'addons']">
+                      <i class="bi bi-plus-circle"></i> Addons
+                    </button>
+                    <button class="btn btn-sm btn-outline-success" [routerLink]="['/admin/packages', package.id, 'itinerary']">
+                      <i class="bi bi-calendar-week"></i> Itinerary
+                    </button>
                   </div>
                 </td>
               </tr>

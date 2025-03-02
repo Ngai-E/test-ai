@@ -1,0 +1,43 @@
+.itinerary-management-container {
+  padding: 20px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .itinerary-timeline {
+    position: relative;
+    
+    &:before {
+      content: '';
+      position: absolute;
+      left: 20px;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #e9ecef;
+      border-radius: 4px;
+    }
+  }
+
+  .itinerary-day {
+    position: relative;
+    margin-left: 40px;
+    
+    &:before {
+      content: '';
+      position: absolute;
+      left: -36px;
+      top: 24px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #0d6efd;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 2px #0d6efd;
+    }
+  }
+}

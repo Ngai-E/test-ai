@@ -32,6 +32,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/packages/**").permitAll()
                 .requestMatchers("/api/addons/**").permitAll()
                 .requestMatchers("/api/reviews/**").permitAll()
+                .requestMatchers("/api/contact/**").permitAll()
+                .requestMatchers("/api/destinations/**").permitAll()
+                .requestMatchers("/api/faqs/**").permitAll()
+                // Admin endpoints
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Swagger UI endpoints
                 .requestMatchers("/swagger-ui.html").permitAll()
                 .requestMatchers("/swagger-ui/**").permitAll()

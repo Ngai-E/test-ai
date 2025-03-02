@@ -5,17 +5,16 @@ import { catchError } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface DashboardStats {
-  totalBookings: number;
   totalUsers: number;
-  totalPackages: number;
+  newUsersThisMonth: number;
+  totalBookings: number;
+  bookingsThisMonth: number;
   totalRevenue: number;
-  revenueChart: {
-    labels: string[];
-    data: number[];
-  };
-  popularPackages: any[];
-  recentBookings: any[];
-  recentReviews: any[];
+  revenueThisMonth: number;
+  totalPackages: number;
+  totalReviews: number;
+  averageRating: number;
+  mostPopularPackage: any;
 }
 
 export interface AdminBooking {
@@ -36,6 +35,29 @@ export interface AdminBooking {
   specialRequirements?: string;
 }
 
+export interface Addon {
+  id: number;
+  name: string;
+  description: string;
+  detailedDescription: string;
+  price: number;
+  imageUrl: string;
+  videoUrl?: string;
+  category: string;
+  tourPackageId: number;
+}
+
+export interface ItineraryDay {
+  id: number;
+  dayNumber: number;
+  title: string;
+  description: string;
+  accommodation: string;
+  meals: string;
+  tourPackageId: number;
+  activities: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -46,7 +68,7 @@ export class AdminService {
 
   // Dashboard
   getDashboardStats(): Observable<DashboardStats> {
-    return this.http.get<DashboardStats>(`${this.apiUrl}/dashboard`).pipe(
+    return this.http.get<DashboardStats>(`${this.apiUrl}/dashboard/statistics`).pipe(
       catchError(this.handleError('getDashboardStats', {} as DashboardStats))
     );
   }
@@ -55,6 +77,12 @@ export class AdminService {
   getPackages(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/packages`).pipe(
       catchError(this.handleError('getPackages', []))
+    );
+  }
+
+  getPackageById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/packages/${id}`).pipe(
+      catchError(this.handleError('getPackageById', {}))
     );
   }
 
@@ -76,6 +104,56 @@ export class AdminService {
     );
   }
 
+  // Addon Management
+  getAddonsByPackageId(packageId: number): Observable<Addon[]> {
+    return this.http.get<Addon[]>(`${this.apiUrl}/packages/${packageId}/addons`).pipe(
+      catchError(this.handleError('getAddonsByPackageId', []))
+    );
+  }
+
+  createAddon(packageId: number, addonData: Partial<Addon>): Observable<Addon> {
+    return this.http.post<Addon>(`${this.apiUrl}/packages/${packageId}/addons`, addonData).pipe(
+      catchError(this.handleError('createAddon', {} as Addon))
+    );
+  }
+
+  updateAddon(packageId: number, addonId: number, addonData: Partial<Addon>): Observable<Addon> {
+    return this.http.put<Addon>(`${this.apiUrl}/addons/${addonId}`, addonData).pipe(
+      catchError(this.handleError('updateAddon', {} as Addon))
+    );
+  }
+
+  deleteAddon(packageId: number, addonId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/addons/${addonId}`).pipe(
+      catchError(this.handleError<void>('deleteAddon'))
+    );
+  }
+
+  // Itinerary Management
+  getItineraryByPackageId(packageId: number): Observable<ItineraryDay[]> {
+    return this.http.get<ItineraryDay[]>(`${this.apiUrl}/packages/${packageId}/itinerary`).pipe(
+      catchError(this.handleError('getItineraryByPackageId', []))
+    );
+  }
+
+  createItineraryDay(packageId: number, itineraryData: Partial<ItineraryDay>): Observable<ItineraryDay> {
+    return this.http.post<ItineraryDay>(`${this.apiUrl}/packages/${packageId}/itinerary`, itineraryData).pipe(
+      catchError(this.handleError('createItineraryDay', {} as ItineraryDay))
+    );
+  }
+
+  updateItineraryDay(packageId: number, dayId: number, itineraryData: Partial<ItineraryDay>): Observable<ItineraryDay> {
+    return this.http.put<ItineraryDay>(`${this.apiUrl}/itinerary/${dayId}`, itineraryData).pipe(
+      catchError(this.handleError('updateItineraryDay', {} as ItineraryDay))
+    );
+  }
+
+  deleteItineraryDay(packageId: number, dayId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/itinerary/${dayId}`).pipe(
+      catchError(this.handleError<void>('deleteItineraryDay'))
+    );
+  }
+
   // Booking Management
   getBookings(): Observable<AdminBooking[]> {
     return this.http.get<AdminBooking[]>(`${this.apiUrl}/bookings`).pipe(
@@ -90,14 +168,8 @@ export class AdminService {
   }
 
   updateBookingStatus(id: number, status: string): Observable<AdminBooking> {
-    return this.http.patch<AdminBooking>(`${this.apiUrl}/bookings/${id}/status`, { status }).pipe(
+    return this.http.put<AdminBooking>(`${this.apiUrl}/bookings/${id}/status`, { status }).pipe(
       catchError(this.handleError('updateBookingStatus', {} as AdminBooking))
-    );
-  }
-
-  updatePaymentStatus(id: number, paymentStatus: string): Observable<AdminBooking> {
-    return this.http.patch<AdminBooking>(`${this.apiUrl}/bookings/${id}/payment`, { paymentStatus }).pipe(
-      catchError(this.handleError('updatePaymentStatus', {} as AdminBooking))
     );
   }
 
@@ -105,18 +177,6 @@ export class AdminService {
   getAllReviews(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/reviews`).pipe(
       catchError(this.handleError('getAllReviews', []))
-    );
-  }
-
-  approveReview(id: number): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/reviews/${id}/approve`, {}).pipe(
-      catchError(this.handleError('approveReview', {}))
-    );
-  }
-
-  rejectReview(id: number): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/reviews/${id}/reject`, {}).pipe(
-      catchError(this.handleError('rejectReview', {}))
     );
   }
 
@@ -139,21 +199,15 @@ export class AdminService {
     );
   }
 
-  updateUserRole(id: number, role: string): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/users/${id}/role`, { role }).pipe(
-      catchError(this.handleError('updateUserRole', {}))
+  updateUser(id: number, userData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/users/${id}`, userData).pipe(
+      catchError(this.handleError('updateUser', {}))
     );
   }
 
-  deactivateUser(id: number): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/users/${id}/deactivate`, {}).pipe(
-      catchError(this.handleError('deactivateUser', {}))
-    );
-  }
-
-  activateUser(id: number): Observable<any> {
-    return this.http.patch<any>(`${this.apiUrl}/users/${id}/activate`, {}).pipe(
-      catchError(this.handleError('activateUser', {}))
+  deleteUser(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/users/${id}`).pipe(
+      catchError(this.handleError<void>('deleteUser'))
     );
   }
 
@@ -161,12 +215,9 @@ export class AdminService {
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       console.error(`${operation} failed: ${error.message}`);
+      // Let the app keep running by returning an empty result.
       return new Observable<T>(observer => {
-        if (result !== undefined) {
-          observer.next(result as T);
-        } else {
-          observer.next();
-        }
+        observer.next(result as T);
         observer.complete();
       });
     };

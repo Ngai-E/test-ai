@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ChartsModule } from 'ng2-charts';
+import { RouterModule } from '@angular/router';
 
 import { AdminRoutingModule } from './admin-routing.module';
 import { AdminLayoutComponent } from './admin-layout/admin-layout.component';
@@ -11,6 +12,8 @@ import { PackageManagementComponent } from './package-management/package-managem
 import { BookingManagementComponent } from './booking-management/booking-management.component';
 import { ReviewManagementComponent } from './review-management/review-management.component';
 import { UserManagementComponent } from './user-management/user-management.component';
+import { AddonManagementComponent } from './addon-management/addon-management.component';
+import { ItineraryManagementComponent } from './itinerary-management/itinerary-management.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +22,9 @@ import { UserManagementComponent } from './user-management/user-management.compo
     PackageManagementComponent,
     BookingManagementComponent,
     ReviewManagementComponent,
-    UserManagementComponent
+    UserManagementComponent,
+    AddonManagementComponent,
+    ItineraryManagementComponent
   ],
   imports: [
     CommonModule,
@@ -27,7 +32,8 @@ import { UserManagementComponent } from './user-management/user-management.compo
     FormsModule,
     ReactiveFormsModule,
     NgbModule,
-    ChartsModule
+    ChartsModule,
+    RouterModule
   ]
 })
 export class AdminModule { }

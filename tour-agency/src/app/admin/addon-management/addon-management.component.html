@@ -1,0 +1,167 @@
+<div class="addon-management-container">
+  <div class="header">
+    <h1>
+      <a [routerLink]="['/admin/packages']" class="btn btn-sm btn-outline-secondary me-2">
+        <i class="bi bi-arrow-left"></i>
+      </a>
+      Addon Management: {{ packageName }}
+    </h1>
+    <button class="btn btn-primary" (click)="openAddonModal()">
+      <i class="bi bi-plus-circle"></i> Add New Addon
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading addons...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill"></i> 
+    Error loading addons. Please try refreshing the page.
+  </div>
+
+  <div *ngIf="!loading && !error" class="content">
+    <!-- Addons Table -->
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let addon of addons">
+                <td>{{ addon.id }}</td>
+                <td>
+                  <img *ngIf="addon.imageUrl" [src]="addon.imageUrl" alt="{{ addon.name }}" class="addon-thumbnail">
+                  <div *ngIf="!addon.imageUrl" class="no-image">No Image</div>
+                </td>
+                <td>{{ addon.name }}</td>
+                <td>{{ addon.category }}</td>
+                <td>{{ addon.description | slice:0:50 }}{{ addon.description.length > 50 ? '...' : '' }}</td>
+                <td>${{ addon.price | number:'1.2-2' }}</td>
+                <td>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" (click)="openAddonModal(addon)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(addon)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="addons.length === 0">
+                <td colspan="7" class="text-center py-4">
+                  <p class="mb-0">No addons found for this package.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Addon Modal -->
+<ng-template #addonModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{ editMode ? 'Edit Addon' : 'Add New Addon' }}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="addonForm">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="name" class="form-label">Addon Name*</label>
+          <input type="text" class="form-control" id="name" formControlName="name">
+          <div *ngIf="addonForm.get('name')?.invalid && addonForm.get('name')?.touched" class="text-danger">
+            Addon name is required (min 3 characters)
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="category" class="form-label">Category*</label>
+          <select class="form-select" id="category" formControlName="category">
+            <option value="">Select a category</option>
+            <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+          </select>
+          <div *ngIf="addonForm.get('category')?.invalid && addonForm.get('category')?.touched" class="text-danger">
+            Category is required
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <label for="description" class="form-label">Short Description*</label>
+          <textarea class="form-control" id="description" formControlName="description" rows="2"></textarea>
+          <div *ngIf="addonForm.get('description')?.invalid && addonForm.get('description')?.touched" class="text-danger">
+            Description is required
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <label for="detailedDescription" class="form-label">Detailed Description</label>
+          <textarea class="form-control" id="detailedDescription" formControlName="detailedDescription" rows="4"></textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="price" class="form-label">Price ($)*</label>
+          <input type="number" class="form-control" id="price" formControlName="price" min="0">
+          <div *ngIf="addonForm.get('price')?.invalid && addonForm.get('price')?.touched" class="text-danger">
+            Valid price is required
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="imageUrl" class="form-label">Image URL</label>
+          <input type="text" class="form-control" id="imageUrl" formControlName="imageUrl">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="videoUrl" class="form-label">Video URL</label>
+          <input type="text" class="form-control" id="videoUrl" formControlName="videoUrl">
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" [disabled]="addonForm.invalid" (click)="saveAddon()">
+      {{ editMode ? 'Update' : 'Create' }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #deleteModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Confirm Delete</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to delete the addon <strong>{{ addonToDelete?.name }}</strong>?</p>
+    <p class="text-danger">This action cannot be undone.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-danger" (click)="deleteAddon()">Delete</button>
+  </div>
+</ng-template>

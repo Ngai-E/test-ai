@@ -25,7 +25,7 @@
         <div class="card metric-card">
           <div class="card-body">
             <h5 class="card-title">Total Bookings</h5>
-            <p class="metric-value">{{ stats.totalBookings }}</p>
+            <p class="metric-value">{{ totalBookings }}</p>
             <p class="metric-icon"><i class="bi bi-calendar-check"></i></p>
           </div>
         </div>
@@ -34,7 +34,7 @@
         <div class="card metric-card">
           <div class="card-body">
             <h5 class="card-title">Total Users</h5>
-            <p class="metric-value">{{ stats.totalUsers }}</p>
+            <p class="metric-value">{{ totalUsers }}</p>
             <p class="metric-icon"><i class="bi bi-people"></i></p>
           </div>
         </div>
@@ -43,7 +43,7 @@
         <div class="card metric-card">
           <div class="card-body">
             <h5 class="card-title">Total Packages</h5>
-            <p class="metric-value">{{ stats.totalPackages }}</p>
+            <p class="metric-value">{{ totalPackages }}</p>
             <p class="metric-icon"><i class="bi bi-box"></i></p>
           </div>
         </div>
@@ -52,7 +52,7 @@
         <div class="card metric-card">
           <div class="card-body">
             <h5 class="card-title">Total Revenue</h5>
-            <p class="metric-value">${{ stats.totalRevenue | number }}</p>
+            <p class="metric-value">${{ totalRevenue | number }}</p>
             <p class="metric-icon"><i class="bi bi-cash"></i></p>
           </div>
         </div>
@@ -89,7 +89,7 @@
           </div>
           <div class="card-body p-0">
             <ul class="list-group list-group-flush">
-              <li class="list-group-item" *ngFor="let pkg of stats.popularPackages">
+              <li class="list-group-item" *ngFor="let pkg of popularPackages">
                 <div class="d-flex justify-content-between align-items-center">
                   <div>
                     <h6 class="mb-0">{{ pkg.name }}</h6>
@@ -121,7 +121,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let booking of stats.recentBookings">
+                  <tr *ngFor="let booking of recentBookings">
                     <td>#{{ booking.id }}</td>
                     <td>{{ booking.customerName }}</td>
                     <td>{{ booking.packageName }}</td>
@@ -142,7 +142,7 @@
           </div>
           <div class="card-body p-0">
             <ul class="list-group list-group-flush">
-              <li class="list-group-item" *ngFor="let review of stats.recentReviews">
+              <li class="list-group-item" *ngFor="let review of recentReviews">
                 <div>
                   <div class="d-flex justify-content-between">
                     <h6 class="mb-0">{{ review.packageName }}</h6>

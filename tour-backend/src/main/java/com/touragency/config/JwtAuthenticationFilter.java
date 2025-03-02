@@ -1,5 +1,6 @@
 package com.touragency.config;
 
+import com.touragency.model.Role;
 import com.touragency.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -7,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -14,6 +16,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -45,14 +49,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 // Validate the token
                 if (jwtService.validateToken(jwt)) {
-                    // Create authentication token
+                    // Extract role from token
+                    String roleStr = jwtService.extractRole(jwt);
+                    Role role = (roleStr != null) ? Role.valueOf(roleStr) : Role.USER;
+                    
+                    // Create authorities based on role
+                    List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+                    
+                    // Create authentication token with authorities
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userId, null, new ArrayList<>());
+                            userId, null, authorities);
                     
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                     
-                    System.out.println("User authenticated: " + userId);
+                    System.out.println("User authenticated: " + userId + " with role: " + role);
                 } else {
                     System.out.println("Invalid JWT token");
                 }

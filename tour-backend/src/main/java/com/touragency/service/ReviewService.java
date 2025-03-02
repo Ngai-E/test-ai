@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.OptionalDouble;
 
 @Service
 public class ReviewService {
@@ -71,5 +72,41 @@ public class ReviewService {
         // Update package average rating
         tourPackage.updateAverageRating();
         packageRepository.save(tourPackage);
+    }
+    
+    // Admin-specific methods
+    
+    public List<Review> getAllReviews() {
+        return reviewRepository.findAll();
+    }
+    
+    @Transactional
+    public void adminDeleteReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
+        
+        Package tourPackage = review.getTourPackage();
+        reviewRepository.delete(review);
+        
+        // Update package average rating
+        tourPackage.updateAverageRating();
+        packageRepository.save(tourPackage);
+    }
+    
+    public long getTotalReviewCount() {
+        return reviewRepository.count();
+    }
+    
+    public double getAverageRating() {
+        List<Review> allReviews = reviewRepository.findAll();
+        if (allReviews.isEmpty()) {
+            return 0.0;
+        }
+        
+        OptionalDouble average = allReviews.stream()
+                .mapToDouble(Review::getRating)
+                .average();
+        
+        return average.orElse(0.0);
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -144,6 +145,67 @@ public class UserService {
         return createUserResponse(updatedUser);
     }
     
+    // Admin-specific methods
+    
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+    
+    public User getUserDetails(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+    
+    public UserResponse adminUpdateUser(Long userId, User userUpdate) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        // Update user fields if provided
+        if (userUpdate.getFullName() != null) {
+            user.setFullName(userUpdate.getFullName());
+        }
+        
+        if (userUpdate.getEmail() != null) {
+            user.setEmail(userUpdate.getEmail());
+        }
+        
+        if (userUpdate.getPhoneNumber() != null) {
+            user.setPhoneNumber(userUpdate.getPhoneNumber());
+        }
+        
+        if (userUpdate.getCoinBalance() != null) {
+            user.setCoinBalance(userUpdate.getCoinBalance());
+        }
+        
+        if (userUpdate.getRole() != null) {
+            user.setRole(userUpdate.getRole());
+        }
+        
+        // Update password if provided and not empty
+        if (userUpdate.getPassword() != null && !userUpdate.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(userUpdate.getPassword()));
+        }
+        
+        User updatedUser = userRepository.save(user);
+        return createUserResponse(updatedUser);
+    }
+    
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found");
+        }
+        userRepository.deleteById(userId);
+    }
+    
+    public long getTotalUserCount() {
+        return userRepository.count();
+    }
+    
+    public long getNewUsersThisMonth() {
+        LocalDateTime startOfMonth = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        return userRepository.countByCreatedAtAfter(startOfMonth);
+    }
+    
     private UserResponse createUserResponse(User user) {
         UserResponse response = new UserResponse();
         response.setId(user.getId());
@@ -152,6 +214,7 @@ public class UserService {
         response.setEmail(user.getEmail());
         response.setCoinBalance(user.getCoinBalance());
         response.setReferralCode(user.getReferralCode());
+        response.setRole(user.getRole());
         
         // Generate JWT token
         String token = jwtService.generateToken(user.getId().toString());
