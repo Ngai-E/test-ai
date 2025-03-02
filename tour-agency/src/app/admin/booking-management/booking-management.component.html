@@ -1,0 +1,196 @@
+<div class="booking-management-container">
+  <div class="header">
+    <h1>Booking Management</h1>
+    <button class="btn btn-outline-primary" (click)="refreshBookings()">
+      <i class="bi bi-arrow-clockwise"></i> Refresh
+    </button>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading bookings...</p>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    Error loading bookings. Please try again later.
+  </div>
+
+  <div *ngIf="!loading && !error" class="content">
+    <!-- Filters -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="searchFilter">Search</label>
+              <input type="text" id="searchFilter" class="form-control" placeholder="Search by ID, user, or package" [(ngModel)]="filters.search" (keyup.enter)="applyFilters()">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="packageFilter">Package</label>
+              <select id="packageFilter" class="form-select" [(ngModel)]="filters.packageId" (change)="applyFilters()">
+                <option value="">All Packages</option>
+                <option *ngFor="let package of packages" [value]="package.id">{{ package.name }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="statusFilter">Booking Status</label>
+              <select id="statusFilter" class="form-select" [(ngModel)]="filters.bookingStatus" (change)="applyFilters()">
+                <option value="">All Status</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Pending">Pending</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="paymentStatusFilter">Payment Status</label>
+              <select id="paymentStatusFilter" class="form-select" [(ngModel)]="filters.paymentStatus" (change)="applyFilters()">
+                <option value="">All Payment Status</option>
+                <option value="Paid">Paid</option>
+                <option value="Pending">Pending</option>
+                <option value="Refunded">Refunded</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Package</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let booking of filteredBookings">
+                <td>{{ booking.id }}</td>
+                <td>
+                  <div>{{ booking.userName }}</div>
+                  <small class="text-muted">{{ booking.userEmail }}</small>
+                </td>
+                <td>{{ booking.packageName }}</td>
+                <td>{{ booking.date | date:'mediumDate' }}</td>
+                <td>${{ booking.amount | number:'1.2-2' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getStatusClass(booking.status)">
+                    {{ booking.status }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="getPaymentStatusClass(booking.paymentStatus)">
+                    {{ booking.paymentStatus }}
+                  </span>
+                </td>
+                <td>
+                  <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                      Actions
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <li><a class="dropdown-item" (click)="viewBookingDetails(booking)">View Details</a></li>
+                      <li><a class="dropdown-item" (click)="updateBookingStatus(booking, 'Confirmed')" *ngIf="booking.status !== 'Confirmed'">Mark as Confirmed</a></li>
+                      <li><a class="dropdown-item" (click)="updateBookingStatus(booking, 'Pending')" *ngIf="booking.status !== 'Pending'">Mark as Pending</a></li>
+                      <li><a class="dropdown-item" (click)="updateBookingStatus(booking, 'Cancelled')" *ngIf="booking.status !== 'Cancelled'">Mark as Cancelled</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" (click)="confirmDelete(booking)">Delete</a></li>
+                    </ul>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Details Modal -->
+<ng-template #bookingDetailsModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Booking Details</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body" *ngIf="selectedBooking">
+    <div class="row">
+      <div class="col-md-6">
+        <h5>User Information</h5>
+        <p><strong>Name:</strong> {{ selectedBooking.userName }}</p>
+        <p><strong>Email:</strong> {{ selectedBooking.userEmail }}</p>
+      </div>
+      <div class="col-md-6">
+        <h5>Package Information</h5>
+        <p><strong>Package:</strong> {{ selectedBooking.packageName }}</p>
+        <p><strong>Date:</strong> {{ selectedBooking.date | date:'mediumDate' }}</p>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-md-6">
+        <h5>Status</h5>
+        <p><strong>Booking Status:</strong> 
+          <span class="badge" [ngClass]="getStatusClass(selectedBooking.status)">
+            {{ selectedBooking.status }}
+          </span>
+        </p>
+        <p><strong>Payment Status:</strong> 
+          <span class="badge" [ngClass]="getPaymentStatusClass(selectedBooking.paymentStatus)">
+            {{ selectedBooking.paymentStatus }}
+          </span>
+        </p>
+      </div>
+      <div class="col-md-6">
+        <h5>Booking Details</h5>
+        <p><strong>Adults:</strong> {{ selectedBooking.adults }}</p>
+        <p><strong>Children:</strong> {{ selectedBooking.children }}</p>
+        <p><strong>Total Amount:</strong> ${{ selectedBooking.amount | number:'1.2-2' }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+    <div class="btn-group" *ngIf="selectedBooking">
+      <button type="button" class="btn btn-success" (click)="updateBookingStatus(selectedBooking, 'Confirmed'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Confirmed'">Mark as Confirmed</button>
+      <button type="button" class="btn btn-warning" (click)="updateBookingStatus(selectedBooking, 'Pending'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Pending'">Mark as Pending</button>
+      <button type="button" class="btn btn-danger" (click)="updateBookingStatus(selectedBooking, 'Cancelled'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Cancelled'">Mark as Cancelled</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #deleteModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Confirm Delete</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body" *ngIf="bookingToDelete">
+    <p>Are you sure you want to delete booking #{{ bookingToDelete.id }} for {{ bookingToDelete.packageName }} by {{ bookingToDelete.userName }}?</p>
+    <p class="text-danger">This action cannot be undone.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-danger" (click)="deleteBooking()">Delete</button>
+  </div>
+</ng-template>

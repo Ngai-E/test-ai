@@ -1,0 +1,56 @@
+// Table styles
+.table {
+  th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+  }
+  
+  td {
+    vertical-align: middle;
+  }
+}
+
+// Badge styles
+.badge {
+  font-size: 0.85rem;
+  padding: 0.35em 0.65em;
+}
+
+// Button group styles
+.btn-group {
+  .btn {
+    padding: 0.25rem 0.5rem;
+    
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Modal styles
+.modal-body {
+  p {
+    margin-bottom: 0.75rem;
+  }
+  
+  .badge {
+    font-size: 0.9rem;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.9rem;
+  }
+  
+  .btn-group {
+    .btn {
+      padding: 0.2rem 0.4rem;
+      
+      i {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

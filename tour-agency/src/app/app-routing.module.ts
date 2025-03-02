@@ -4,7 +4,6 @@ import { HomeComponent } from './components/home/home.component';
 import { PackagesComponent } from './components/packages/packages.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { PackageDetailsComponent } from './components/package-details/package-details.component';
-import { PackageManagementComponent } from './components/admin/package-management/package-management.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
 import { WishlistComponent } from './components/wishlist/wishlist.component';
@@ -21,7 +20,6 @@ const routes: Routes = [
   { path: 'packages', component: PackagesComponent },
   { path: 'contact', component: ContactComponent },
   { path: 'packages/:id', component: PackageDetailsComponent },
-  { path: 'admin/packages', component: PackageManagementComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'wishlist', component: WishlistComponent, canActivate: [AuthGuard] },
@@ -31,6 +29,10 @@ const routes: Routes = [
   { path: 'booking-confirmation/:id', component: BookingConfirmationComponent, canActivate: [AuthGuard] },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'auth-test', component: AuthTestComponent },
+  { 
+    path: 'admin', 
+    loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule)
+  },
   { path: '**', redirectTo: '' }
 ];
 

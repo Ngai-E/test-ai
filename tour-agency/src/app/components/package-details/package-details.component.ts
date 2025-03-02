@@ -949,6 +949,9 @@ export class PackageDetailsComponent implements OnInit, OnDestroy {
       next: () => {
         this.toastService.showSuccess('Review submitted successfully');
         this.hasUserReviewed = true;
+        
+        // Close the modal
+        this.modalService.dismissAll();
 
         // Reload package to get updated reviews
         this.loadPackageDetails(this.package.id);

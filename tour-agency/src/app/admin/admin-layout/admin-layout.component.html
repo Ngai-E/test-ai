@@ -1,0 +1,70 @@
+<div class="admin-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="brand-container">
+      <h3 class="brand-name">NEA Travels</h3>
+      <p class="brand-subtitle">Admin Portal</p>
+    </div>
+    
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/admin/dashboard']" routerLinkActive="active">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/admin/packages']" routerLinkActive="active">
+          <i class="fas fa-suitcase"></i> Packages
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/admin/bookings']" routerLinkActive="active">
+          <i class="fas fa-calendar-check"></i> Bookings
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/admin/reviews']" routerLinkActive="active">
+          <i class="fas fa-star"></i> Reviews
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" [routerLink]="['/admin/users']" routerLinkActive="active">
+          <i class="fas fa-users"></i> Users
+        </a>
+      </li>
+      <li class="nav-item mt-4">
+        <a class="nav-link" [routerLink]="['/']">
+          <i class="fas fa-arrow-left"></i> Back to Site
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="page-title">Admin Portal</h1>
+        <div class="user-menu">
+          <div class="dropdown">
+            <button class="btn dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-user-circle"></i> Admin
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Profile</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-cog"></i> Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" (click)="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

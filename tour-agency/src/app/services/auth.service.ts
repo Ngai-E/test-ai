@@ -201,6 +201,25 @@ export class AuthService {
   }
 
   /**
+   * Check if the current user has admin role
+   * @returns boolean indicating if user is an admin
+   */
+  isAdmin(): boolean {
+    const currentUser = this.currentUserValue;
+    // In a real application, you would check the user's role from the token or user object
+    // For now, we'll simulate this with a simple check
+    if (!currentUser) {
+      return false;
+    }
+    
+    // Check if user has admin role - this would be based on your actual user model
+    // For example: return currentUser.role === 'admin';
+    
+    // For development purposes, we'll return true to allow access to admin pages
+    return true;
+  }
+
+  /**
    * Get user's referral information
    */
   getReferralInfo(): Observable<{ referralCode: string, referralCount: number, coinsEarned: number }> {

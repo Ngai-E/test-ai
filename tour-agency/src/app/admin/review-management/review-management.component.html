@@ -1,0 +1,207 @@
+<div class="review-management-container">
+  <div class="header">
+    <h1>Review Management</h1>
+    <button class="btn btn-outline-primary" (click)="refreshReviews()">
+      <i class="bi bi-arrow-clockwise"></i> Refresh
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading reviews...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill"></i> 
+    Error loading reviews. Please try refreshing the page.
+  </div>
+
+  <div *ngIf="!loading && !error" class="content">
+    <!-- Filters -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="searchFilter">Search</label>
+              <input type="text" id="searchFilter" class="form-control" placeholder="Search reviews..." 
+                [(ngModel)]="filters.search" (input)="applyFilters()">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="packageFilter">Package</label>
+              <select id="packageFilter" class="form-select" [(ngModel)]="filters.packageId" (change)="applyFilters()">
+                <option value="">All Packages</option>
+                <option *ngFor="let package of packages" [value]="package.id">{{ package.name }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="ratingFilter">Rating</label>
+              <select id="ratingFilter" class="form-select" [(ngModel)]="filters.rating" (change)="applyFilters()">
+                <option value="">All Ratings</option>
+                <option value="5">5 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="2">2 Stars</option>
+                <option value="1">1 Star</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="statusFilter">Status</label>
+              <select id="statusFilter" class="form-select" [(ngModel)]="filters.status" (change)="applyFilters()">
+                <option value="">All Status</option>
+                <option value="Approved">Approved</option>
+                <option value="Pending">Pending</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Table -->
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Package</th>
+                <th>Rating</th>
+                <th>Comment</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let review of filteredReviews">
+                <td>#{{ review.id }}</td>
+                <td>{{ review.userName }}</td>
+                <td>{{ review.packageName }}</td>
+                <td>
+                  <div class="rating">
+                    <i *ngFor="let star of [1,2,3,4,5]" class="bi" 
+                      [ngClass]="star <= review.rating ? 'bi-star-fill text-warning' : 'bi-star'"></i>
+                  </div>
+                </td>
+                <td>
+                  <div class="review-comment">
+                    {{ review.comment.length > 50 ? (review.comment | slice:0:50) + '...' : review.comment }}
+                  </div>
+                </td>
+                <td>{{ review.date | date:'mediumDate' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getStatusClass(review.status)">
+                    {{ review.status }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-sm btn-outline-primary me-1" (click)="viewReviewDetails(review)">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-success me-1" *ngIf="review.status !== 'Approved'" (click)="approveReview(review)">
+                      <i class="bi bi-check-lg"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger me-1" *ngIf="review.status !== 'Rejected'" (click)="rejectReview(review)">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(review)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="filteredReviews.length === 0">
+                <td colspan="8" class="text-center py-4">
+                  <p class="mb-0">No reviews found matching your filters.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Review Details Modal -->
+<ng-template #reviewDetailsModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Review Details</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body" *ngIf="selectedReview">
+    <div class="review-details">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <h5>Review Information</h5>
+          <p><strong>Review ID:</strong> #{{ selectedReview.id }}</p>
+          <p><strong>Date:</strong> {{ selectedReview.date | date:'medium' }}</p>
+          <p>
+            <strong>Rating:</strong> 
+            <span class="rating">
+              <i *ngFor="let star of [1,2,3,4,5]" class="bi" 
+                [ngClass]="star <= selectedReview.rating ? 'bi-star-fill text-warning' : 'bi-star'"></i>
+            </span>
+          </p>
+          <p><strong>Status:</strong> <span class="badge" [ngClass]="getStatusClass(selectedReview.status)">{{ selectedReview.status }}</span></p>
+        </div>
+        <div class="col-md-6">
+          <h5>User Information</h5>
+          <p><strong>Name:</strong> {{ selectedReview.userName }}</p>
+          <p><strong>User ID:</strong> {{ selectedReview.userId }}</p>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-12">
+          <h5>Package Information</h5>
+          <p><strong>Package:</strong> {{ selectedReview.packageName }}</p>
+          <p><strong>Package ID:</strong> {{ selectedReview.packageId }}</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <h5>Review Comment</h5>
+          <div class="review-comment-full p-3 border rounded">
+            {{ selectedReview.comment }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+    <div class="btn-group" *ngIf="selectedReview">
+      <button type="button" class="btn btn-success" (click)="approveReview(selectedReview); modal.dismiss()" *ngIf="selectedReview.status !== 'Approved'">Approve</button>
+      <button type="button" class="btn btn-danger" (click)="rejectReview(selectedReview); modal.dismiss()" *ngIf="selectedReview.status !== 'Rejected'">Reject</button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #deleteModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Confirm Delete</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to delete review <strong>#{{ reviewToDelete?.id }}</strong>?</p>
+    <p class="text-danger">This action cannot be undone.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-danger" (click)="deleteReview()">Delete</button>
+  </div>
+</ng-template>

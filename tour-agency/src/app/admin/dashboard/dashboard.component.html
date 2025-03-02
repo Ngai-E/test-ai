@@ -1,0 +1,162 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <button class="btn btn-outline-primary" (click)="refresh()">
+      <i class="bi bi-arrow-clockwise"></i> Refresh
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading dashboard data...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill"></i> 
+    Error loading dashboard data. Please try refreshing the page.
+  </div>
+
+  <div *ngIf="!loading && !error && stats" class="dashboard-content">
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card metric-card">
+          <div class="card-body">
+            <h5 class="card-title">Total Bookings</h5>
+            <p class="metric-value">{{ stats.totalBookings }}</p>
+            <p class="metric-icon"><i class="bi bi-calendar-check"></i></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card metric-card">
+          <div class="card-body">
+            <h5 class="card-title">Total Users</h5>
+            <p class="metric-value">{{ stats.totalUsers }}</p>
+            <p class="metric-icon"><i class="bi bi-people"></i></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card metric-card">
+          <div class="card-body">
+            <h5 class="card-title">Total Packages</h5>
+            <p class="metric-value">{{ stats.totalPackages }}</p>
+            <p class="metric-icon"><i class="bi bi-box"></i></p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card metric-card">
+          <div class="card-body">
+            <h5 class="card-title">Total Revenue</h5>
+            <p class="metric-value">${{ stats.totalRevenue | number }}</p>
+            <p class="metric-icon"><i class="bi bi-cash"></i></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Monthly Revenue</h5>
+          </div>
+          <div class="card-body">
+          <canvas baseChart
+            [datasets]="revenueChartData"
+            [labels]="revenueChartLabels"
+            [options]="revenueChartOptions"
+            [legend]="true"
+            chartType="line">
+          </canvas>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Popular Packages and Recent Activities -->
+    <div class="row">
+      <!-- Popular Packages -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Popular Packages</h5>
+          </div>
+          <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item" *ngFor="let pkg of stats.popularPackages">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="mb-0">{{ pkg.name }}</h6>
+                    <small class="text-muted">{{ pkg.destination }}</small>
+                  </div>
+                  <span class="badge bg-primary rounded-pill">{{ pkg.bookings }} bookings</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Bookings -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Recent Bookings</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Package</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let booking of stats.recentBookings">
+                    <td>#{{ booking.id }}</td>
+                    <td>{{ booking.customerName }}</td>
+                    <td>{{ booking.packageName }}</td>
+                    <td><span [class]="getStatusClass(booking.status)">{{ booking.status }}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Reviews -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Recent Reviews</h5>
+          </div>
+          <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item" *ngFor="let review of stats.recentReviews">
+                <div>
+                  <div class="d-flex justify-content-between">
+                    <h6 class="mb-0">{{ review.packageName }}</h6>
+                    <small class="text-muted">{{ review.date | date:'shortDate' }}</small>
+                  </div>
+                  <p class="mb-1 text-warning">{{ getRatingStars(review.rating) }}</p>
+                  <p class="mb-1 review-comment">{{ review.comment }}</p>
+                  <small class="text-muted">By {{ review.userName }}</small>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

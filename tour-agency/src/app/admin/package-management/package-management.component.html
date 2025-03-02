@@ -1,0 +1,230 @@
+<div class="package-management-container">
+  <div class="header">
+    <h1>Package Management</h1>
+    <button class="btn btn-primary" (click)="openPackageModal()">
+      <i class="bi bi-plus-circle"></i> Add New Package
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-center p-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading packages...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill"></i> 
+    Error loading packages. Please try refreshing the page.
+  </div>
+
+  <div *ngIf="!loading && !error" class="content">
+    <!-- Filters -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="searchFilter">Search</label>
+              <input type="text" id="searchFilter" class="form-control" placeholder="Search packages..." 
+                [(ngModel)]="filters.search" (input)="applyFilters()">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="destinationFilter">Destination</label>
+              <select id="destinationFilter" class="form-select" [(ngModel)]="filters.destination" (change)="applyFilters()">
+                <option value="">All Destinations</option>
+                <option *ngFor="let destination of destinations" [value]="destination">{{ destination }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="statusFilter">Status</label>
+              <select id="statusFilter" class="form-select" [(ngModel)]="filters.status" (change)="applyFilters()">
+                <option value="">All Status</option>
+                <option value="true">Available</option>
+                <option value="false">Unavailable</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="featuredFilter">Featured</label>
+              <select id="featuredFilter" class="form-select" [(ngModel)]="filters.featured" (change)="applyFilters()">
+                <option value="">All Packages</option>
+                <option value="true">Featured Only</option>
+                <option value="false">Non-Featured Only</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Packages Table -->
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Destination</th>
+                <th>Duration</th>
+                <th>Price</th>
+                <th>Featured</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let package of filteredPackages">
+                <td>{{ package.id }}</td>
+                <td>
+                  <img *ngIf="package.imageUrl" [src]="package.imageUrl" alt="{{ package.name }}" class="package-thumbnail">
+                  <div *ngIf="!package.imageUrl" class="no-image">No Image</div>
+                </td>
+                <td>{{ package.name }}</td>
+                <td>{{ package.destination }}</td>
+                <td>{{ package.duration }} days</td>
+                <td>${{ package.price | number:'1.2-2' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="package.featured ? 'bg-success' : 'bg-secondary'">
+                    {{ package.featured ? 'Yes' : 'No' }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge" [ngClass]="package.available ? 'bg-success' : 'bg-danger'">
+                    {{ package.available ? 'Available' : 'Unavailable' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" (click)="openPackageModal(package)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(package)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="filteredPackages.length === 0">
+                <td colspan="9" class="text-center py-4">
+                  <p class="mb-0">No packages found matching your filters.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Package Modal -->
+<ng-template #packageModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">{{ editMode ? 'Edit Package' : 'Add New Package' }}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="packageForm">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="name" class="form-label">Package Name*</label>
+          <input type="text" class="form-control" id="name" formControlName="name">
+          <div *ngIf="packageForm.get('name')?.invalid && packageForm.get('name')?.touched" class="text-danger">
+            Package name is required
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="destination" class="form-label">Destination*</label>
+          <input type="text" class="form-control" id="destination" formControlName="destination">
+          <div *ngIf="packageForm.get('destination')?.invalid && packageForm.get('destination')?.touched" class="text-danger">
+            Destination is required
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="duration" class="form-label">Duration (days)*</label>
+          <input type="number" class="form-control" id="duration" formControlName="duration" min="1">
+          <div *ngIf="packageForm.get('duration')?.invalid && packageForm.get('duration')?.touched" class="text-danger">
+            Valid duration is required
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="price" class="form-label">Price ($)*</label>
+          <input type="number" class="form-control" id="price" formControlName="price" min="0">
+          <div *ngIf="packageForm.get('price')?.invalid && packageForm.get('price')?.touched" class="text-danger">
+            Valid price is required
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <label for="description" class="form-label">Description*</label>
+          <textarea class="form-control" id="description" formControlName="description" rows="3"></textarea>
+          <div *ngIf="packageForm.get('description')?.invalid && packageForm.get('description')?.touched" class="text-danger">
+            Description is required
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 mb-3">
+          <label for="imageUrl" class="form-label">Image URL</label>
+          <input type="text" class="form-control" id="imageUrl" formControlName="imageUrl">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="featured" formControlName="featured">
+            <label class="form-check-label" for="featured">
+              Featured Package
+            </label>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="available" formControlName="available">
+            <label class="form-check-label" for="available">
+              Available for Booking
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" [disabled]="packageForm.invalid" (click)="savePackage()">
+      {{ editMode ? 'Update' : 'Create' }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #deleteModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Confirm Delete</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to delete the package <strong>{{ packageToDelete?.name }}</strong>?</p>
+    <p class="text-danger">This action cannot be undone.</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-danger" (click)="deletePackage()">Delete</button>
+  </div>
+</ng-template>
