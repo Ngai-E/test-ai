@@ -85,13 +85,14 @@
               <tr *ngFor="let package of filteredPackages">
                 <td>{{ package.id }}</td>
                 <td>
-                  <img *ngIf="package.imageUrl" [src]="package.imageUrl" alt="{{ package.name }}" class="package-thumbnail">
-                  <div *ngIf="!package.imageUrl" class="no-image">No Image</div>
+                  <img *ngIf="package.image" [src]="package.image" alt="{{ package.name }}" class="package-thumbnail">
+                  <img *ngIf="!package.image && package.imageUrl" [src]="package.imageUrl" alt="{{ package.name }}" class="package-thumbnail">
+                  <div *ngIf="!package.image && !package.imageUrl" class="no-image">No Image</div>
                 </td>
                 <td>{{ package.name }}</td>
-                <td>{{ package.destination }}</td>
+                <td>{{ package.country || package.destination }}</td>
                 <td>{{ package.duration }} days</td>
-                <td>${{ package.price | number:'1.2-2' }}</td>
+                <td>${{ package.basePrice || package.price | number:'1.2-2' }}</td>
                 <td>
                   <span class="badge" [ngClass]="package.featured ? 'bg-success' : 'bg-secondary'">
                     {{ package.featured ? 'Yes' : 'No' }}
@@ -175,21 +176,46 @@
       </div>
 
       <div class="row">
-        <div class="col-md-12 mb-3">
-          <label for="description" class="form-label">Description*</label>
-          <textarea class="form-control" id="description" formControlName="description" rows="3"></textarea>
-          <div *ngIf="packageForm.get('description')?.invalid && packageForm.get('description')?.touched" class="text-danger">
-            Description is required
+        <div class="col-md-6 mb-3">
+          <label for="basePrice" class="form-label">Base Price ($)</label>
+          <input type="number" class="form-control" id="basePrice" formControlName="basePrice" min="0">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="destination" class="form-label">Destination*</label>
+          <input type="text" class="form-control" id="destination" formControlName="destination">
+          <div *ngIf="packageForm.get('destination')?.invalid && packageForm.get('destination')?.touched" class="text-danger">
+            Destination is required
           </div>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-md-12 mb-3">
+        <div class="col-md-6 mb-3">
+          <label for="country" class="form-label">Country</label>
+          <input type="text" class="form-control" id="country" formControlName="country">
+        </div>
+        <div class="col-md-6 mb-3">
           <label for="imageUrl" class="form-label">Image URL</label>
           <input type="text" class="form-control" id="imageUrl" formControlName="imageUrl">
           <div *ngIf="packageForm.get('imageUrl')?.value" class="mt-2">
             <img [src]="packageForm.get('imageUrl')?.value" alt="Package image preview" class="img-thumbnail" style="max-height: 100px;">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="image" class="form-label">Alternative Image URL</label>
+          <input type="text" class="form-control" id="image" formControlName="image">
+          <div *ngIf="packageForm.get('image')?.value" class="mt-2">
+            <img [src]="packageForm.get('image')?.value" alt="Package image preview" class="img-thumbnail" style="max-height: 100px;">
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="description" class="form-label">Description*</label>
+          <textarea class="form-control" id="description" formControlName="description" rows="3"></textarea>
+          <div *ngIf="packageForm.get('description')?.invalid && packageForm.get('description')?.touched" class="text-danger">
+            Description is required
           </div>
         </div>
       </div>

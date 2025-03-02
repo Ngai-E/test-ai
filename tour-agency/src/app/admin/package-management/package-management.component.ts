@@ -7,11 +7,14 @@ import { ToastService } from '../../services/toast.service';
 interface Package {
   id: number;
   name: string;
-  destination: string;
+  destination?: string;
+  country?: string;
   duration: number;
-  price: number;
+  price?: number;
+  basePrice?: number;
   description: string;
   imageUrl?: string;
+  image?: string;
   highlights?: string;
   inclusions?: string;
   exclusions?: string;
@@ -72,10 +75,13 @@ export class PackageManagementComponent implements OnInit {
       id: [null],
       name: ['', [Validators.required, Validators.minLength(3)]],
       destination: ['', Validators.required],
+      country: [''],
       duration: ['', [Validators.required, Validators.min(1)]],
       price: ['', [Validators.required, Validators.min(1)]],
+      basePrice: [''],
       description: ['', Validators.required],
       imageUrl: [''],
+      image: [''],
       highlights: [''],
       inclusions: [''],
       exclusions: [''],
@@ -90,14 +96,32 @@ export class PackageManagementComponent implements OnInit {
     this.loading = true;
     this.adminService.getPackages().subscribe(
       (data) => {
-        this.packages = data;
+        // Normalize package data to ensure all fields are present
+        this.packages = data.map(pkg => ({
+          ...pkg,
+          // Ensure both field naming conventions are present
+          price: pkg.price || pkg.basePrice || 0,
+          basePrice: pkg.basePrice || pkg.price || 0,
+          destination: pkg.destination || pkg.country || '',
+          country: pkg.country || pkg.destination || '',
+          image: pkg.image || pkg.imageUrl || '',
+          imageUrl: pkg.imageUrl || pkg.image || '',
+          // Ensure other fields have default values
+          highlights: pkg.highlights || '',
+          inclusions: pkg.inclusions || '',
+          exclusions: pkg.exclusions || '',
+          bestTimeToVisit: pkg.bestTimeToVisit || '',
+          groupSize: pkg.groupSize || '',
+          featured: !!pkg.featured,
+          available: pkg.available !== false
+        }));
         this.filteredPackages = [...this.packages];
         this.extractDestinations();
         this.loading = false;
       },
       (error) => {
         console.error('Error loading packages:', error);
-        this.error = true;
+        this.toastService.showError('Failed to load packages');
         this.loading = false;
       }
     );
@@ -119,7 +143,7 @@ export class PackageManagementComponent implements OnInit {
       // Search filter (case insensitive)
       const searchMatch = !this.filters.search || 
         pkg.name.toLowerCase().includes(this.filters.search.toLowerCase()) ||
-        pkg.destination.toLowerCase().includes(this.filters.search.toLowerCase()) ||
+        pkg.destination?.toLowerCase().includes(this.filters.search.toLowerCase()) ||
         pkg.description?.toLowerCase().includes(this.filters.search.toLowerCase());
       
       // Destination filter
@@ -146,11 +170,14 @@ export class PackageManagementComponent implements OnInit {
       this.packageForm.patchValue({
         id: pkg.id,
         name: pkg.name,
-        destination: pkg.destination,
+        destination: pkg.destination || '',
+        country: pkg.country || '',
         duration: pkg.duration,
-        price: pkg.price,
+        price: pkg.price || 0,
+        basePrice: pkg.basePrice || 0,
         description: pkg.description,
         imageUrl: pkg.imageUrl || '',
+        image: pkg.image || '',
         highlights: pkg.highlights || '',
         inclusions: pkg.inclusions || '',
         exclusions: pkg.exclusions || '',
@@ -165,7 +192,8 @@ export class PackageManagementComponent implements OnInit {
         featured: false,
         available: true,
         duration: 1,
-        price: 0
+        price: 0,
+        basePrice: 0
       });
     }
     
@@ -182,7 +210,27 @@ export class PackageManagementComponent implements OnInit {
       return;
     }
     
-    const packageData = this.packageForm.value;
+    const formData = this.packageForm.value;
+    
+    // Create a new object with both old and new field names for compatibility
+    const packageData = {
+      ...formData,
+      // Ensure both field naming conventions are present
+      price: formData.price || 0,
+      basePrice: formData.basePrice || formData.price || 0,
+      destination: formData.destination || '',
+      country: formData.country || formData.destination || '',
+      image: formData.image || '',
+      imageUrl: formData.imageUrl || formData.image || '',
+      // Include all other fields
+      highlights: formData.highlights || '',
+      inclusions: formData.inclusions || '',
+      exclusions: formData.exclusions || '',
+      bestTimeToVisit: formData.bestTimeToVisit || '',
+      groupSize: formData.groupSize || '',
+      featured: !!formData.featured,
+      available: formData.available !== false
+    };
     
     if (this.editMode) {
       // Update existing package

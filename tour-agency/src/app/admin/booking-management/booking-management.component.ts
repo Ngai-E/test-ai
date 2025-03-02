@@ -236,7 +236,7 @@ export class BookingManagementComponent implements OnInit {
     if (!this.editingBooking) return;
     
     // Convert date string to appropriate format for date input (YYYY-MM-DD)
-    let travelDate = this.editingBooking.travelDate;
+    let travelDate = this.editingBooking.travelDate || this.editingBooking.startDate;
     if (travelDate && typeof travelDate === 'string') {
       // Handle different date formats
       const dateObj = new Date(travelDate);
@@ -250,11 +250,11 @@ export class BookingManagementComponent implements OnInit {
       customerEmail: [this.editingBooking.userEmail || '', [Validators.required, Validators.email]],
       customerPhone: [this.editingBooking.userPhone || ''],
       travelDate: [travelDate || '', Validators.required],
-      numberOfAdults: [this.editingBooking.numberOfAdults || 1, [Validators.required, Validators.min(1)]],
-      numberOfChildren: [this.editingBooking.numberOfChildren || 0, [Validators.required, Validators.min(0)]],
-      status: [this.editingBooking.status || 'Pending', Validators.required],
+      numberOfAdults: [this.editingBooking.numberOfAdults || this.editingBooking.adults || 1, [Validators.required, Validators.min(1)]],
+      numberOfChildren: [this.editingBooking.numberOfChildren || this.editingBooking.children || 0, [Validators.required, Validators.min(0)]],
+      status: [this.editingBooking.status || this.editingBooking.bookingStatus || 'Pending', Validators.required],
       paymentStatus: [this.editingBooking.paymentStatus || 'Pending', Validators.required],
-      amount: [this.editingBooking.amount || 0, [Validators.required, Validators.min(0)]],
+      amount: [this.editingBooking.amount || this.editingBooking.totalPrice || 0, [Validators.required, Validators.min(0)]],
       notes: [this.editingBooking.notes || '']
     });
   }
@@ -273,12 +273,17 @@ export class BookingManagementComponent implements OnInit {
       userName: formValues.customerName,
       userEmail: formValues.customerEmail,
       userPhone: formValues.customerPhone,
+      startDate: formValues.travelDate,
       travelDate: formValues.travelDate,
+      adults: formValues.numberOfAdults,
       numberOfAdults: formValues.numberOfAdults,
+      children: formValues.numberOfChildren,
       numberOfChildren: formValues.numberOfChildren,
       status: formValues.status,
+      bookingStatus: formValues.status,
       paymentStatus: formValues.paymentStatus,
       amount: formValues.amount,
+      totalPrice: formValues.amount,
       notes: formValues.notes
     };
 
@@ -290,6 +295,12 @@ export class BookingManagementComponent implements OnInit {
         if (index !== -1) {
           // Merge the updated fields with the existing booking
           this.bookings[index] = { ...this.bookings[index], ...updatedBooking };
+          
+          // If the selected booking is the one being edited, update it too
+          if (this.selectedBooking && this.selectedBooking.id === updatedBooking.id) {
+            this.selectedBooking = { ...this.selectedBooking, ...updatedBooking };
+          }
+          
           this.applyFilters(); // Refresh the filtered list
         }
         

@@ -50,7 +50,9 @@ export interface AdminBooking {
   numberOfAdults?: number;
   numberOfChildren?: number;
   amount: number;
+  totalPrice?: number;
   status: string;
+  bookingStatus?: string;
   paymentStatus: string;
   bookingReference?: string;
   createdAt?: string;
@@ -277,7 +279,9 @@ export class AdminService {
       numberOfAdults: booking.numberOfAdults,
       numberOfChildren: booking.numberOfChildren,
       amount: amount,
+      totalPrice: booking.totalPrice,
       status: booking.bookingStatus || booking.status,
+      bookingStatus: booking.bookingStatus,
       paymentStatus: booking.paymentStatus,
       bookingReference: booking.bookingReference || `BK-${booking.id}`,
       createdAt: booking.createdAt,
@@ -311,7 +315,9 @@ export class AdminService {
         numberOfAdults: 2,
         numberOfChildren: 1,
         amount: 3499.99,
+        totalPrice: 3499.99,
         status: 'Pending',
+        bookingStatus: 'Pending',
         paymentStatus: 'Pending',
         bookingReference: 'BK-1001',
         createdAt: '2025-02-15T10:30:00',
@@ -349,7 +355,9 @@ export class AdminService {
         numberOfAdults: 1,
         numberOfChildren: 0,
         amount: 1699.99,
+        totalPrice: 1699.99,
         status: 'Pending',
+        bookingStatus: 'Pending',
         paymentStatus: 'Pending',
         bookingReference: 'BK-1002',
         createdAt: '2025-02-16T14:45:00'
