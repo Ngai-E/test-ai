@@ -284,10 +284,9 @@
       <div class="mb-4 text-center">
         <label class="form-label d-block">Your Rating</label>
         <div class="rating-input">
-          <i class="far" 
+          <i 
              *ngFor="let i of [1, 2, 3, 4, 5]"
-             [class.fa-star]="i <= selectedRating || i <= hoverRating"
-             [class.fa-star-o]="i > selectedRating && i > hoverRating"
+             [class]="i <= selectedRating ? 'fas fa-star' : (i <= hoverRating ? 'fas fa-star' : 'far fa-star')"
              (click)="setRating(i)"
              (mouseenter)="hoverRating = i"
              (mouseleave)="hoverRating = 0"></i>
