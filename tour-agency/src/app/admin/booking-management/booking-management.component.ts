@@ -185,4 +185,19 @@ export class BookingManagementComponent implements OnInit {
         return 'bg-secondary';
     }
   }
+
+  calculateAddonTotal(): number {
+    if (!this.selectedBooking || !this.selectedBooking.addons || this.selectedBooking.addons.length === 0) {
+      return 0;
+    }
+    
+    return this.selectedBooking.addons.reduce((total, addon) => {
+      return total + this.calculateAddonItemTotal(addon);
+    }, 0);
+  }
+  
+  calculateAddonItemTotal(addon: any): number {
+    const price = addon.priceAtBooking || (addon.addon ? addon.addon.price : 0) || 0;
+    return price * addon.quantity;
+  }
 }

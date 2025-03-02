@@ -83,7 +83,7 @@ export class BookingsComponent implements OnInit {
   }
 
   viewBookingDetails(bookingId: number): void {
-    this.router.navigate(['/user/booking-details', bookingId]);
+    this.router.navigate(['/bookings', bookingId]);
   }
 
   cancelBooking(bookingId: number, event: Event): void {

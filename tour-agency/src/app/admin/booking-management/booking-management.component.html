@@ -76,7 +76,7 @@
                 <th>ID</th>
                 <th>User</th>
                 <th>Package</th>
-                <th>Date</th>
+                <th>Start Date</th>
                 <th>Amount</th>
                 <th>Status</th>
                 <th>Payment</th>
@@ -91,7 +91,7 @@
                   <small class="text-muted">{{ booking.userEmail }}</small>
                 </td>
                 <td>{{ booking.packageName }}</td>
-                <td>{{ booking.date | date:'mediumDate' }}</td>
+                <td>{{ booking.startDate | date:'mediumDate' }}</td>
                 <td>${{ booking.amount | number:'1.2-2' }}</td>
                 <td>
                   <span class="badge" [ngClass]="getStatusClass(booking.status)">
@@ -104,18 +104,24 @@
                   </span>
                 </td>
                 <td>
-                  <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                      Actions
+                  <div class="action-buttons">
+                    <button class="btn btn-sm btn-outline-primary me-1" (click)="viewBookingDetails(booking)" title="View Details">
+                      <i class="bi bi-eye"></i>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                      <li><a class="dropdown-item" (click)="viewBookingDetails(booking)">View Details</a></li>
-                      <li><a class="dropdown-item" (click)="updateBookingStatus(booking, 'Confirmed')" *ngIf="booking.status !== 'Confirmed'">Mark as Confirmed</a></li>
-                      <li><a class="dropdown-item" (click)="updateBookingStatus(booking, 'Pending')" *ngIf="booking.status !== 'Pending'">Mark as Pending</a></li>
-                      <li><a class="dropdown-item" (click)="updateBookingStatus(booking, 'Cancelled')" *ngIf="booking.status !== 'Cancelled'">Mark as Cancelled</a></li>
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" (click)="confirmDelete(booking)">Delete</a></li>
-                    </ul>
+                    <div class="btn-group" role="group">
+                      <button class="btn btn-sm btn-outline-success" (click)="updateBookingStatus(booking, 'Confirmed')" *ngIf="booking.status !== 'Confirmed'" title="Mark as Confirmed">
+                        <i class="bi bi-check-circle"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-warning" (click)="updateBookingStatus(booking, 'Pending')" *ngIf="booking.status !== 'Pending'" title="Mark as Pending">
+                        <i class="bi bi-clock"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger" (click)="updateBookingStatus(booking, 'Cancelled')" *ngIf="booking.status !== 'Cancelled'" title="Mark as Cancelled">
+                        <i class="bi bi-x-circle"></i>
+                      </button>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger ms-1" (click)="confirmDelete(booking)" title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -139,11 +145,15 @@
         <h5>User Information</h5>
         <p><strong>Name:</strong> {{ selectedBooking.userName }}</p>
         <p><strong>Email:</strong> {{ selectedBooking.userEmail }}</p>
+        <p><strong>Booking Reference:</strong> {{ selectedBooking.bookingReference }}</p>
+        <p><strong>Created:</strong> {{ selectedBooking.createdAt | date:'medium' }}</p>
       </div>
       <div class="col-md-6">
         <h5>Package Information</h5>
         <p><strong>Package:</strong> {{ selectedBooking.packageName }}</p>
-        <p><strong>Date:</strong> {{ selectedBooking.date | date:'mediumDate' }}</p>
+        <p><strong>Start Date:</strong> {{ selectedBooking.startDate | date:'mediumDate' }}</p>
+        <p><strong>End Date:</strong> {{ selectedBooking.endDate | date:'mediumDate' }}</p>
+        <p><strong>Duration:</strong> {{ selectedBooking.duration }} days</p>
       </div>
     </div>
     <hr>
@@ -165,16 +175,65 @@
         <h5>Booking Details</h5>
         <p><strong>Adults:</strong> {{ selectedBooking.adults }}</p>
         <p><strong>Children:</strong> {{ selectedBooking.children }}</p>
+        <p><strong>Base Price:</strong> ${{ selectedBooking.packagePrice | number:'1.2-2' }}</p>
+        <p *ngIf="selectedBooking.discountAmount"><strong>Discount:</strong> ${{ selectedBooking.discountAmount | number:'1.2-2' }}</p>
         <p><strong>Total Amount:</strong> ${{ selectedBooking.amount | number:'1.2-2' }}</p>
       </div>
+    </div>
+    
+    <!-- Addons Section -->
+    <div *ngIf="selectedBooking.addons && selectedBooking.addons.length > 0">
+      <hr>
+      <h5>Selected Add-ons</h5>
+      <div class="table-responsive">
+        <table class="table table-sm table-striped">
+          <thead>
+            <tr>
+              <th>Add-on</th>
+              <th>Description</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let addon of selectedBooking.addons">
+              <td>{{ addon.addon?.name || 'Unknown Addon' }}</td>
+              <td>{{ addon.addon?.description || 'No description available' }}</td>
+              <td>{{ addon.quantity }}</td>
+              <td>${{ addon.priceAtBooking || addon.addon?.price || 0 | number:'1.2-2' }}</td>
+              <td>${{ calculateAddonItemTotal(addon) | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" class="text-end"><strong>Add-ons Total:</strong></td>
+              <td>${{ calculateAddonTotal() | number:'1.2-2' }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Notes Section -->
+    <div *ngIf="selectedBooking.notes">
+      <hr>
+      <h5>Notes</h5>
+      <p>{{ selectedBooking.notes }}</p>
     </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
     <div class="btn-group" *ngIf="selectedBooking">
-      <button type="button" class="btn btn-success" (click)="updateBookingStatus(selectedBooking, 'Confirmed'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Confirmed'">Mark as Confirmed</button>
-      <button type="button" class="btn btn-warning" (click)="updateBookingStatus(selectedBooking, 'Pending'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Pending'">Mark as Pending</button>
-      <button type="button" class="btn btn-danger" (click)="updateBookingStatus(selectedBooking, 'Cancelled'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Cancelled'">Mark as Cancelled</button>
+      <button type="button" class="btn btn-success" (click)="updateBookingStatus(selectedBooking, 'Confirmed'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Confirmed'">
+        <i class="bi bi-check-circle"></i> Confirm
+      </button>
+      <button type="button" class="btn btn-warning" (click)="updateBookingStatus(selectedBooking, 'Pending'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Pending'">
+        <i class="bi bi-clock"></i> Pending
+      </button>
+      <button type="button" class="btn btn-danger" (click)="updateBookingStatus(selectedBooking, 'Cancelled'); modal.dismiss()" *ngIf="selectedBooking.status !== 'Cancelled'">
+        <i class="bi bi-x-circle"></i> Cancel
+      </button>
     </div>
   </div>
 </ng-template>

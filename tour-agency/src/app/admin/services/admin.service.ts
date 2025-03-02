@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface DashboardStats {
@@ -17,22 +17,44 @@ export interface DashboardStats {
   mostPopularPackage: any;
 }
 
+export interface AdminAddon {
+  id: number;
+  addon?: {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    category?: string;
+  };
+  quantity: number;
+  priceAtBooking?: number;
+}
+
 export interface AdminBooking {
   id: number;
   packageId: number;
   packageName: string;
   packageImage?: string;
+  packagePrice?: number;
   userId: number;
   userName: string;
   userEmail: string;
-  date: Date;
+  startDate: string;
+  endDate: string;
+  duration?: number;
   adults: number;
   children?: number;
   amount: number;
   status: string;
   paymentStatus: string;
+  bookingReference?: string;
   createdAt?: string;
+  updatedAt?: string;
   specialRequirements?: string;
+  notes?: string;
+  couponCode?: string;
+  discountAmount?: number;
+  addons?: AdminAddon[];
 }
 
 export interface Addon {
@@ -156,21 +178,57 @@ export class AdminService {
 
   // Booking Management
   getBookings(): Observable<AdminBooking[]> {
-    return this.http.get<AdminBooking[]>(`${this.apiUrl}/bookings`).pipe(
+    return this.http.get<any[]>(`${this.apiUrl}/bookings`).pipe(
+      map(bookings => this.mapBookingsResponse(bookings)),
       catchError(this.handleError('getBookings', []))
     );
   }
 
   getBookingById(id: number): Observable<AdminBooking> {
-    return this.http.get<AdminBooking>(`${this.apiUrl}/bookings/${id}`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/bookings/${id}`).pipe(
+      map(booking => this.mapBookingResponse(booking)),
       catchError(this.handleError('getBookingById', {} as AdminBooking))
     );
   }
 
   updateBookingStatus(id: number, status: string): Observable<AdminBooking> {
-    return this.http.put<AdminBooking>(`${this.apiUrl}/bookings/${id}/status`, { status }).pipe(
+    return this.http.put<any>(`${this.apiUrl}/bookings/${id}/status`, { status }).pipe(
+      map(booking => this.mapBookingResponse(booking)),
       catchError(this.handleError('updateBookingStatus', {} as AdminBooking))
     );
+  }
+
+  private mapBookingsResponse(bookings: any[]): AdminBooking[] {
+    return bookings.map(booking => this.mapBookingResponse(booking));
+  }
+
+  private mapBookingResponse(booking: any): AdminBooking {
+    return {
+      id: booking.id,
+      packageId: booking.tourPackage?.id || booking.packageId,
+      packageName: booking.tourPackage?.name || booking.packageName,
+      packageImage: booking.tourPackage?.imageUrl || booking.packageImage,
+      packagePrice: booking.tourPackage?.price || booking.packagePrice,
+      userId: booking.user?.id || booking.userId,
+      userName: booking.user?.name || booking.userName,
+      userEmail: booking.user?.email || booking.userEmail,
+      startDate: booking.startDate || booking.date,
+      endDate: booking.endDate,
+      duration: booking.duration || (booking.tourPackage?.duration || 1),
+      adults: booking.adults,
+      children: booking.children,
+      amount: booking.amount,
+      status: booking.status,
+      paymentStatus: booking.paymentStatus,
+      bookingReference: booking.bookingReference || `BK-${booking.id}`,
+      createdAt: booking.createdAt,
+      updatedAt: booking.updatedAt,
+      specialRequirements: booking.specialRequirements,
+      notes: booking.notes,
+      couponCode: booking.couponCode,
+      discountAmount: booking.discountAmount,
+      addons: booking.addons || []
+    };
   }
 
   // Review Management
